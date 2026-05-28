@@ -70,10 +70,22 @@ body {
 .tag-green:hover { background: #2ea44f22; box-shadow: 0 0 12px #2ea44f33; }
 .tag-add { color: #8888a0; border-color: #8888a044; border-style: dashed; }
 
+.nav-sticky-wrapper {
+  position: sticky; top: 0; z-index: 100;
+  margin-bottom: 32px;
+}
 .nav {
   display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;
   border: 1px solid rgba(255,255,255,0.08);
-  padding: 8px; margin-bottom: 32px; background: #0a0a0f;
+  padding: 8px; background: rgba(10,10,15,0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+.nav.stuck {
+  border-color: rgba(0,212,255,0.25);
+  box-shadow: 0 2px 20px rgba(0,0,0,0.6), 0 0 30px rgba(0,212,255,0.06);
+  background: rgba(10,10,15,0.95);
 }
 .nav a {
   font-family: 'JetBrains Mono', monospace; font-size: 13px;
@@ -183,6 +195,20 @@ body {
   text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 14px;
 }
 .back-link:hover { color: #fff; }
+
+/* === Scroll animations === */
+.fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
+.fade-up.visible { opacity: 1; transform: translateY(0); }
+
+.hero.fade-up { transition-delay: 0.1s; }
+.nav-sticky-wrapper.fade-up { transition-delay: 0.2s; }
+.post.fade-up:nth-child(1) { transition-delay: 0.1s; }
+.post.fade-up:nth-child(2) { transition-delay: 0.2s; }
+.post.fade-up:nth-child(3) { transition-delay: 0.3s; }
+.post.fade-up:nth-child(4) { transition-delay: 0.4s; }
+.post.fade-up:nth-child(5) { transition-delay: 0.5s; }
+.tags-index.fade-up { transition-delay: 0.3s; }
+.footer.fade-up { transition-delay: 0.4s; }
 
 @media (max-width: 640px) {
   .container { padding: 20px 12px; }
