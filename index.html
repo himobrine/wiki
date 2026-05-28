@@ -62,56 +62,6 @@
   <a href="posts/reverse-debugging.html" class="read-more">[ + ] READ MORE &rarr;</a>
 </div>
 
-<h2 class="section-title">// ALL // DOCUMENTS</h2>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 28</div>
-  <div class="post-title"><a href="posts/owasp-injection.html">OWASP Top 10 深度解读：注入攻击 (Injection)</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">漏洞分析</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">OWASP</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">Web安全</span>
-  </div>
-  <div class="post-excerpt">注入攻击连续多年位居 OWASP Top 10 榜首。无论是 SQL 注入、NoSQL 注入还是 OS 命令注入，其本质都是 <strong>用户输入被解释器当作代码执行</strong>。</div>
-  <a href="posts/owasp-injection.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 25</div>
-  <div class="post-title"><a href="posts/pentest-toolchain.html">渗透测试工具链：从信息收集到权限维持</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">安全工具</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">KaliLinux</span>
-  </div>
-  <div class="post-excerpt">一次完整的渗透测试通常遵循 <strong>PTES (Penetration Testing Execution Standard)</strong> 标准流程。本文整理各阶段的核心工具及使用技巧。</div>
-  <a href="posts/pentest-toolchain.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 20</div>
-  <div class="post-title"><a href="posts/ctf-web-intro.html">CTF 学习笔记：Web 安全入门实战</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">学习笔记</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">CTF</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">Web安全</span>
-  </div>
-  <div class="post-excerpt">CTF (Capture The Flag) 是信息安全学习者最好的练兵场。本文梳理 Web 方向的核心题型与解题思路。</div>
-  <a href="posts/ctf-web-intro.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 15</div>
-  <div class="post-title"><a href="posts/log4j-analysis.html">从 Log4j 漏洞看供应链安全</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">漏洞分析</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">供应链安全</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">CVE</span>
-  </div>
-  <div class="post-excerpt">CVE-2021-44228 (Log4Shell) 是近年来影响最广泛的漏洞之一。一个几乎无处不在的日志库，一个 JNDI 注入，导致了整个互联网的"大地震"。</div>
-  <a href="posts/log4j-analysis.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
 <div class="tags-index fade-up">
   <h3>// TAGS // INDEX</h3>
   <div class="tag-row"><a href="#">#漏洞分析</a><span class="count">2</span></div>
@@ -142,6 +92,11 @@
 
 </div>
 
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
 <script>
 const sentinel = document.getElementById('navSentinel');
 const navWrap = document.getElementById('navWrap');
@@ -164,6 +119,29 @@ const animObserver = new IntersectionObserver(
   { threshold: 0.1 }
 );
 document.querySelectorAll('.fade-up').forEach(el => animObserver.observe(el));
+
+/* theme toggle */
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+
+/* back to top */
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+const topObs = new IntersectionObserver(
+  ([e]) => topBtn.classList.toggle('show', !e.isIntersecting),
+  { threshold: [0] }
+);
+topObs.observe(document.getElementById('navSentinel'));
 </script>
 
 </body>
