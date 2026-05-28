@@ -24,7 +24,7 @@
 
 ### `2026 // 05 / 30` [**Windows 逆向调试工具速查手册**](posts/reverse-debugging.html)
 
-`TAGS:` [![](https://img.shields.io/badge/逆向-7b2d8e?style=flat-square)](#) [![](https://img.shields.io/badge/调试-2ea44f?style=flat-square)](#) [![](https://img.shields.io/badge/X64dbg-00d4ff?style=flat-square)](#) [![](https://img.shields.io/badge/Windbg-3366ff?style=flat-square)](#)
+`TAGS:` [![](https://img.shields.io/badge/逆向-7b2d8e?style=flat-square)](#) [![](https://img.shields.io/badge/调试-2ea44f?style=flat-square)](#) [![](https://img.shields.io/badge/X64dbg-00d4ff?style=flat-square)](#) [![](https://img.shields.io/badge/Windbg-3366ff?style=flat-square)](#) [![](https://img.shields.io/badge/学习笔记-ff6b35?style=flat-square)](#)
 
 > 一份全面系统的 Windows 逆向工程与调试工具速查手册，涵盖 **X64dbg**、**Windbg**、**OllyDbg (Onlydbg)** 三大调试器的核心快捷键、断点类型、内存操作、寄存器查看、模块管理、异常处理等关键命令与技巧。适合逆向初学者和日常开发调试查阅。
 
@@ -80,7 +80,7 @@
 |------|-------|
 | `#漏洞分析` | 2 |
 | `#安全工具` | 1 |
-| `#学习笔记` | 1 |
+| `#学习笔记` | 2 |
 | `#逆向` | 1 |
 | `#调试` | 1 |
 | `#OWASP` | 1 |
