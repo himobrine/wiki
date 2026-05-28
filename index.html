@@ -28,6 +28,10 @@
   </div>
 </div>
 
+<div class="container" style="padding-top:0">
+
+<div id="navSentinel"></div>
+
 <div class="nav-sticky-wrapper fade-up" id="navWrap">
   <div class="nav-inner">
     <a href="#" class="active">🏠 首页</a>
@@ -39,8 +43,6 @@
     <a href="#">📋 标签归档</a>
   </div>
 </div>
-
-<div class="container">
 
 <h2 class="section-title fade-up">// LATEST // DOCUMENT</h2>
 
@@ -141,12 +143,21 @@
 </div>
 
 <script>
+const sentinel = document.getElementById('navSentinel');
 const navWrap = document.getElementById('navWrap');
-const observer = new IntersectionObserver(
-  ([e]) => navWrap.classList.toggle('stuck', e.intersectionRatio < 1),
-  { threshold: [1] }
-);
-observer.observe(navWrap);
+let spacer = null;
+const obs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !spacer) {
+    spacer = document.createElement('div');
+    spacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(spacer, navWrap.nextSibling);
+  } else if (!stuck && spacer) {
+    spacer.remove(); spacer = null;
+  }
+}, { threshold: [0] });
+obs.observe(sentinel);
 
 const animObserver = new IntersectionObserver(
   (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); animObserver.unobserve(e.target); } }),
