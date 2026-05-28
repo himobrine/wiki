@@ -84,6 +84,10 @@ body {
 .tag-orange:hover { background: #ff6b3522; box-shadow: 0 0 12px #ff6b3533; }
 .tag-muted { color: #555570; border-color: #55557044; }
 .tag-muted:hover { background: #55557022; }
+.tag-purple { color: #7b2d8e; border-color: #7b2d8e44; }
+.tag-purple:hover { background: #7b2d8e22; box-shadow: 0 0 12px #7b2d8e33; }
+.tag-green { color: #2ea44f; border-color: #2ea44f44; }
+.tag-green:hover { background: #2ea44f22; box-shadow: 0 0 12px #2ea44f33; }
 .tag-add { color: #8888a0; border-color: #8888a044; border-style: dashed; }
 
 /* Loading bar */
@@ -262,6 +266,8 @@ body {
     <a href="#" class="tag tag-cyan">#漏洞分析</a>
     <a href="#" class="tag tag-blue">#安全工具</a>
     <a href="#" class="tag tag-orange">#学习笔记</a>
+    <a href="#" class="tag" style="color:#7b2d8e;border-color:#7b2d8e44;">#逆向</a>
+    <a href="#" class="tag" style="color:#2ea44f;border-color:#2ea44f44;">#调试</a>
     <a href="#" class="tag tag-add">+ 自定义标签</a>
   </div>
   <div class="tagline">&gt; 记录信息安全路上的学习、思考与实战。持续更新中 ...</div>
@@ -280,6 +286,32 @@ body {
 <h2 class="section-title">// LATEST // POSTS</h2>
 
 <!-- Post 1 -->
+<div class="post">
+  <div class="post-date">2026 // 05 / 30</div>
+  <div class="post-title"><a href="#">Windows 逆向调试工具速查手册</a></div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">X64dbg</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Windbg</span>
+  </div>
+  <div class="post-excerpt">
+    一份全面系统的 Windows 逆向工程与调试工具速查手册，涵盖 <strong>X64dbg</strong>、<strong>Windbg</strong>、<strong>OllyDbg (Onlydbg)</strong> 三大调试器的核心快捷键、断点类型、内存操作、寄存器查看、模块管理、异常处理等关键命令与技巧。适合逆向初学者和日常开发调试查阅。
+  </div>
+  <a class="read-more" onclick="togglePost(this)">[ + ] READ MORE</a>
+  <div class="post-content">
+    <h4>内容概览</h4>
+    <table>
+      <tr><th>章节</th><th>内容</th></tr>
+      <tr><td><strong>X64dbg 篇</strong></td><td>快捷键大全、断点管理（F2/F9/F7/F8）、寄存器与内存窗口、调试执行控制</td></tr>
+      <tr><td><strong>Windbg 篇</strong></td><td>进程控制、内存读写（db/dw/dd/dq/eb/ew/ed/eq）、搜索命令（s -b/-d/-a）、断点（ba/bp/bu/bm）、栈回溯（k/kb/kv/kp）、线程与模块管理、符号配置</td></tr>
+      <tr><td><strong>OllyDbg 篇</strong></td><td>全部快捷键映射（F2-F12/Ctrl+F2-F12/Alt+组合键）、断点类型（BP/BPX/BPD/BC/MR/MW/MD/HR/HW/HE/HD）、内存转储（DUMP/DA/DB/DC/DD/DU/DW）、表达式与监视</td></tr>
+    </table>
+    <blockquote><strong>完整文档</strong>: <a href="assets/逆向调试笔记.docx" style="color:#00d4ff;">assets/逆向调试笔记.docx</a> — 本地可下载查阅</blockquote>
+  </div>
+</div>
+
+<!-- Post 2 -->
 <div class="post">
   <div class="post-date">2026 // 05 / 28</div>
   <div class="post-title"><a href="#">OWASP Top 10 深度解读：注入攻击 (Injection)</a></div>
@@ -497,6 +529,10 @@ JNDI 查询                 恶意 LDAP 服务器
   <div class="tag-row"><a href="#">#供应链安全</a><span class="count">1</span></div>
   <div class="tag-row"><a href="#">#CVE</a><span class="count">1</span></div>
   <div class="tag-row"><a href="#">#KaliLinux</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#逆向</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#调试</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#X64dbg</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#Windbg</a><span class="count">1</span></div>
   <div class="tag-row"><a href="#" style="color:#555570;">#自定义标签</a><span class="count">— 待添加</span></div>
 </div>
 

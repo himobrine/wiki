@@ -4,7 +4,7 @@
 
 `RHODES ISLAND :// SECURITY // RESEARCH // EXPLOIT // DEFENSE`
 
-[![Tag](https://img.shields.io/badge/TAG-漏洞分析-00d4ff?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-安全工具-3366ff?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-学习笔记-ff6b35?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-自定义-add?style=flat-square&color=8888a0)](#)
+[![Tag](https://img.shields.io/badge/TAG-漏洞分析-00d4ff?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-安全工具-3366ff?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-学习笔记-ff6b35?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-逆向-7b2d8e?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-调试-2ea44f?style=flat-square)](#) [![Tag](https://img.shields.io/badge/TAG-自定义-add?style=flat-square&color=8888a0)](#)
 
 `> 记录信息安全路上的学习、思考与实战。持续更新中 ...`  
 `> LOADING - 100% ..................................................................`
@@ -31,6 +31,29 @@
 ## `// LATEST // POSTS`
 
 <br>
+
+### `2026 // 05 / 30` <a href="#">**Windows 逆向调试工具速查手册**</a>
+
+`TAGS:` [![](https://img.shields.io/badge/逆向-7b2d8e?style=flat-square)](#) [![](https://img.shields.io/badge/调试-2ea44f?style=flat-square)](#) [![](https://img.shields.io/badge/X64dbg-00d4ff?style=flat-square)](#) [![](https://img.shields.io/badge/Windbg-3366ff?style=flat-square)](#)
+
+> 一份全面系统的 Windows 逆向工程与调试工具速查手册，涵盖 **X64dbg**、**Windbg**、**OllyDbg (Onlydbg)** 三大调试器的核心快捷键、断点类型、内存操作、寄存器查看、模块管理、异常处理等关键命令与技巧。适合逆向初学者和日常开发调试查阅。
+
+<details>
+<summary><code>READ MORE // 展开阅读全文</code></summary>
+
+#### 内容概览
+
+| 章节 | 内容 |
+|------|------|
+| **X64dbg 篇** | 快捷键大全、断点管理（F2/F9/F7/F8）、寄存器与内存窗口、调试执行控制 |
+| **Windbg 篇** | 进程控制、内存读写（db/dw/dd/dq/eb/ew/ed/eq）、搜索命令（s -b/-d/-a）、断点（ba/bp/bu/bm）、栈回溯（k/kb/kv/kp）、线程与模块管理、符号配置 |
+| **OllyDbg 篇** | 全部快捷键映射（F2-F12/Ctrl+F2-F12/Alt+组合键）、断点类型（BP/BPX/BPD/BC/MR/MW/MD/HR/HW/HE/HD）、内存转储（DUMP/DA/DB/DC/DD/DU/DW）、表达式与监视 |
+
+> 📎 **完整文档**: [`assets/逆向调试笔记.docx`](assets/逆向调试笔记.docx) — 本地可下载查阅
+
+</details>
+
+---
 
 ### `2026 // 05 / 28` <a href="#">**OWASP Top 10 深度解读：注入攻击 (Injection)**</a>
 
@@ -257,6 +280,10 @@ JNDI 查询                 恶意 LDAP 服务器
 | <a href="#">`#供应链安全`</a> | 1 |
 | <a href="#">`#CVE`</a> | 1 |
 | <a href="#">`#KaliLinux`</a> | 1 |
+| <a href="#">`#逆向`</a> | 1 |
+| <a href="#">`#调试`</a> | 1 |
+| <a href="#">`#X64dbg`</a> | 1 |
+| <a href="#">`#Windbg`</a> | 1 |
 | <a href="#">`#自定义标签`</a> | — 待添加 |
 
 ---
