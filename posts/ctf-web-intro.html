@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTF 学习笔记：Web 安全入门实战 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="#" class="tag tag-orange">#学习笔记</a>
+    <a href="#" class="tag tag-blue">#CTF</a>
+    <a href="#" class="tag tag-orange">#Web安全</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 20</div>
+  <div class="post-title">CTF 学习笔记：Web 安全入门实战</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">学习笔记</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">CTF</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">Web安全</span>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<h4>Web 常见题型速查表</h4>
+<table>
+  <tr><th>题型</th><th>核心考点</th><th>难度</th></tr>
+  <tr><td><strong>SQL 注入</strong></td><td>参数化查询绕过、报错注入、布尔盲注</td><td>⭐⭐</td></tr>
+  <tr><td><strong>XSS</strong></td><td>反射型/存储型/DOM 型、CSP 绕过</td><td>⭐⭐</td></tr>
+  <tr><td><strong>SSRF</strong></td><td>服务端请求伪造、内网探测</td><td>⭐⭐⭐</td></tr>
+  <tr><td><strong>文件上传</strong></td><td>后缀绕过、.htaccess、PHAR 反序列化</td><td>⭐⭐⭐</td></tr>
+  <tr><td><strong>RCE</strong></td><td>命令注入、模板注入 (SSTI)</td><td>⭐⭐⭐⭐</td></tr>
+  <tr><td><strong>JWT 攻击</strong></td><td>算法混淆、空签名、密钥爆破</td><td>⭐⭐</td></tr>
+  <tr><td><strong>反序列化</strong></td><td>PHP/Python/Java 反序列化利用链</td><td>⭐⭐⭐⭐⭐</td></tr>
+</table>
+
+<h4>新手推荐学习路线</h4>
+<pre><code>基础阶段
+├── HTTP 协议基础 (请求/响应/状态码/Header)
+├── 前端安全基础 (同源策略/CORS/Cookie)
+├── 专业术语库 (Payload/POC/EXP/SHELL)
+└── 实验室环境搭建 (DVWA/Pikachu/SQLi-Labs)
+
+进阶阶段
+├── OWASP Top 10 逐个攻破
+├── 阅读 CVE 漏洞公告
+├── 参加线上 CTF (BugKu / CTFHub / HackTheBox)
+└── 复现经典漏洞 (ThinkPHP/Shiro/Log4j)
+
+实战阶段
+├── 挖 SRC 漏洞 (补天 / 漏洞盒子 / HackerOne)
+├── 撰写漏洞分析文章
+└── 参与护网/攻防演练</code></pre>
+
+<h4>常用工具速查</h4>
+<table>
+  <tr><th>工具</th><th>场景</th></tr>
+  <tr><td><strong>Burp Suite</strong></td><td>HTTP 拦截/重放/爆破 (Web 安全必备)</td></tr>
+  <tr><td><strong>HackBar</strong> (Burp 插件)</td><td>快速编解码/SQL 注入辅助</td></tr>
+  <tr><td><strong>CyberChef</strong></td><td>万能编解码/加解密工具</td></tr>
+  <tr><td><strong>sqlmap</strong></td><td>SQL 注入自动化检测与利用</td></tr>
+</table>
+
+<blockquote><strong>推荐 CTF 平台</strong>: <a href="https://www.ctfhub.com/">CTFHub</a> · <a href="https://ctf.bugku.com/">BugKu</a> · <a href="https://buuoj.cn/">Buuctf</a> · <a href="https://www.hackthebox.com/">HackTheBox</a> · <a href="https://picoctf.com/">PicoCTF</a></blockquote>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+</body>
+</html>
