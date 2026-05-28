@@ -12,9 +12,8 @@
 <body>
 <div class="scanline"></div>
 
-<div class="container">
-
 <div class="hero fade-up">
+  <div class="container">
   <h1>// BLOG : himobrine</h1>
   <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
   <div class="tags-bar">
@@ -26,10 +25,11 @@
   </div>
   <div class="tagline">&gt; 记录信息安全路上的学习、思考与实战。持续更新中 ...</div>
   <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+  </div>
 </div>
 
 <div class="nav-sticky-wrapper fade-up" id="navWrap">
-  <div class="nav" id="navBar">
+  <div class="nav-inner">
     <a href="#" class="active">🏠 首页</a>
     <a href="#">🏷 漏洞分析</a>
     <a href="#">🛠 安全工具</a>
@@ -39,6 +39,8 @@
     <a href="#">📋 标签归档</a>
   </div>
 </div>
+
+<div class="container">
 
 <h2 class="section-title fade-up">// LATEST // DOCUMENT</h2>
 
@@ -139,12 +141,12 @@
 </div>
 
 <script>
-const navBar = document.getElementById('navBar');
+const navWrap = document.getElementById('navWrap');
 const observer = new IntersectionObserver(
-  ([e]) => navBar.classList.toggle('stuck', e.intersectionRatio < 1),
+  ([e]) => navWrap.classList.toggle('stuck', e.intersectionRatio < 1),
   { threshold: [1] }
 );
-observer.observe(document.getElementById('navWrap'));
+observer.observe(navWrap);
 
 const animObserver = new IntersectionObserver(
   (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); animObserver.unobserve(e.target); } }),
