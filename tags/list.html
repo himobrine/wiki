@@ -72,6 +72,13 @@ const POSTS = [
     url: '../posts/variable-memory-layout.html',
     excerpt: '深入分析 C/C++ 基本数据类型（int、unsigned int、float、double）在内存中的表示方式，涵盖有符号/无符号整型的补码存储、IEEE 754 浮点编码等。',
     tags: ['逆向', 'C/C++', '底层原理', '调试']
+  },
+  {
+    title: 'DVWA 靶场 Command Injection 全难度教程（附带代码分析）',
+    date: '2026 // 05 / 27',
+    url: '../posts/dvwa-command-execution.html',
+    excerpt: 'DVWA 靶场 Command Injection 全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用及 PHP 代码分析。',
+    tags: ['Web安全', '渗透测试', 'DVWA', '命令注入']
   }
 ];
 
@@ -130,7 +137,7 @@ function renderTag(tag) {
       html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
       html += '<div class="post-tags">';
       p.tags.forEach(t => {
-        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', '底层原理': 'ff6b35' };
+        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', '底层原理': 'ff6b35', 'Web安全': '3366ff', '渗透测试': 'ff6b35', 'DVWA': '00d4ff', '命令注入': '2ea44f' };
         const c = colors[t] || '888';
         html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
       });

