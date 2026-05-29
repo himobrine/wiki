@@ -200,6 +200,11 @@ body {
 }
 .read-more:hover { color: var(--text-primary); text-shadow: 0 0 8px color-mix(in srgb, var(--accent-cyan) 40%, transparent); }
 
+.post-content h5 {
+  font-family: 'Titillium Web', sans-serif; font-size: 14px; font-weight: 600;
+  color: var(--text-primary); margin: 18px 0 8px; letter-spacing: 0.04em;
+  border-left: 2px solid var(--border-accent); padding-left: 10px;
+}
 .post-content h4 {
   font-family: 'Titillium Web', sans-serif; font-size: 16px; font-weight: 600;
   color: var(--accent-blue); margin: 20px 0 10px; letter-spacing: 0.05em;
@@ -269,6 +274,64 @@ body {
   text-decoration: none; font-family: 'JetBrains Mono', monospace; font-size: 14px;
 }
 .back-link:hover { color: var(--text-primary); }
+
+/* === Table of Contents sidebar === */
+.post-toc {
+  position: fixed;
+  left: 24px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 50;
+  width: 200px;
+  max-height: 70vh;
+  overflow-y: auto;
+  padding: 16px 14px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-left: 3px solid var(--accent-cyan);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  scrollbar-width: thin;
+}
+.post-toc::-webkit-scrollbar { width: 3px; }
+.post-toc-title {
+  display: block;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--accent-cyan);
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+}
+.post-toc ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.post-toc li { margin: 0; padding: 0; }
+.post-toc a {
+  display: block;
+  padding: 3px 0 3px 0;
+  color: var(--text-muted);
+  text-decoration: none;
+  transition: color 0.2s, border-color 0.2s;
+  border-left: 2px solid transparent;
+  padding-left: 8px;
+}
+.post-toc a:hover { color: var(--accent-cyan); }
+.post-toc a.active {
+  color: var(--accent-cyan);
+  border-left-color: var(--accent-cyan);
+}
+.post-toc .toc-h4 { }
+.post-toc .toc-h5 { padding-left: 16px; font-size: 12px; }
+@media (max-width: 1200px) {
+  .post-toc { display: none; }
+}
 
 /* === Floating action buttons === */
 .floating-buttons {

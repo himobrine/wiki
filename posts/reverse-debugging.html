@@ -40,7 +40,47 @@
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
 
-<h4>概述 — Hello World 调试入门</h4>
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a></li>
+    <li class="toc-h4"><a href="#xdbg-shortcuts">X64dbg 快捷键</a>
+      <ul>
+        <li class="toc-h5"><a href="#xdbg-control">调试控制</a></li>
+        <li class="toc-h5"><a href="#xdbg-bp">断点操作</a></li>
+        <li class="toc-h5"><a href="#xdbg-reg">寄存器</a></li>
+        <li class="toc-h5"><a href="#xdbg-mem">内存</a></li>
+        <li class="toc-h5"><a href="#xdbg-dynamic">动态分析</a></li>
+        <li class="toc-h5"><a href="#xdbg-other">其他</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#xdbg-advanced">X64dbg 深入操作</a></li>
+    <li class="toc-h4"><a href="#windbg-intro">Windbg 操作入门</a></li>
+    <li class="toc-h4"><a href="#windbg-commands">Windbg 命令速查</a>
+      <ul>
+        <li class="toc-h5"><a href="#windbg-flow">流程控制</a></li>
+        <li class="toc-h5"><a href="#windbg-mem-rw">内存读写</a></li>
+        <li class="toc-h5"><a href="#windbg-mem-search">内存搜索</a></li>
+        <li class="toc-h5"><a href="#windbg-hw-bp">硬件断点</a></li>
+        <li class="toc-h5"><a href="#windbg-sw-bp">软件断点</a></li>
+        <li class="toc-h5"><a href="#windbg-disasm">反汇编</a></li>
+        <li class="toc-h5"><a href="#windbg-stack">堆栈回溯</a></li>
+        <li class="toc-h5"><a href="#windbg-proc">进程与线程</a></li>
+        <li class="toc-h5"><a href="#windbg-module">模块与符号</a></li>
+        <li class="toc-h5"><a href="#windbg-other">其他常用命令</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#ollydbg">OllyDbg</a>
+      <ul>
+        <li class="toc-h5"><a href="#olly-shortcuts">快捷键</a></li>
+        <li class="toc-h5"><a href="#olly-disasm">反汇编窗口</a></li>
+        <li class="toc-h5"><a href="#olly-commands">命令行命令</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述 — Hello World 调试入门</h4>
 
 <pre><code>#include &lt;windows.h&gt;
 
@@ -71,9 +111,9 @@ int wWinMain(HINSTANCE hinstance, HINSTANCE hPrevInstance,
 <p><img src="../assets/rd_image014.png" alt="" style="max-width:100%"></p>
 <p><img src="../assets/rd_image015.png" alt="" style="max-width:100%"></p>
 
-<h4>X64dbg 快捷键大全</h4>
+<h4 id="xdbg-shortcuts">X64dbg 快捷键大全</h4>
 
-<p><strong>调试控制</strong></p>
+<h5 id="xdbg-control">调试控制</h5>
 <pre><code>F2    : 开始/停止调试
 F3    : 单步执行
 F7    : 进入函数调用
@@ -81,37 +121,37 @@ F8    : 跳过函数调用
 F9    : 继续执行
 F12   : 暂停/继续执行</code></pre>
 
-<p><strong>断点操作</strong></p>
+<h5 id="xdbg-bp">断点操作</h5>
 <pre><code>F5        : 添加/删除断点
 Ctrl+F5   : 添加/删除硬件断点
 F6        : 添加/删除条件断点
 F9        : 启用/禁用断点
 Ctrl+F9   : 启用/禁用所有断点</code></pre>
 
-<p><strong>寄存器</strong></p>
+<h5 id="xdbg-reg">寄存器</h5>
 <pre><code>Ctrl+R    : 打开/关闭寄存器窗口
 Ctrl+G    : 跳转到指定地址
 F2/F4/F6  : 在寄存器窗口中修改寄存器的值</code></pre>
 
-<p><strong>内存</strong></p>
+<h5 id="xdbg-mem">内存</h5>
 <pre><code>Ctrl+M       : 打开/关闭内存窗口
 Ctrl+E       : 打开/关闭表达式窗口
 Ctrl+F       : 查找指定字节序列
 Ctrl+Shift+F : 查找指定指令序列
 Ctrl+D       : 将内存中的数据以十六进制形式导出到文件中</code></pre>
 
-<p><strong>动态分析</strong></p>
+<h5 id="xdbg-dynamic">动态分析</h5>
 <pre><code>Ctrl+A : 打开/关闭汇编窗口
 Ctrl+B : 打开/关闭堆栈窗口
 Ctrl+C : 打开/关闭 CPU 窗口
 Ctrl+L : 打开/关闭日志窗口</code></pre>
 
-<p><strong>其他</strong></p>
+<h5 id="xdbg-other">其他</h5>
 <pre><code>Ctrl+F2  : 打开/关闭工具栏
 Ctrl+F10 : 打开/关闭菜单栏
 Ctrl+Q   : 退出 X64dbg</code></pre>
 
-<h4>X64dbg 深入操作</h4>
+<h4 id="xdbg-advanced">X64dbg 深入操作</h4>
 
 <p>图形化断点管理、追踪断点、备注区以及 X64dbg 自带的反汇编功能。</p>
 
@@ -137,7 +177,7 @@ Ctrl+Q   : 退出 X64dbg</code></pre>
 <p><img src="../assets/rd_image035.png" alt="" style="max-width:100%"></p>
 <p><img src="../assets/rd_image036.png" alt="" style="max-width:100%"></p>
 
-<h4>Windbg 操作入门</h4>
+<h4 id="windbg-intro">Windbg 操作入门</h4>
 
 <p>使用 Windbg 打开程序，输入 <code>u</code> 显示反汇编代码。<code>@$exentry</code> 是执行入口代码（默认入口）。</p>
 
@@ -150,9 +190,9 @@ Ctrl+Q   : 退出 X64dbg</code></pre>
 
 <p>Windbg 快捷键参考：<a href="https://learn.microsoft.com/zh-cn/windows-hardware/drivers/debuggercmds/commands">Microsoft 官方文档</a></p>
 
-<h4>Windbg 命令速查</h4>
+<h4 id="windbg-commands">Windbg 命令速查</h4>
 
-<p><strong>流程控制</strong></p>
+<h5 id="windbg-flow">流程控制</h5>
 <pre><code>g                  // Go — 让程序跑起来
 p                  // 单步步进 (F10)
 p 2                // 单步步进 2 次
@@ -163,7 +203,7 @@ qd                 // 脱离调试会话（不结束进程，不退出 windbg）
 .restart           // 重启目标进程
 .reboot            // 重启调试系统（内核调试中使用）</code></pre>
 
-<p><strong>内存读写</strong></p>
+<h5 id="windbg-mem-rw">内存读写</h5>
 <pre><code>db / dw / dd / dq  // 按 1/2/4/8 字节显示
 da / du            // 按 ASCII / UNICODE 字符显示
 df / dD            // 按单精度/双精度浮点数显示
@@ -184,13 +224,13 @@ r eax=5, edx=6     // 修改寄存器值
 !pte 0x80b99000    // 查看页表/页目录信息
 !vtop 33a3f000 0x80b99000  // 指定页目录基址查看</code></pre>
 
-<p><strong>内存搜索</strong></p>
+<h5 id="windbg-mem-search">内存搜索</h5>
 <pre><code>s -b addr L100 cc c2       // 搜索字节序列
 s -b addr L-100 cc c2      // 向前搜索
 s -d addr L100 'H'          // 按双字搜索 ASCII
 s -a addr L100 "ntdll"     // 搜索 ASCII 字符串</code></pre>
 
-<p><strong>硬件断点 (ba) — break on access</strong></p>
+<h5 id="windbg-hw-bp">硬件断点 (ba) — break on access</h5>
 <pre><code>ba r4 0x00401200    // 对指定地址 4 字节读写时断下
 ba w4 0x00401200    // 对指定地址 4 字节写入时断下
 ba e 0x00401000     // 执行时断下
@@ -198,7 +238,7 @@ ba i4 0x3f8         // I/O 端口访问时断下（内核模式）
 
 参数说明: e(执行)  r(读/写)  w(写)  i(I/O)</code></pre>
 
-<p><strong>软件断点 (bp, bu, bm)</strong></p>
+<h5 id="windbg-sw-bp">软件断点 (bp, bu, bm)</h5>
 <pre><code>bp main             // 在 main 函数开头设断
 bp 0x7c801b00       // 在指定地址设断
 bp /p EProcess      // 对指定进程设断（内核模式）
@@ -209,14 +249,14 @@ be *                // 启用所有断点
 bd *                // 禁用所有断点
 bc 1 2 5            // 清除指定编号断点</code></pre>
 
-<p><strong>反汇编</strong></p>
+<h5 id="windbg-disasm">反汇编</h5>
 <pre><code>u                        // 反汇编 eip 后 8 条指令
 u main.exe+0x10 L20      // 指定地址后 20 条指令
 ub 000c135d L20          // 查看指定地址前 20 条指令
 uf NtOpenProcess         // 反汇编整个函数
 uf demo::add             // 反汇编类成员函数</code></pre>
 
-<p><strong>堆栈回溯</strong></p>
+<h5 id="windbg-stack">堆栈回溯</h5>
 <pre><code>k              // 显示当前调用堆栈
 kn             // 带栈编号显示
 kb             // 显示前 3 个函数参数
@@ -228,7 +268,7 @@ kd             // 打印堆栈地址
 .frame /r n    // 显示指定栈帧及寄存器
 dv             // 显示当前栈帧的参数和局部变量</code></pre>
 
-<p><strong>进程与线程</strong></p>
+<h5 id="windbg-proc">进程与线程</h5>
 <pre><code>!process -1 0              // 查看当前进程信息
 !process 0n&lt;PID&gt; 0         // 获取指定 PID 的进程信息
 !process 0 0 &lt;进程名&gt;     // 按进程名查找
@@ -238,7 +278,7 @@ dv             // 显示当前栈帧的参数和局部变量</code></pre>
 .thread                    // 显示当前线程 ETHREAD
 .thread 84018d78           // 切换到指定线程</code></pre>
 
-<p><strong>模块与符号</strong></p>
+<h5 id="windbg-module">模块与符号</h5>
 <pre><code>lm               // 列出所有模块符号信息
 ld kernel32      // 加载 kernel32.dll 符号
 .sympath SRV*C:\dbg\sym*http://msdl.microsoft.com/download/symbols  // 设置符号路径
@@ -247,7 +287,7 @@ ld kernel32      // 加载 kernel32.dll 符号
 .reload /f /v               // 强制加载 + 详细输出
 x nt!Dbg*                   // 查看 nt 模块中以 Dbg 开头的函数</code></pre>
 
-<p><strong>其他常用命令</strong></p>
+<h5 id="windbg-other">其他常用命令</h5>
 <pre><code>!handle 0              // 列出当前进程所有句柄
 !handle 0 6 Mutant     // 只显示互斥类型对象
 !object &lt;addr&gt;          // 查看对象类型
@@ -263,7 +303,7 @@ ln eip                 // 列出与 eip 最近的符号
 !dpcs                  // 获取当前 CPU 的 DPC 队列
 !apc                   // 显示所有 APC</code></pre>
 
-<h4>OllyDbg</h4>
+<h4 id="ollydbg">OllyDbg</h4>
 
 <p>智能搜索找到 "hello world" 字符串并跳转至目标地址进行修改。</p>
 
@@ -274,7 +314,7 @@ ln eip                 // 列出与 eip 最近的符号
 <p><img src="../assets/rd_image041.png" alt="" style="max-width:100%"></p>
 <p><img src="../assets/rd_image042.png" alt="" style="max-width:100%"></p>
 
-<p><strong>OllyDbg 快捷键</strong></p>
+<h5 id="olly-shortcuts">OllyDbg 快捷键</h5>
 <pre><code>F2        : 设置 INT3 断点
 Shift+F2  : 设置条件断点
 F4        : 执行到所选行
@@ -287,7 +327,7 @@ Ctrl+F2   : 重新运行
 Ctrl+F11  : 跟踪进入
 Ctrl+F12  : 跟踪跳过</code></pre>
 
-<p><strong>反汇编窗口快捷键</strong></p>
+<h5 id="olly-disasm">反汇编窗口快捷键</h5>
 <pre><code>回车键       : 跟随跳转/调用到目标地址
 退格键       : 移除自动分析信息
 Ctrl+F1     : 打开 API 帮助
@@ -310,7 +350,7 @@ Ctrl+S      : 搜索汇编命令
 加号(+)     : 前进到下一个命令历史
 减号(-)     : 后退到上一个命令历史</code></pre>
 
-<p><strong>命令行命令</strong></p>
+<h5 id="olly-commands">命令行命令</h5>
 <pre><code>CALC     : 判断表达式
 WATCH    : 添加监视表达式
 AT       : 在指定地址反汇编
@@ -397,6 +437,28 @@ themeBtn.addEventListener('click', () => {
 const topBtn = document.getElementById('backToTop');
 topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
 window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
 </script>
 
 </body>
