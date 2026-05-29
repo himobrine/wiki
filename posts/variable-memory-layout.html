@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C/C++ 基本变量数据类型的内存表示 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="#" class="tag tag-purple">#逆向</a>
+    <a href="#" class="tag tag-blue">#C/C++</a>
+    <a href="#" class="tag tag-orange">#底层原理</a>
+    <a href="#" class="tag tag-green">#调试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 30</div>
+  <div class="post-title">C/C++ 基本变量数据类型的内存表示</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</span>
+    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</span>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<h4>环境说明</h4>
+<p>CLion 2023.2 / MinGW（自带）/ Windows / MSVC（官方版）</p>
+
+<h4>基本数据类型</h4>
+
+<p><strong>整型数据类型</strong></p>
+<p>注意各编译器下类型所占的大小：vs2019 中 long 占 4 字节，short 占 2 字节，long long 占 8 字节。</p>
+
+<p><strong>无符号整型</strong></p>
+<p>具体取值范围查阅 <em>C Primer Plus</em> 有详细说明。</p>
+<p>unsigned int 在内存中占 4 字节（8 个十六进制字符表示），所有位均用于表示数值，MSB（最高位）无符号含义。</p>
+
+<p><strong>有符号整型</strong></p>
+<p>符号位为最高位，0 表示正数，1 表示负数。</p>
+<p>负数在内存中以补码形式存储：取反后 +1。详见调试器中的具体信息。</p>
+
+<p><strong>浮点数据类型</strong></p>
+<p>Float 占 4 字节，double 占 8 字节。强转时 float 转 int 直接去掉小数部分，int 转 float 时结果不可控。</p>
+
+<p><strong>浮点数的编码方式</strong></p>
+<p><em>Float 的 IEEE 编码</em>：Float 前 8 位记录科学计数法的指数部分，剩余 23 位记录科学计数法的尾数部分。</p>
+<p><em>Double 的 IEEE 编码</em>：与 float 格式一致，但比 float 空间更大，能表示的范围也越大。</p>
+
+<p><strong>浮点数指令</strong></p>
+<p>旧 CPU 使用 ST 指令（FPU）。</p>
+<p><img src="../assets/image001.png" alt="FPU 指令截图" style="max-width:100%"></p>
+<p>现在使用的是 SSE2 指令集。</p>
+<p>参考：<a href="https://blog.csdn.net/celerychen2009/article/details/8934972">SSE2 指令集系列之一 — 浮点运算指令_16字节浮点数运算指令-CSDN博客</a></p>
+<p><img src="../assets/image002.png" alt="SSE2 指令截图" style="max-width:100%"></p>
+
+<h4>C 代码演示</h4>
+
+<p><strong>Int 类型</strong></p>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(){
+    int a = 999;
+    int c = -999;
+    unsigned int b = 999;
+    printf("%d\r\n", sizeof(int));
+    printf("%d", sizeof(unsigned int));
+    return 0;
+}</code></pre>
+
+<p><strong>MinGW 环境</strong></p>
+<p><img src="../assets/image003.png" alt="MinGW 内存截图" style="max-width:100%"></p>
+<p>A 值为 e7 03 00 00（> 999 = 0x3e7）</p>
+<p>B 值为 23 01 00 00（> 0x123）</p>
+<p>C 值为 19 fc ff ff（> -999）</p>
+<p>存储方式为小端序。</p>
+
+<p><strong>MSVC 环境</strong></p>
+<p><img src="../assets/image004.png" alt="MSVC 内存截图" style="max-width:100%"></p>
+<p>A 值为 e7 03 00 00（> 999 = 0x3e7）</p>
+<p>B 值为 23 01 00 00（> 0x123）</p>
+<p>C 值为 19 fc ff ff（> -999）</p>
+<p>存储方式同样为小端序。</p>
+
+<p><strong>Float 类型</strong></p>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(){
+    float f = 3.14f;
+    printf("%f\r\n", f);
+    int argc = (int)f;
+    printf("%d\r\n", argc);
+    return 0;
+}</code></pre>
+
+<p><strong>x64 MinGW 汇编</strong></p>
+<p><img src="../assets/image005.png" alt="MinGW x64 汇编截图" style="max-width:100%"></p>
+<pre><code>main:
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x30,%rsp
+    call    __main
+    movss   0x88c6(%rip),%xmm0        ; 加载 3.14f 常量
+    movss   %xmm0,-0x4(%rbp)          ; f = 3.14f
+    pxor    %xmm0,%xmm0
+    cvtss2sd -0x4(%rbp),%xmm0         ; f 转为 double 传参
+    movq    %xmm0,%rax
+    mov     %rax,%rdx                 ; 参数 2
+    lea     0x8891(%rip),%rax         ; 参数 1 "%f\r\n"
+    mov     %rax,%rcx
+    call    printf
+    movss   -0x4(%rbp),%xmm0
+    cvttss2si %xmm0,%eax              ; eax = (int)f （截断转换）
+    mov     %eax,-0x8(%rbp)           ; argc = (int)f 入栈
+    mov     -0x8(%rbp),%eax           ; 参数 2 argc
+    mov     %eax,%edx
+    lea     0x8876(%rip),%rax         ; 参数 1 "%d\r\n"
+    mov     %rax,%rcx
+    call    printf
+    mov     $0x0,%eax
+    add     $0x30,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>MSVC x64 汇编</strong></p>
+<p><img src="../assets/image006.png" alt="MSVC x64 汇编截图" style="max-width:100%"></p>
+<pre><code>main(...):
+    pushq   %rdi
+    subq    $0x30, %rsp
+    movss   0x8742(%rip), %xmm0
+    movss   %xmm0, 0x20(%rsp)         ; f = 3.14f
+    cvtss2sd 0x20(%rsp), %xmm0
+    movaps  %xmm0, %xmm1
+    movq    %xmm1, %rdx               ; 参数 2
+    leaq    0xab17(%rip), %rcx        ; 参数 1
+    callq   printf
+    cvttss2si 0x20(%rsp), %eax        ; argc = (int)f
+    movl    %eax, 0x24(%rsp)
+    movl    0x24(%rsp), %edx          ; 参数 2
+    leaq    0xab05(%rip), %rcx        ; 参数 1
+    callq   printf
+    xorl    %eax, %eax
+    addq    $0x30, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<p><strong>MSVC x86 汇编</strong></p>
+<p><img src="../assets/image007.png" alt="MSVC x86 汇编截图" style="max-width:100%"></p>
+<pre><code>main(...):
+    pushl   %ebp
+    movl    %esp, %ebp
+    subl    $0x8, %esp
+    movl    $0xcccccccc, -0x8(%ebp)   ; imm = 0xCCCCCCCC
+    movl    $0xcccccccc, -0x4(%ebp)   ; imm = 0xCCCCCCCC
+    movss   0x2d6b30, %xmm0           ; xmm0 = mem[0],zero,zero,zero
+    movss   %xmm0, -0x4(%ebp)         ; f = 3.14f
+    cvtss2sd -0x4(%ebp), %xmm0
+    subl    $0x8, %esp
+    movsd   %xmm0, (%esp)             ; 参数 2
+    pushl   $0x2d9000                 ; 参数 1
+    calll   _printf
+    addl    $0xc, %esp
+    cvttss2si -0x4(%ebp), %eax        ; argc = (int)f
+    movl    %eax, -0x8(%ebp)
+    movl    -0x8(%ebp), %ecx
+    pushl   %ecx                      ; 参数 2
+    pushl   $0x2d9008                 ; 参数 1
+    calll   _printf
+    addl    $0x8, %esp
+    xorl    %eax, %eax
+    addl    $0x8, %esp
+    cmpl    %esp, %ebp                ; 检查栈是否平衡
+    calll   __RTC_CheckEsp
+    movl    %ebp, %esp
+    popl    %ebp
+    retl</code></pre>
+
+<h4>C++ 代码演示</h4>
+
+<p><strong>x64 MinGW (C++) — int</strong></p>
+<pre><code>main():
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x30,%rsp
+    call    __main
+    movl    $0x3e7,-0x4(%rbp)         ; a = 999 (0x3e7)
+    movl    $0xfffffc19,-0x8(%rbp)    ; c = -999 (0xfffffc19)
+    movl    $0x3e7,-0xc(%rbp)         ; b = 999
+    mov     -0x4(%rbp),%eax
+    mov     %eax,%edx
+    mov     0x2be2(%rip),%rax         ; std::cout
+    mov     %rax,%rcx
+    call    std::basic_ostream::operator&lt;&lt;(int)
+    mov     $0x0,%eax
+    add     $0x30,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>x64 MinGW (C++) — float</strong></p>
+<pre><code>main():
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x30,%rsp
+    call    __main
+    movss   0x8917(%rip),%xmm0        ; 加载 3.14f
+    movss   %xmm0,-0x4(%rbp)          ; f = 3.14f
+    pxor    %xmm0,%xmm0
+    cvtss2sd -0x4(%rbp),%xmm0
+    movq    %xmm0,%rax
+    mov     %rax,%rdx
+    lea     0x88e2(%rip),%rax         ; "%f\r\n"
+    mov     %rax,%rcx
+    call    printf
+    movss   -0x4(%rbp),%xmm0
+    cvttss2si %xmm0,%eax              ; argc = (int)f
+    mov     %eax,-0x8(%rbp)
+    mov     -0x8(%rbp),%eax
+    mov     %eax,%edx
+    lea     0x88c7(%rip),%rax         ; "%d\r\n"
+    mov     %rax,%rcx
+    call    printf
+    mov     $0x0,%eax
+    add     $0x30,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>x64 MSVC (C++)</strong></p>
+<pre><code>main():
+    pushq   %rdi
+    subq    $0x30, %rsp
+    movss   0x8766(%rip), %xmm0
+    movss   %xmm0, 0x20(%rsp)         ; f = 3.14f
+    cvtss2sd 0x20(%rsp), %xmm0
+    movaps  %xmm0, %xmm1
+    movq    %xmm1, %rdx
+    leaq    0x86c7(%rip), %rcx
+    callq   printf
+    cvttss2si 0x20(%rsp), %eax        ; argc = (int)f
+    movl    %eax, 0x24(%rsp)
+    movl    0x24(%rsp), %edx
+    leaq    0x86b5(%rip), %rcx
+    callq   printf
+    xorl    %eax, %eax
+    addq    $0x30, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<p><strong>x86 MSVC (C++)</strong></p>
+<pre><code>main():
+    pushq   %rdi
+    subq    $0x30, %rsp
+    movss   0x8766(%rip), %xmm0
+    movss   %xmm0, 0x20(%rsp)         ; f = 3.14f
+    cvtss2sd 0x20(%rsp), %xmm0
+    movaps  %xmm0, %xmm1
+    movq    %xmm1, %rdx
+    leaq    0x86c7(%rip), %rcx
+    callq   printf
+    cvttss2si 0x20(%rsp), %eax        ; argc = (int)f
+    movl    %eax, 0x24(%rsp)
+    movl    0x24(%rsp), %edx
+    leaq    0x86b5(%rip), %rcx
+    callq   printf
+    xorl    %eax, %eax
+    addq    $0x30, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<h4>函数返回值为浮点数</h4>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+float getfloat(){
+    return 12.25f;
+}
+
+int main(){
+    float f = getfloat();
+    return 0;
+}</code></pre>
+
+<p><strong>MinGW x64</strong></p>
+<pre><code>main:
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x30,%rsp
+    call    __main
+    call    getfloat
+    movd    %xmm0,%eax                ; 返回值从 xmm0 取出
+    mov     %eax,-0x4(%rbp)           ; f = 12.25f
+    mov     $0x0,%eax
+    add     $0x30,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>MSVC x64</strong></p>
+<pre><code>main(...):
+    pushq   %rdi
+    subq    $0x30, %rsp
+    callq   getfloat
+    movss   %xmm0, 0x20(%rsp)         ; f = 12.25f (xmm0 返回值)
+    xorl    %eax, %eax
+    addq    $0x30, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<p><strong>MSVC x86 (64→32)</strong></p>
+<pre><code>main(...):
+    pushl   %ebp
+    movl    %esp, %ebp
+    pushl   %ecx
+    movl    $0xcccccccc, -0x4(%ebp)   ; imm = 0xCCCCCCCC
+    calll   _getfloat
+    fstps   -0x4(%ebp)                ; f = 12.25f (FPU 栈顶 → 内存)
+    xorl    %eax, %eax
+    addl    $0x4, %esp
+    cmpl    %esp, %ebp                ; 检查栈是否平衡
+    calll   __RTC_CheckEsp
+    movl    %ebp, %esp
+    popl    %ebp
+    retl</code></pre>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+</script>
+
+</body>
+</html>
