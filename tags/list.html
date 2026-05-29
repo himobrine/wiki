@@ -91,27 +91,24 @@ function renderArchive() {
   const tagMap = getAllTags();
   const sortedTags = Object.keys(tagMap).sort();
   let html = '<h2 class="section-title fade-up">// ALL // TAGS</h2>';
+  html += '<div class="tag-grid">';
   sortedTags.forEach(tag => {
     const posts = tagMap[tag];
-    html += '<div class="post fade-up">';
-    html += '<div class="post-tags">';
-    html += '<span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">' + tag + '</span>';
-    html += '<span style="font-size:12px;color:var(--text-muted);margin-left:8px">' + posts.length + ' 篇</span>';
+    html += '<div class="tag-row" style="flex-direction:column;align-items:stretch;padding:12px;gap:4px;cursor:default">';
+    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
+    html += '<span style="color:var(--accent-cyan);font-size:13px">' + tag + '</span>';
+    html += '<span style="color:var(--text-muted);font-size:12px">' + posts.length + ' 篇</span>';
     html += '</div>';
-    html += '<div style="margin-top:8px">';
-    const latest = posts.slice(0, 10);
-    latest.forEach((p, i) => {
-      html += '<div style="padding:6px 0;' + (i < latest.length - 1 ? 'border-bottom:1px solid var(--border-color);' : '') + '">';
-      html += '<div style="font-size:12px;color:var(--text-muted)">' + p.date + '</div>';
-      html += '<a href="' + p.url + '" style="color:var(--text-primary);text-decoration:none;font-size:14px">' + p.title + '</a>';
-      html += '</div>';
+    posts.slice(0, 10).forEach(p => {
+      html += '<a href="' + p.url + '" class="tag-post-link">' + p.title + '</a>';
     });
     if (posts.length > 10) {
-      html += '<div style="padding:4px 0;font-size:12px;color:var(--text-muted)">还有 ' + (posts.length - 10) + ' 篇...</div>';
+      html += '<div style="font-size:11px;color:var(--text-muted);padding:2px 0">还有 ' + (posts.length - 10) + ' 篇...</div>';
     }
-    html += '<a href="list.html?tag=' + encodeURIComponent(tag) + '" style="display:inline-block;margin-top:6px;font-size:12px;color:var(--accent-cyan);text-decoration:none">查看全部 &rarr;</a>';
-    html += '</div></div>';
+    html += '<a href="list.html?tag=' + encodeURIComponent(tag) + '" style="font-size:12px;color:var(--accent-cyan);text-decoration:none;margin-top:2px;display:inline-block">查看全部 &rarr;</a>';
+    html += '</div>';
   });
+  html += '</div>';
   document.getElementById('contentArea').innerHTML = html;
 }
 
