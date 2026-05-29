@@ -460,18 +460,27 @@ const tocObs = new IntersectionObserver(
 );
 tocTargets.forEach(t => tocObs.observe(t.el));
 
-/* code block toolbar */
+/* code block header bar */
 document.querySelectorAll('.post-content pre').forEach(pre => {
   const wrap = document.createElement('div');
   wrap.className = 'code-wrapper';
   pre.parentNode.insertBefore(wrap, pre);
   wrap.appendChild(pre);
 
-  const tb = document.createElement('div');
-  tb.className = 'code-toolbar';
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
 
   const copy = document.createElement('button');
-  copy.className = 'code-btn'; copy.textContent = 'copy';
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
   copy.onclick = (e) => {
     e.stopPropagation();
     navigator.clipboard.writeText(pre.textContent).then(() => {
@@ -481,12 +490,24 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
   };
 
   const fold = document.createElement('button');
-  fold.className = 'code-btn code-btn-fold'; fold.textContent = '[-]';
-  fold.onclick = (e) => { e.stopPropagation(); wrap.classList.toggle('collapsed'); };
-  wrap.onclick = () => { if (wrap.classList.contains('collapsed')) wrap.classList.remove('collapsed'); };
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
 
-  tb.append(copy, fold);
-  wrap.prepend(tb);
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
 });
 </script>
 
