@@ -276,12 +276,14 @@ body {
   font-family: 'Titillium Web', sans-serif; font-size: 18px; font-weight: 600;
   color: var(--accent-cyan); margin-bottom: 16px; letter-spacing: 0.08em; text-transform: uppercase;
 }
+.tags-index .tag-grid { display: grid; grid-template-columns: 1fr 1fr; }
 .tag-row {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 6px 0; border-bottom: 1px solid var(--border-color);
+  padding: 8px 12px; border-bottom: 1px solid var(--border-color);
   font-family: 'JetBrains Mono', monospace; font-size: 14px;
 }
-.tag-row:last-child { border-bottom: none; }
+.tag-row:nth-child(odd) { border-right: 1px solid var(--border-color); }
+.tags-index .tag-grid .tag-row:last-child { border-bottom: 1px solid var(--border-color); }
 .tag-row a { color: var(--text-secondary); text-decoration: none; }
 .tag-row a:hover { color: var(--accent-cyan); }
 .tag-row .count { color: var(--text-muted); font-size: 13px; }
@@ -417,4 +419,6 @@ body {
   .post { padding: 16px; }
   .nav a { font-size: 12px; padding: 4px 10px; }
   .tags-bar .tag { font-size: 11px; padding: 3px 10px; }
+  .tags-index .tag-grid { grid-template-columns: 1fr; }
+  .tag-row:nth-child(odd) { border-right: none; }
 }
