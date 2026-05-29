@@ -437,6 +437,35 @@ const tocObs = new IntersectionObserver(
   { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
 );
 tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block toolbar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const tb = document.createElement('div');
+  tb.className = 'code-toolbar';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '[-]';
+  fold.onclick = (e) => { e.stopPropagation(); wrap.classList.toggle('collapsed'); };
+  wrap.onclick = () => { if (wrap.classList.contains('collapsed')) wrap.classList.remove('collapsed'); };
+
+  tb.append(copy, fold);
+  wrap.prepend(tb);
+});
 </script>
 
 </body>
