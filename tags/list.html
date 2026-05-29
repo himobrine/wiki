@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>标签归档 - himobrine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+
+<div class="hero fade-up">
+  <div class="container">
+  <h1 id="pageTitle">// TAGS ARCHIVE</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tagline" id="pageTagline">&gt; 所有标签分类汇总 <span class="cursor">▌</span></div>
+  </div>
+</div>
+
+<div class="container" style="padding-top:0">
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper fade-up" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="list.html?tag=安全工具">安全工具</a>
+    <a href="list.html?tag=学习笔记">学习笔记</a>
+    <a href="list.html?tag=逆向">逆向</a>
+    <a href="list.html?tag=调试">调试</a>
+    <a href="list.html">标签归档</a>
+  </div>
+</div>
+
+<div id="contentArea"></div>
+
+<div class="footer fade-up">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="motto">&gt; 道可道，非常道，名可名，非常名 </div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="https://github.com/himobrine/wiki">Blog</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+/* === post database === */
+const POSTS = [
+  {
+    title: 'Windows 逆向调试工具速查手册',
+    date: '2026 // 05 / 30',
+    url: '../posts/reverse-debugging.html',
+    excerpt: '一份全面系统的 Windows 逆向工程与调试工具速查手册，涵盖 X64dbg、Windbg 及 OllyDbg 三大调试器的完整操作指南，附带 42 张实操截图。',
+    tags: ['逆向', '调试', 'X64dbg', 'Windbg', '学习笔记']
+  },
+  {
+    title: 'C/C++ 基本变量数据类型的内存表示',
+    date: '2026 // 05 / 30',
+    url: '../posts/variable-memory-layout.html',
+    excerpt: '深入分析 C/C++ 基本数据类型（int、unsigned int、float、double）在内存中的表示方式，涵盖有符号/无符号整型的补码存储、IEEE 754 浮点编码等。',
+    tags: ['逆向', 'C/C++', '底层原理', '调试']
+  }
+];
+
+/* === collect all tags === */
+function getAllTags() {
+  const map = {};
+  POSTS.forEach(p => {
+    p.tags.forEach(t => {
+      if (!map[t]) map[t] = [];
+      map[t].push(p);
+    });
+  });
+  return map;
+}
+
+/* === render tag archive === */
+function renderArchive() {
+  const tagMap = getAllTags();
+  const sortedTags = Object.keys(tagMap).sort();
+  let html = '<h2 class="section-title fade-up">// ALL // TAGS</h2>';
+  sortedTags.forEach(tag => {
+    const posts = tagMap[tag];
+    html += '<div class="post fade-up">';
+    html += '<div class="post-tags">';
+    html += '<span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">' + tag + '</span>';
+    html += '<span style="font-size:12px;color:var(--text-muted);margin-left:8px">' + posts.length + ' 篇</span>';
+    html += '</div>';
+    html += '<div style="margin-top:8px">';
+    const latest = posts.slice(0, 10);
+    latest.forEach((p, i) => {
+      html += '<div style="padding:6px 0;' + (i < latest.length - 1 ? 'border-bottom:1px solid var(--border-color);' : '') + '">';
+      html += '<div style="font-size:12px;color:var(--text-muted)">' + p.date + '</div>';
+      html += '<a href="' + p.url + '" style="color:var(--text-primary);text-decoration:none;font-size:14px">' + p.title + '</a>';
+      html += '</div>';
+    });
+    if (posts.length > 10) {
+      html += '<div style="padding:4px 0;font-size:12px;color:var(--text-muted)">还有 ' + (posts.length - 10) + ' 篇...</div>';
+    }
+    html += '<a href="list.html?tag=' + encodeURIComponent(tag) + '" style="display:inline-block;margin-top:6px;font-size:12px;color:var(--accent-cyan);text-decoration:none">查看全部 &rarr;</a>';
+    html += '</div></div>';
+  });
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* === render tag filtered === */
+function renderTag(tag) {
+  const decoded = decodeURIComponent(tag);
+  const filtered = POSTS.filter(p => p.tags.includes(decoded));
+  document.getElementById('pageTitle').textContent = '// TAG : ' + decoded;
+  document.getElementById('pageTagline').innerHTML = '&gt; 标签 <strong>' + decoded + '</strong> 共 ' + filtered.length + ' 篇文章 <span class="cursor">▌</span>';
+
+  let html = '<h2 class="section-title fade-up">// ' + decoded + ' // ' + filtered.length + ' POSTS</h2>';
+  if (filtered.length === 0) {
+    html += '<div class="post fade-up" style="text-align:center;padding:40px;color:var(--text-muted)">暂无该标签的文章</div>';
+  } else {
+    filtered.slice(0, 10).forEach(p => {
+      html += '<div class="post fade-up">';
+      html += '<div class="post-date">' + p.date + '</div>';
+      html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
+      html += '<div class="post-tags">';
+      p.tags.forEach(t => {
+        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', '底层原理': 'ff6b35' };
+        const c = colors[t] || '888';
+        html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
+      });
+      html += '</div>';
+      html += '<div class="post-excerpt">' + p.excerpt + '</div>';
+      html += '<a href="' + p.url + '" class="read-more">[ + ] READ MORE &rarr;</a>';
+      html += '</div>';
+    });
+    if (filtered.length > 10) {
+      html += '<div class="fade-up" style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">仅显示最近 10 篇，共 ' + filtered.length + ' 篇</div>';
+    }
+  }
+  document.getElementById('contentArea').innerHTML = html;
+}
+
+/* === init === */
+const params = new URLSearchParams(window.location.search);
+const tag = params.get('tag');
+if (tag) {
+  renderTag(tag);
+  // highlight nav
+  document.querySelectorAll('.nav-inner a').forEach(a => {
+    if (a.getAttribute('href') === 'list.html?tag=' + encodeURIComponent(tag)) a.classList.add('active');
+  });
+} else {
+  renderArchive();
+  document.querySelectorAll('.nav-inner a').forEach(a => {
+    if (a.getAttribute('href') === 'list.html') a.classList.add('active');
+  });
+}
+
+/* === sticky nav === */
+const sentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let spacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !spacer) {
+    spacer = document.createElement('div');
+    spacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(spacer, navWrap.nextSibling);
+  } else if (!stuck && spacer) {
+    spacer.remove(); spacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(sentinel);
+
+/* === scroll animation === */
+const animObserver = new IntersectionObserver(
+  (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); animObserver.unobserve(e.target); } }),
+  { threshold: 0.1 }
+);
+document.querySelectorAll('.fade-up').forEach(el => animObserver.observe(el));
+
+/* === theme toggle === */
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+
+/* === back to top === */
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+const topObs = new IntersectionObserver(
+  ([e]) => topBtn.classList.toggle('show', !e.isIntersecting),
+  { threshold: [0] }
+);
+topObs.observe(document.getElementById('navSentinel'));
+</script>
+
+</body>
+</html>
