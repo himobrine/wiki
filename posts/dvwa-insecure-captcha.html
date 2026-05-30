@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=验证码" class="tag tag-orange">#验证码</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2025 // 07 / 05</div>
+  <div class="post-title">DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">验证码</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#setup">环境搭建</a></li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="setup">环境搭建</h4>
+
+<p>DVWA 的 CAPTCHA 模块依赖 Google reCAPTCHA 服务，需要配置 API 密钥才能正常显示验证码：</p>
+
+<p><img src="../assets/ic_image001.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/ic_image002.png" alt="" style="max-width:100%"></p>
+
+<p>Linux 和 Windows 搭建方法相同。</p>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Change' ] ) &amp;&amp; ( $_POST[ 'step' ] == '1' ) ) {
+    // Hide the CAPTCHA form
+    $hide_form = true;
+
+    // Get input
+    $pass_new  = $_POST[ 'password_new' ];
+    $pass_conf = $_POST[ 'password_conf' ];
+
+    // Check CAPTCHA from 3rd party
+    $resp = recaptcha_check_answer(
+        $_DVWA[ 'recaptcha_private_key'],
+        $_POST['g-recaptcha-response']
+    );
+
+    // Did the CAPTCHA fail?
+    if( !$resp ) {
+        $html     .= "&lt;pre&gt;&lt;br /&gt;The CAPTCHA was incorrect. Please try again.&lt;/pre&gt;";
+        $hide_form = false;
+        return;
+    }
+    else {
+        // CAPTCHA was correct. Do both new passwords match?
+        if( $pass_new == $pass_conf ) {
+            // Show next stage for the user
+            echo "
+                &lt;pre&gt;&lt;br /&gt;You passed the CAPTCHA! Click the button to confirm your changes.&lt;br /&gt;&lt;/pre&gt;
+                &lt;form action=\&quot;#\&quot; method=\&quot;POST\&quot;&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;step\&quot; value=\&quot;2\&quot; /&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;password_new\&quot; value=\&quot;{$pass_new}\&quot; /&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;password_conf\&quot; value=\&quot;{$pass_conf}\&quot; /&gt;
+                    &lt;input type=\&quot;submit\&quot; name=\&quot;Change\&quot; value=\&quot;Change\&quot; /&gt;
+                &lt;/form&gt;";
+        }
+        else {
+            $html     .= "&lt;pre&gt;Both passwords must match.&lt;/pre&gt;";
+            $hide_form = false;
+        }
+    }
+}
+
+if( isset( $_POST[ 'Change' ] ) &amp;&amp; ( $_POST[ 'step' ] == '2' ) ) {
+    // Hide the CAPTCHA form
+    $hide_form = true;
+
+    // Get input
+    $pass_new  = $_POST[ 'password_new' ];
+    $pass_conf = $_POST[ 'password_conf' ];
+
+    // Check to see if both password match
+    if( $pass_new == $pass_conf ) {
+        // They do!
+        $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $pass_new = md5( $pass_new );
+
+        // Update database
+        $insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "';";
+        $result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+        // Feedback for the end user
+        echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+    }
+    else {
+        echo "&lt;pre&gt;Passwords did not match.&lt;/pre&gt;";
+        $hide_form = false;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>将改密操作分成了两步：</p>
+<ol>
+  <li>检查用户输入的验证码（reCAPTCHA）</li>
+  <li>验证通过后修改密码</li>
+</ol>
+<p>关键漏洞：step=2 的代码块完全独立，不验证前置步骤是否通过 CAPTCHA。只要直接提交 step=2 即可绕过验证码。</p>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p><img src="../assets/ic_image003.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ic_image004.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ic_image005.png" alt="" style="max-width:100%"></p>
+<p><img src="../assets/ic_image006.png" alt="" style="max-width:100%"></p>
+
+<p>抓包后将 step 参数从 1 改为 2，直接提交即可绕过 CAPTCHA 验证。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Change' ] ) &amp;&amp; ( $_POST[ 'step' ] == '1' ) ) {
+    // Hide the CAPTCHA form
+    $hide_form = true;
+
+    // Get input
+    $pass_new  = $_POST[ 'password_new' ];
+    $pass_conf = $_POST[ 'password_conf' ];
+
+    // Check CAPTCHA from 3rd party
+    $resp = recaptcha_check_answer(
+        $_DVWA[ 'recaptcha_private_key' ],
+        $_POST['g-recaptcha-response']
+    );
+
+    // Did the CAPTCHA fail?
+    if( !$resp ) {
+        $html     .= "&lt;pre&gt;&lt;br /&gt;The CAPTCHA was incorrect. Please try again.&lt;/pre&gt;";
+        $hide_form = false;
+        return;
+    }
+    else {
+        // CAPTCHA was correct. Do both new passwords match?
+        if( $pass_new == $pass_conf ) {
+            echo "
+                &lt;pre&gt;&lt;br /&gt;You passed the CAPTCHA! Click the button to confirm your changes.&lt;br /&gt;&lt;/pre&gt;
+                &lt;form action=\&quot;#\&quot; method=\&quot;POST\&quot;&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;step\&quot; value=\&quot;2\&quot; /&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;password_new\&quot; value=\&quot;{$pass_new}\&quot; /&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;password_conf\&quot; value=\&quot;{$pass_conf}\&quot; /&gt;
+                    &lt;input type=\&quot;hidden\&quot; name=\&quot;passed_captcha\&quot; value=\&quot;true\&quot; /&gt;
+                    &lt;input type=\&quot;submit\&quot; name=\&quot;Change\&quot; value=\&quot;Change\&quot; /&gt;
+                &lt;/form&gt;";
+        }
+        else {
+            $html     .= "&lt;pre&gt;Both passwords must match.&lt;/pre&gt;";
+            $hide_form = false;
+        }
+    }
+}
+
+if( isset( $_POST[ 'Change' ] ) &amp;&amp; ( $_POST[ 'step' ] == '2' ) ) {
+    // Hide the CAPTCHA form
+    $hide_form = true;
+
+    // Get input
+    $pass_new  = $_POST[ 'password_new' ];
+    $pass_conf = $_POST[ 'password_conf' ];
+
+    // Check to see if they did stage 1
+    if( !$_POST[ 'passed_captcha' ] ) {
+        $html     .= "&lt;pre&gt;&lt;br /&gt;You have not passed the CAPTCHA.&lt;/pre&gt;";
+        $hide_form = false;
+        return;
+    }
+
+    // Check to see if both password match
+    if( $pass_new == $pass_conf ) {
+        $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $pass_new = md5( $pass_new );
+
+        $insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "';";
+        $result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+        echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+    }
+    else {
+        echo "&lt;pre&gt;Passwords did not match.&lt;/pre&gt;";
+        $hide_form = false;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>Medium 在 step=2 增加了 <code>passed_captcha</code> 参数的检查，但该参数由客户端提交，攻击者仍然可以控制。</p>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<p>抓包后添加 <code>passed_captcha=true</code> 参数，同时将 step 改为 2 即可绕过：</p>
+
+<p><img src="../assets/ic_image007.png" alt="" style="max-width:100%"></p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Change' ] ) ) {
+    // Hide the CAPTCHA form
+    $hide_form = true;
+
+    // Get input
+    $pass_new  = $_POST[ 'password_new' ];
+    $pass_conf = $_POST[ 'password_conf' ];
+
+    // Check CAPTCHA from 3rd party
+    $resp = recaptcha_check_answer(
+        $_DVWA[ 'recaptcha_private_key' ],
+        $_POST['g-recaptcha-response']
+    );
+
+    if (
+        $resp || 
+        (
+            $_POST[ 'g-recaptcha-response' ] == 'hidd3n_valu3'
+            &amp;&amp; $_SERVER[ 'HTTP_USER_AGENT' ] == 'reCAPTCHA'
+        )
+    ){
+        // CAPTCHA was correct. Do both new passwords match?
+        if ($pass_new == $pass_conf) {
+            $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $pass_new = md5( $pass_new );
+
+            $insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "' LIMIT 1;";
+            $result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+            echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+        } else {
+            $html     .= "&lt;pre&gt;Both passwords must match.&lt;/pre&gt;";
+            $hide_form = false;
+        }
+    } else {
+        $html     .= "&lt;pre&gt;&lt;br /&gt;The CAPTCHA was incorrect. Please try again.&lt;/pre&gt;";
+        $hide_form = false;
+        return;
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>High 不再分两步处理，而是增加了一个后端验证码绕过逻辑：当 <code>$_POST['g-recaptcha-response'] == 'hidd3n_valu3'</code> 且 <code>User-Agent == 'reCAPTCHA'</code> 时，即使 reCAPTCHA 验证失败也视为通过。</p>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<p>修改请求包中的对应参数即可：</p>
+
+<p><img src="../assets/ic_image008.png" alt="" style="max-width:100%"></p>
+
+<p>将 <code>g-recaptcha-response</code> 设为 <code>hidd3n_valu3</code>，同时将 <code>User-Agent</code> 改为 <code>reCAPTCHA</code>。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Change' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Hide the CAPTCHA form
+    $hide_form = true;
+
+    // Get input
+    $pass_new  = $_POST[ 'password_new' ];
+    $pass_new  = stripslashes( $pass_new );
+    $pass_new  = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass_new  = md5( $pass_new );
+
+    $pass_conf = $_POST[ 'password_conf' ];
+    $pass_conf = stripslashes( $pass_conf );
+    $pass_conf = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_conf ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass_conf = md5( $pass_conf );
+
+    $pass_curr = $_POST[ 'password_current' ];
+    $pass_curr = stripslashes( $pass_curr );
+    $pass_curr = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_curr ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass_curr = md5( $pass_curr );
+
+    // Check CAPTCHA from 3rd party
+    $resp = recaptcha_check_answer(
+        $_DVWA[ 'recaptcha_private_key' ],
+        $_POST['g-recaptcha-response']
+    );
+
+    // Did the CAPTCHA fail?
+    if( !$resp ) {
+        echo "&lt;pre&gt;&lt;br /&gt;The CAPTCHA was incorrect. Please try again.&lt;/pre&gt;";
+        $hide_form = false;
+    }
+    else {
+        // Check that the current password is correct
+        $data = $db-&gt;prepare( 'SELECT password FROM users WHERE user = (:user) AND password = (:password) LIMIT 1;' );
+        $data-&gt;bindParam( ':user', dvwaCurrentUser(), PDO::PARAM_STR );
+        $data-&gt;bindParam( ':password', $pass_curr, PDO::PARAM_STR );
+        $data-&gt;execute();
+
+        // Do both new password match and was the current password correct?
+        if( ( $pass_new == $pass_conf) &amp;&amp; ( $data-&gt;rowCount() == 1 ) ) {
+            // Update the database
+            $data = $db-&gt;prepare( 'UPDATE users SET password = (:password) WHERE user = (:user);' );
+            $data-&gt;bindParam( ':password', $pass_new, PDO::PARAM_STR );
+            $data-&gt;bindParam( ':user', dvwaCurrentUser(), PDO::PARAM_STR );
+            $data-&gt;execute();
+
+            echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+        }
+        else {
+            echo "&lt;pre&gt;Either your current password is incorrect or the new passwords did not match.&lt;br /&gt;Please try again.&lt;/pre&gt;";
+            $hide_form = false;
+        }
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>Impossible 级别不再将验证码流程分为两步，有效堵塞了绕过路径。同时加入了三重防护：</p>
+
+<ol>
+  <li><strong>Anti-CSRF Token</strong> — <code>checkToken()</code> 防止跨站请求伪造</li>
+  <li><strong>原密码验证</strong> — 要求用户输入当前密码（password_current）</li>
+  <li><strong>PDO 预编译</strong> — 使用 <code>$db-&gt;prepare()</code> 和 <code>bindParam()</code> 防止 SQL 注入</li>
+</ol>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

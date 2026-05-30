@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 CSRF（跨站请求伪造）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=CSRF" class="tag tag-orange">#CSRF</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 03 / 06</div>
+  <div class="post-title">DVWA 靶场 CSRF（跨站请求伪造）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CSRF</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#principle">CSRF 原理</a></li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="principle">CSRF 原理</h4>
+
+<p>CSRF（Cross-Site Request Forgery，跨站请求伪造）是一种攻击手段，攻击者诱导用户点击伪造的请求链接，利用用户尚未失效的认证信息（Cookie／Session），在用户不知情的情况下向服务器发送高风险操作请求（如修改密码、转账等）。</p>
+
+<p>CSRF 攻击的核心在于：重要操作的所有参数都可以被攻击者猜测到，因此攻击者能够构造出合法的请求。</p>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p>Low 级别没有任何防护。直接构造修改密码的 URL：</p>
+
+<pre><code>http://192.168.21.133/dvwa/vulnerabilities/csrf/?password_new=password&amp;password_conf=password&amp;Change=Change#</code></pre>
+
+<p><img src="../assets/cs_image001.png" alt="" style="max-width:100%"></p>
+
+<p>实际攻击中，这种显而易见的 URL 可以通过短链接生成器伪装，或嵌入一个显示 404 的页面中（页面内包含 payload）。</p>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+    // Get input
+    $pass_new  = $_GET[ 'password_new' ];
+    $pass_conf = $_GET[ 'password_conf' ];
+
+    // Do the passwords match?
+    if( $pass_new == $pass_conf ) {
+        // They do!
+        $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $pass_new = md5( $pass_new );
+
+        // Update the database
+        $insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "';";
+        $result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+        // Feedback for the user
+        echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+    }
+    else {
+        // Issue with passwords matching
+        echo "&lt;pre&gt;Passwords did not match.&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>可以看到 Low 难度的源代码中没有使用任何 CSRF Token。用户提交的 password_new 和 password_conf 直接拼接进 SQL 更新语句，只要两次密码一致就执行数据库更新。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<p>Medium 级别添加了 Referer 检查，检查 HTTP_REFERER 头中是否包含服务器主机名。要绕过它，需要让 Referer 中包含目标主机名。</p>
+
+<p>创建一个 HTML 文件，内容如下：</p>
+
+<pre><code>&lt;img src=&quot;http://192.168.21.133/dvwa/vulnerabilities/csrf/?password_new=password&amp;password_conf=password&amp;Change=Change#&quot; border=&quot;0&quot; style=&quot;display:none;&quot;/&gt;
+&lt;h1&gt;404&lt;/h1&gt;
+&lt;h2&gt;file not found.&lt;/h2&gt;</code></pre>
+
+<p>将文件名改为目标靶机 IP（例如 <code>192.168.21.133.html</code>），使得 Referer 中包含 IP 地址：</p>
+
+<p><img src="../assets/cs_image002.png" alt="" style="max-width:100%"></p>
+
+<p>打开 Burp Suite，抓取 CSRF 请求包：</p>
+
+<p><img src="../assets/cs_image003.png" alt="" style="max-width:100%"></p>
+
+<p>进入 Repeater 模块，修改 Referer 头为包含靶机 IP 的地址：</p>
+
+<p><img src="../assets/cs_image004.png" alt="" style="max-width:100%"></p>
+
+<p>发送请求即可成功修改密码。</p>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+    // Checks to see where the request came from
+    if( stripos( $_SERVER[ 'HTTP_REFERER' ] ,$_SERVER[ 'SERVER_NAME' ]) !== false ) {
+        // Get input
+        $pass_new  = $_GET[ 'password_new' ];
+        $pass_conf = $_GET[ 'password_conf' ];
+
+        // Do the passwords match?
+        if( $pass_new == $pass_conf ) {
+            // They do!
+            $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+            $pass_new = md5( $pass_new );
+
+            // Update the database
+            $insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "';";
+            $result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+            // Feedback for the user
+            echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+        }
+        else {
+            // Issue with passwords matching
+            echo "&lt;pre&gt;Passwords did not match.&lt;/pre&gt;";
+        }
+    }
+    else {
+        // Didn't come from a trusted source
+        echo "&lt;pre&gt;That request didn't look correct.&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>比起 Low 难度，Medium 多了一行关键检查：</p>
+
+<pre><code>stripos( $_SERVER[ 'HTTP_REFERER' ] ,$_SERVER[ 'SERVER_NAME' ]) !== false</code></pre>
+
+<p>该语句判断 HTTP_REFERER 中是否包含 SERVER_NAME（即主机名或 IP），如果包含则认为是可信来源。攻击者只需将 HTML 文件名设为靶机 IP，或者直接在 Burp 中修改 Referer 头即可绕过。</p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<p>High 级别加入了 Anti-CSRF Token，每次访问改密页面时服务器会生成一个随机 token。要绕过此机制，需要结合 XSS 漏洞获取受害者的 token 值。</p>
+
+<p>首先打开 DVWA 的 XSS（Stored）界面。在浏览器中打开开发者工具（查看器），找到与 name 框架有关的代码，将 size 和 maxlength 值改大一些。然后构造 iframe 页面获取 token：</p>
+
+<pre><code>&lt;iframe src=&quot;../../csrf&quot; onload=&quot;alert(frames[0].document.getElementsByName(&#39;user_token&#39;)[0].value)&quot;&gt;</code></pre>
+
+<p>在 XSS Stored 的消息框中输入内容，点击 Sign Guestbook 后，弹窗会显示当前用户的 token 值。获取到 token 后，就可以利用 Medium 中的方法构造带有 token 参数的修改密码请求。</p>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $pass_new  = $_GET[ 'password_new' ];
+    $pass_conf = $_GET[ 'password_conf' ];
+
+    // Do the passwords match?
+    if( $pass_new == $pass_conf ) {
+        // They do!
+        $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $pass_new = md5( $pass_new );
+
+        // Update the database
+        $insert = "UPDATE `users` SET password = '$pass_new' WHERE user = '" . dvwaCurrentUser() . "';";
+        $result = mysqli_query($GLOBALS["___mysqli_ston"],  $insert ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+        // Feedback for the user
+        echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+    }
+    else {
+        // Issue with passwords matching
+        echo "&lt;pre&gt;Passwords did not match.&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>这次加入了 <code>checkToken()</code> 函数验证 user_token，同时每次请求后会调用 <code>generateSessionToken()</code> 生成新的 token。攻击者必须在攻击服务器上实时获取受害者的 token 值才能构造有效请求。总体而言，CSRF 攻击的本质是：重要操作的所有参数如果都可以被攻击者猜测到，就存在 CSRF 风险。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Change' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $pass_curr = $_GET[ 'password_current' ];
+    $pass_new  = $_GET[ 'password_new' ];
+    $pass_conf = $_GET[ 'password_conf' ];
+
+    // Sanitise current password input
+    $pass_curr = stripslashes( $pass_curr );
+    $pass_curr = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_curr ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+    $pass_curr = md5( $pass_curr );
+
+    // Check that the current password is correct
+    $data = $db-&gt;prepare( 'SELECT password FROM users WHERE user = (:user) AND password = (:password) LIMIT 1;' );
+    $data-&gt;bindParam( ':user', dvwaCurrentUser(), PDO::PARAM_STR );
+    $data-&gt;bindParam( ':password', $pass_curr, PDO::PARAM_STR );
+    $data-&gt;execute();
+
+    // Do both new passwords match and does the current password match the user?
+    if( ( $pass_new == $pass_conf ) &amp;&amp; ( $data-&gt;rowCount() == 1 ) ) {
+        // It does!
+        $pass_new = stripslashes( $pass_new );
+        $pass_new = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $pass_new ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+        $pass_new = md5( $pass_new );
+
+        // Update database with new password
+        $data = $db-&gt;prepare( 'UPDATE users SET password = (:password) WHERE user = (:user);' );
+        $data-&gt;bindParam( ':password', $pass_new, PDO::PARAM_STR );
+        $data-&gt;bindParam( ':user', dvwaCurrentUser(), PDO::PARAM_STR );
+        $data-&gt;execute();
+
+        // Feedback for the user
+        echo "&lt;pre&gt;Password Changed.&lt;/pre&gt;";
+    }
+    else {
+        // Issue with passwords matching
+        echo "&lt;pre&gt;Passwords did not match or current password incorrect.&lt;/pre&gt;";
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>Impossible 级别做了三重防护：</p>
+
+<ol>
+  <li><strong>Anti-CSRF Token</strong> — <code>checkToken()</code> 验证请求中的 user_token</li>
+  <li><strong>原密码验证</strong> — 要求用户输入当前密码（password_current），用 md5 比对数据库中已有密码</li>
+  <li><strong>PDO 预编译</strong> — 使用 <code>$db-&gt;prepare()</code> 和 <code>bindParam()</code> 防止 SQL 注入</li>
+</ol>
+
+<p>在不知道用户原密码的情况下，攻击者无法构造有效的修改密码请求，从而彻底防御了 CSRF 攻击。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

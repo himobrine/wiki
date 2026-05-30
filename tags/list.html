@@ -79,6 +79,76 @@ const POSTS = [
     url: '../posts/dvwa-command-execution.html',
     excerpt: 'DVWA 靶场 Command Injection 全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用及 PHP 代码分析。',
     tags: ['Web安全', '渗透测试', 'DVWA', '命令注入']
+  },
+  {
+    title: 'DVWA 靶场 File Inclusion 全难度教程（附代码解析）',
+    date: '2026 // 04 / 12',
+    url: '../posts/dvwa-file-inclusion.html',
+    excerpt: 'DVWA 靶场 File Inclusion（文件包含）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（本地文件读取、远程文件包含、伪协议利用）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '文件包含']
+  },
+  {
+    title: 'DVWA 靶场 File Upload 全难度教程（附代码分析）',
+    date: '2025 // 05 / 08',
+    url: '../posts/dvwa-file-upload.html',
+    excerpt: 'DVWA 靶场 File Upload（文件上传）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（一句话木马上传、图片马制作、Burp 改后缀绕过、文件包含配合利用）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '文件上传']
+  },
+  {
+    title: 'DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析）',
+    date: '2026 // 03 / 28',
+    url: '../posts/dvwa-brute-force.html',
+    excerpt: 'DVWA 靶场 Brute Force（暴力破解）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（Burp Suite 抓包爆破、Resource Pool 时停设置、Anti-CSRF Token 绕过、Python 脚本自动化爆破）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '暴力破解']
+  },
+  {
+    title: 'DVWA 靶场 CSRF（跨站请求伪造）全难度教程（附代码分析）',
+    date: '2026 // 03 / 06',
+    url: '../posts/dvwa-csrf.html',
+    excerpt: 'DVWA 靶场 CSRF（跨站请求伪造）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（URL 直接修改密码、Referer 绕过、XSS+CSRF 结合获取 Token、PDO 预编译+原密码验证）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'CSRF']
+  },
+  {
+    title: 'DVWA 靶场搭建 - Windows phpstudy & Kali Docker 部署教程',
+    date: '2026 // 04 / 27',
+    url: '../posts/dvwa-setup.html',
+    excerpt: '利用 phpstudy 搭建 DVWA 靶场完整流程，以及 基于 Docker 的 DVWA 部署方法，涵盖源码下载、配置文件修改、数据库初始化、Docker 换源与镜像部署，以及常见问题（allow_url_include、reCAPTCHA key）的解决方案。',
+    tags: ['Web安全', 'DVWA', '靶场搭建']
+  },
+  {
+    title: 'DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）',
+    date: '2023 // 04 / 04',
+    url: '../posts/dvwa-sql-injection.html',
+    excerpt: 'DVWA 靶场 SQL Injection（SQL 注入）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（手工联合查询注入、sqlmap 自动化注入、POST 注入绕过）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'SQL注入']
+  },
+  {
+    title: 'DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度教程（附代码分析）',
+    date: '2025 // 07 / 05',
+    url: '../posts/dvwa-insecure-captcha.html',
+    excerpt: 'DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（两步验证绕过、passed_captcha 参数伪造、User-Agent 与隐藏值绕过、PDO 预编译+原密码验证）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '验证码']
+  },
+  {
+    title: 'DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析）',
+    date: '2026 // 03 / 02',
+    url: '../posts/dvwa-weak-session-ids.html',
+    excerpt: 'DVWA 靶场 Weak Session IDs（弱会话 IDs）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（递增 Session 预测、时间戳 Cookie 劫持、MD5 加密枚举、SHA1 随机数防御）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '会话安全']
+  },
+  {
+    title: 'DVWA 靶场 Content Security Policy (CSP) Bypass(CSP绕过)全难度教程（附代码分析）',
+    date: '2024 // 05 / 14',
+    url: '../posts/dvwa-csp-bypass.html',
+    excerpt: 'DVWA 靶场 Content Security Policy (CSP) Bypass 全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（CSP 白名单绕过、unsafe-inline + nonce 绕过、JSONP 回调函数注入）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'CSP绕过']
+  },
+  {
+    title: 'DVWA 靶场 JavaScript Attacks(js攻击)全难度教程（附代码分析）',
+    date: '2024 // 05 / 14',
+    url: '../posts/dvwa-javascript-attacks.html',
+    excerpt: 'DVWA 靶场 JavaScript Attacks（JS 攻击）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（MD5+ROT13 Token 计算、字符串反转绕过、SHA256 混淆 JS 逆向分析）及 PHP/JS 代码分析。',
+    tags: ['Web安全', 'DVWA', 'JS攻击']
   }
 ];
 
@@ -137,7 +207,7 @@ function renderTag(tag) {
       html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
       html += '<div class="post-tags">';
       p.tags.forEach(t => {
-        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', '底层原理': 'ff6b35', 'Web安全': '3366ff', '渗透测试': 'ff6b35', 'DVWA': '00d4ff', '命令注入': '2ea44f' };
+        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'JS攻击': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', '渗透测试': 'ff6b35', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35' };
         const c = colors[t] || '888';
         html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
       });

@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=会话安全" class="tag tag-orange">#会话安全</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 03 / 02</div>
+  <div class="post-title">DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">会话安全</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p>点击 Generate 按钮，抓包观察 Cookie 的变化：</p>
+
+<p><img src="../assets/ws_image001.png" alt="" style="max-width:100%"></p>
+
+<p>第一次请求返回的 Set-Cookie 中 dvwaSession=1：</p>
+
+<p><img src="../assets/ws_image002.png" alt="" style="max-width:100%"></p>
+
+<p>再次点击 Generate，Cookie 变为 2，多次尝试后发现是简单的递增关系：</p>
+
+<p><img src="../assets/ws_image003.png" alt="" style="max-width:100%"></p>
+
+<p>构造 payload 即可进行会话劫持：</p>
+
+<p><img src="../assets/ws_image004.png" alt="" style="max-width:100%"></p>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+$html = "";
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    if (!isset ($_SESSION['last_session_id'])) {
+        $_SESSION['last_session_id'] = 0;
+    }
+    $_SESSION['last_session_id']++;
+    $cookie_value = $_SESSION['last_session_id'];
+    setcookie("dvwaSession", $cookie_value);
+}
+?&gt;</code></pre>
+
+<p>这种生成方式容易被攻击者猜测或推测出合法的会话标识，从而增加会话劫持攻击的风险。</p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<p>抓包观察：</p>
+
+<p><img src="../assets/ws_image005.png" alt="" style="max-width:100%"></p>
+
+<p>回包中的 Cookie 值看起来像时间戳：</p>
+
+<p><img src="../assets/ws_image006.png" alt="" style="max-width:100%"></p>
+
+<p>将时间戳转换为可读时间验证：</p>
+
+<p><img src="../assets/ws_image007.png" alt="" style="max-width:100%"></p>
+
+<p>攻击者可以在特定时间点获取 Cookie 值后进行会话劫持：</p>
+
+<p><img src="../assets/ws_image008.png" alt="" style="max-width:100%"></p>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+$html = "";
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    $cookie_value = time();
+    setcookie("dvwaSession", $cookie_value);
+}
+?&gt;</code></pre>
+
+<p>直接使用当前时间戳作为 Session ID，攻击者可以预测特定时间点的 Cookie 值进行定时攻击。</p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<p>抓包观察 Cookie：</p>
+
+<p><img src="../assets/ws_image009.png" alt="" style="max-width:100%"></p>
+
+<p>回包中的 Cookie 值长度固定，前后无关联规律，推测为哈希值：</p>
+
+<p><img src="../assets/ws_image010.png" alt="" style="max-width:100%"></p>
+
+<p>将返回值进行 MD5 解密验证：</p>
+
+<p><img src="../assets/ws_image011.png" alt="" style="max-width:100%"></p>
+
+<p>确定是 MD5 加密，可以进行暴力破解：</p>
+
+<p><img src="../assets/ws_image012.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/ws_image013.png" alt="" style="max-width:100%"></p>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+$html = "";
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    if (!isset ($_SESSION['last_session_id_high'])) {
+        $_SESSION['last_session_id_high'] = 0;
+    }
+    $_SESSION['last_session_id_high']++;
+    $cookie_value = md5($_SESSION['last_session_id_high']);
+    setcookie("dvwaSession", $cookie_value, time()+3600, "/vulnerabilities/weak_id/", $_SERVER['HTTP_HOST'], false, false);
+}
+
+?&gt;</code></pre>
+
+<p>虽然对递增的 Session ID 进行了 MD5 加密，但由于底层仍然是可预测的递增序列，攻击者仍然可以通过枚举 MD5 值来破解。</p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+$html = "";
+
+if ($_SERVER['REQUEST_METHOD'] == "POST") {
+    $cookie_value = sha1(mt_rand() . time() . "Impossible");
+    setcookie("dvwaSession", $cookie_value, time()+3600, "/vulnerabilities/weak_id/", $_SERVER['HTTP_HOST'], true, true);
+}
+?&gt;</code></pre>
+
+<p>采用随机数 + 时间戳 + 固定字符串组合后进行 SHA1 哈希，使得 Session ID 不可预测。同时设置了 <code>HttpOnly</code> 和 <code>Secure</code> 标志，大幅提升了安全性。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>
