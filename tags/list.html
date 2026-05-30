@@ -78,7 +78,7 @@ const POSTS = [
     date: '2026 // 05 / 27',
     url: '../posts/dvwa-command-execution.html',
     excerpt: 'DVWA 靶场 Command Injection 全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用及 PHP 代码分析。',
-    tags: ['Web安全', '渗透测试', 'DVWA', '命令注入']
+    tags: ['Web安全', 'DVWA', '命令注入']
   },
   {
     title: 'DVWA 靶场 File Inclusion 全难度教程（附代码解析）',
@@ -114,6 +114,27 @@ const POSTS = [
     url: '../posts/dvwa-setup.html',
     excerpt: '利用 phpstudy 搭建 DVWA 靶场完整流程，以及 基于 Docker 的 DVWA 部署方法，涵盖源码下载、配置文件修改、数据库初始化、Docker 换源与镜像部署，以及常见问题（allow_url_include、reCAPTCHA key）的解决方案。',
     tags: ['Web安全', 'DVWA', '靶场搭建']
+  },
+  {
+    title: 'DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度教程（附代码分析）',
+    date: '2024 // 05 / 18',
+    url: '../posts/dvwa-xss-reflected.html',
+    excerpt: 'DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（&lt;script&gt; 注入、大小写绕过、&lt;img onerror&gt; 绕过）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'XSS']
+  },
+  {
+    title: 'DVWA 靶场 Authorisation Bypass（未授权访问）全难度教程（附代码分析）',
+    date: '2024 // 05 / 19',
+    url: '../posts/dvwa-auth-bypass.html',
+    excerpt: 'DVWA 靶场 Authorisation Bypass（未授权访问）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（直接 URL 访问、get_user_data.php 越权、POST 参数篡改）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '未授权访问']
+  },
+  {
+    title: 'DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度教程（附代码分析）',
+    date: '2024 // 05 / 20',
+    url: '../posts/dvwa-open-http-redirect.html',
+    excerpt: 'DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（直接 URL 跳转、路径穿越绕过、参数注入绕过）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'URL重定向']
   },
   {
     title: 'DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）',
@@ -191,23 +212,29 @@ function renderArchive() {
 }
 
 /* === render tag filtered === */
-function renderTag(tag) {
+function renderTag(tag, page) {
+  const PER_PAGE = 10;
   const decoded = decodeURIComponent(tag);
   const filtered = POSTS.filter(p => p.tags.includes(decoded));
+  const totalPages = Math.ceil(filtered.length / PER_PAGE) || 1;
+  page = Math.max(1, Math.min(page, totalPages));
+  const start = (page - 1) * PER_PAGE;
+  const pagePosts = filtered.slice(start, start + PER_PAGE);
+
   document.getElementById('pageTitle').textContent = '// TAG : ' + decoded;
-  document.getElementById('pageTagline').innerHTML = '&gt; 标签 <strong>' + decoded + '</strong> 共 ' + filtered.length + ' 篇文章 <span class="cursor">▌</span>';
+  document.getElementById('pageTagline').innerHTML = '&gt; 标签 <strong>' + decoded + '</strong> 共 ' + filtered.length + ' 篇文章' + (totalPages > 1 ? ' — 第 ' + page + ' / ' + totalPages + ' 页' : '') + ' <span class="cursor">▌</span>';
 
   let html = '<h2 class="section-title fade-up">// ' + decoded + ' // ' + filtered.length + ' POSTS</h2>';
   if (filtered.length === 0) {
     html += '<div class="post fade-up" style="text-align:center;padding:40px;color:var(--text-muted)">暂无该标签的文章</div>';
   } else {
-    filtered.slice(0, 10).forEach(p => {
+    pagePosts.forEach(p => {
       html += '<div class="post fade-up">';
       html += '<div class="post-date">' + p.date + '</div>';
       html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
       html += '<div class="post-tags">';
       p.tags.forEach(t => {
-        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'JS攻击': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', '渗透测试': 'ff6b35', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35' };
+        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f', 'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35' };
         const c = colors[t] || '888';
         html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
       });
@@ -216,8 +243,44 @@ function renderTag(tag) {
       html += '<a href="' + p.url + '" class="read-more">[ + ] READ MORE &rarr;</a>';
       html += '</div>';
     });
-    if (filtered.length > 10) {
-      html += '<div class="fade-up" style="text-align:center;padding:16px;color:var(--text-muted);font-size:13px">仅显示最近 10 篇，共 ' + filtered.length + ' 篇</div>';
+
+    /* pagination */
+    if (totalPages > 1) {
+      html += '<div class="pagination fade-up">';
+
+      if (page > 1) {
+        html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + (page - 1) + '" class="pagination-link">&larr; 上一页</a>';
+      } else {
+        html += '<span class="pagination-link pagination-disabled">&larr; 上一页</span>';
+      }
+
+      const range = 2;
+      const pageNums = [];
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= page - range && i <= page + range)) {
+          pageNums.push(i);
+        } else if (pageNums[pageNums.length - 1] !== '...') {
+          pageNums.push('...');
+        }
+      }
+
+      pageNums.forEach(p => {
+        if (p === '...') {
+          html += '<span class="pagination-ellipsis">…</span>';
+        } else if (p === page) {
+          html += '<span class="pagination-link pagination-current">' + p + '</span>';
+        } else {
+          html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + p + '" class="pagination-link">' + p + '</a>';
+        }
+      });
+
+      if (page < totalPages) {
+        html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + (page + 1) + '" class="pagination-link">下一页 &rarr;</a>';
+      } else {
+        html += '<span class="pagination-link pagination-disabled">下一页 &rarr;</span>';
+      }
+
+      html += '</div>';
     }
   }
   document.getElementById('contentArea').innerHTML = html;
@@ -226,8 +289,9 @@ function renderTag(tag) {
 /* === init === */
 const params = new URLSearchParams(window.location.search);
 const tag = params.get('tag');
+const page = parseInt(params.get('page')) || 1;
 if (tag) {
-  renderTag(tag);
+  renderTag(tag, page);
   // highlight nav
   document.querySelectorAll('.nav-inner a').forEach(a => {
     if (a.getAttribute('href') === 'list.html?tag=' + encodeURIComponent(tag)) a.classList.add('active');

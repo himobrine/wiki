@@ -422,6 +422,35 @@ body {
 .tags-index.fade-up { transition-delay: 0.3s; }
 .footer.fade-up { transition-delay: 0.4s; }
 
+/* === Pagination === */
+.pagination {
+  display: flex; justify-content: center; align-items: center; gap: 6px;
+  flex-wrap: wrap; margin-top: 32px;
+}
+.pagination-link {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 36px; height: 36px; padding: 0 10px;
+  background: var(--bg-elevated); border: 1px solid var(--border-color);
+  color: var(--text-secondary); text-decoration: none;
+  font-family: 'JetBrains Mono', monospace; font-size: 13px;
+  transition: all 0.2s ease; cursor: pointer; border-radius: 2px;
+}
+.pagination-link:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); }
+.pagination-current {
+  background: color-mix(in srgb, var(--accent-cyan) 12%, transparent);
+  border-color: var(--accent-cyan); color: var(--accent-cyan); font-weight: 700;
+  pointer-events: none;
+}
+.pagination-disabled {
+  opacity: 0.3; pointer-events: none; color: var(--text-muted);
+}
+.pagination-ellipsis {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 28px; height: 36px;
+  color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 14px;
+  letter-spacing: 2px;
+}
+
 @media (max-width: 640px) {
   .container { padding: 20px 12px; }
   .post { padding: 16px; }

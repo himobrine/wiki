@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度教程（附代码分析） - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="tag tag-cyan">#DVWA</a>
+    <a href="../tags/list.html?tag=URL重定向" class="tag tag-red">#URL重定向</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2024 // 05 / 20</div>
+  <div class="post-title">DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度教程（附代码分析）</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">URL重定向</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#intro">简介</a></li>
+    <li class="toc-h4"><a href="#low">Low 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#low-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#low-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#medium">Medium 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#medium-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#medium-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#high">High 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#high-code">代码分析</a></li>
+        <li class="toc-h5"><a href="#high-exploit">漏洞利用</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#impossible">Impossible 难度</a>
+      <ul>
+        <li class="toc-h5"><a href="#impossible-code">代码分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="intro">简介</h4>
+
+<p>本质是 URL 跳转，叫 URL 跳转漏洞也叫开放重定向漏洞，多用于钓鱼场景。</p>
+
+<p>重定向的类型：</p>
+
+<ol>
+  <li><strong>永久重定向</strong> — 状态码 301 和 308</li>
+  <li><strong>临时重定向</strong> — 状态码 302、303、307</li>
+  <li><strong>特殊重定向</strong> — 状态码 300、304</li>
+</ol>
+
+<h4 id="low">Low 难度</h4>
+
+<h5 id="low-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if (array_key_exists ("redirect", $_GET) && $_GET['redirect'] != "") {
+    header ("location: " . $_GET['redirect']);
+    exit;
+}
+
+http_response_code (500);
+?&gt;
+&lt;p&gt;Missing redirect target.&lt;/p&gt;
+&lt;?php
+exit;
+?&gt;</code></pre>
+
+<ol>
+  <li>通过 <code>array_key_exists</code> 判断 $_GET 数组中是否存在 redirect 键值，如果存在且不为空，则调用 header 函数，否则返回 500 状态码。</li>
+  <li>调用 header 函数，将 Location 字段设置为 $_GET['redirect'] 的值，完成重定向操作。exit 用于终止脚本执行，确保 header 函数的执行效果。</li>
+</ol>
+
+<h5 id="low-exploit">漏洞利用</h5>
+
+<p><img src="../assets/or_image001.png" alt="" style="max-width:100%"></p>
+
+<p>都点一下试试：</p>
+
+<p><img src="../assets/or_image002.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/or_image003.png" alt="" style="max-width:100%"></p>
+
+<p>注意 URL，后面应该是能跟网址的：</p>
+
+<pre><code>http://192.168.21.128/dvwa/vulnerabilities/open_redirect/source/low.php?redirect=https://baidu.com</code></pre>
+
+<p><img src="../assets/or_image004.png" alt="" style="max-width:100%"></p>
+
+<h4 id="medium">Medium 难度</h4>
+
+<h5 id="medium-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if (array_key_exists ("redirect", $_GET) && $_GET['redirect'] != "") {
+    if (preg_match ("/http:\/\/|https:\/\//i", $_GET['redirect'])) {
+        http_response_code (500);
+        ?&gt;
+        &lt;p&gt;Absolute URLs not allowed.&lt;/p&gt;
+        &lt;?php
+        exit;
+    } else {
+        header ("location: " . $_GET['redirect']);
+        exit;
+    }
+}
+
+http_response_code (500);
+?&gt;
+&lt;p&gt;Missing redirect target.&lt;/p&gt;
+&lt;?php
+exit;
+?&gt;</code></pre>
+
+<p>过滤了 http 和 https，可以使用别的方法进行跳转。</p>
+
+<h5 id="medium-exploit">漏洞利用</h5>
+
+<pre><code>http://192.168.21.128/dvwa/vulnerabilities/open_redirect/source/medium.php?redirect=../../../index.php</code></pre>
+
+<p><img src="../assets/or_image005.png" alt="" style="max-width:100%"></p>
+
+<p>这个就只能在网站内进行跳转了。</p>
+
+<h4 id="high">High 难度</h4>
+
+<h5 id="high-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+if (array_key_exists ("redirect", $_GET) && $_GET['redirect'] != "") {
+    if (strpos($_GET['redirect'], "info.php") !== false) {
+        header ("location: " . $_GET['redirect']);
+        exit;
+    } else {
+        http_response_code (500);
+        ?&gt;
+        &lt;p&gt;You can only redirect to the info page.&lt;/p&gt;
+        &lt;?php
+        exit;
+    }
+}
+
+http_response_code (500);
+?&gt;
+&lt;p&gt;Missing redirect target.&lt;/p&gt;
+&lt;?php
+exit;
+?&gt;</code></pre>
+
+<p>重定向被锁定到 info.php。</p>
+
+<h5 id="high-exploit">漏洞利用</h5>
+
+<pre><code>http://192.168.21.128/dvwa/vulnerabilities/open_redirect/source/high.php?redirect=https://www.baidu.com?id=info.php</code></pre>
+
+<p><img src="../assets/or_image006.png" alt="" style="max-width:100%"></p>
+
+<h4 id="impossible">Impossible 难度</h4>
+
+<h5 id="impossible-code">代码分析</h5>
+
+<pre><code>&lt;?php
+
+$target = "";
+
+if (array_key_exists ("redirect", $_GET) && is_numeric($_GET['redirect'])) {
+    switch (intval ($_GET['redirect'])) {
+        case 1:
+            $target = "info.php?id=1";
+            break;
+        case 2:
+            $target = "info.php?id=2";
+            break;
+        case 99:
+            $target = "https://digi.ninja";
+            break;
+    }
+    if ($target != "") {
+        header ("location: " . $target);
+        exit;
+    } else {
+        ?&gt;
+        Unknown redirect target.
+        &lt;?php
+        exit;
+    }
+}
+
+?&gt;
+Missing redirect target.</code></pre>
+
+<p>指定重定向的网站并且无法控制。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>
