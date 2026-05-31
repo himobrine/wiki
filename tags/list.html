@@ -113,7 +113,7 @@ const POSTS = [
     title: 'Web10 500pt XSS 标签注入 Writeup',
     date: '2026 // 05 / 31',
     url: '../posts/web-xss-tag-500pt.html',
-    excerpt: 'Web10 500pt XSS Writeup：标签系统注入 <script>alert("flag")</script> → 6 个标签逐一执行 → 获取 flag',
+    excerpt: 'Web10 500pt XSS Writeup：标签系统注入 <script>alert("flag")<\/script> → 6 个标签逐一执行 → 获取 flag',
     tags: ['CTF', 'Web安全', 'XSS']
   },
   {
@@ -307,6 +307,22 @@ const POSTS = [
   }
 ];
 
+function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+const TAG_COLORS = {
+  '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff',
+  '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6',
+  '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f',
+  'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f',
+  '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f',
+  '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35',
+  'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff', 'RC4': 'f59e0b',
+  '蓝桥杯': 'ec4899', 'MD5碰撞': 'f59e0b', 'Java': 'e34f26',
+  'MISC': 'f97316', 'Pwn': '10b981', 'PHP': '777bb3',
+  '栈溢出': 'f97316', '漏洞分析': 'e4405f', '安全工具': '00d4ff',
+  'OWASP': 'e4405f', '供应链安全': 'ff6b35', 'CVE': 'e4405f', 'KaliLinux': '3366ff'
+};
+
 /* === collect all tags === */
 function getAllTags() {
   const map = {};
@@ -329,7 +345,8 @@ function renderArchive() {
     const posts = tagMap[tag];
     html += '<div class="tag-row" style="flex-direction:column;align-items:stretch;padding:12px;gap:4px;cursor:default">';
     html += '<div style="display:flex;justify-content:space-between;align-items:center">';
-    html += '<span style="color:var(--accent-cyan);font-size:13px">' + tag + '</span>';
+    const tagColor = TAG_COLORS[tag];
+    html += '<span style="color:' + (tagColor ? '#' + tagColor : 'var(--accent-cyan)') + ';font-size:13px">' + esc(tag) + '</span>';
     html += '<span style="color:var(--text-muted);font-size:12px">' + posts.length + ' 篇</span>';
     html += '</div>';
     posts.slice(0, 10).forEach(p => {
@@ -348,7 +365,7 @@ function renderArchive() {
 /* === render tag filtered === */
 function renderTag(tag, page) {
   const PER_PAGE = 10;
-  const decoded = decodeURIComponent(tag);
+  let decoded; try { decoded = decodeURIComponent(tag); } catch { decoded = tag; }
   const filtered = POSTS.filter(p => p.tags.includes(decoded));
   const totalPages = Math.ceil(filtered.length / PER_PAGE) || 1;
   page = Math.max(1, Math.min(page, totalPages));
@@ -356,7 +373,7 @@ function renderTag(tag, page) {
   const pagePosts = filtered.slice(start, start + PER_PAGE);
 
   document.getElementById('pageTitle').textContent = '// TAG : ' + decoded;
-  document.getElementById('pageTagline').innerHTML = '&gt; 标签 <strong>' + decoded + '</strong> 共 ' + filtered.length + ' 篇文章' + (totalPages > 1 ? ' — 第 ' + page + ' / ' + totalPages + ' 页' : '') + ' <span class="cursor">▌</span>';
+  document.getElementById('pageTagline').innerHTML = '&gt; 标签 <strong>' + esc(decoded) + '</strong> 共 ' + filtered.length + ' 篇文章' + (totalPages > 1 ? ' — 第 ' + page + ' / ' + totalPages + ' 页' : '') + ' <span class="cursor">▌</span>';
 
   let html = '<h2 class="section-title fade-up">// ' + decoded + ' // ' + filtered.length + ' POSTS</h2>';
   if (filtered.length === 0) {
@@ -368,12 +385,8 @@ function renderTag(tag, page) {
       html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
       html += '<div class="post-tags">';
       p.tags.forEach(t => {
-        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f', 'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35', 'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff', 'RC4': 'f59e0b', '蓝桥杯': 'ec4899', 'MD5碰撞': 'f59e0b', 'Java': 'e34f26',
-        'MISC': 'f97316',
-        'Pwn': '10b981',
-        'PHP': '777bb3' };
-        const c = colors[t] || '888';
-        html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
+        const c = TAG_COLORS[t] || '888888';
+        html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + esc(t) + '</span>';
       });
       html += '</div>';
       html += '<div class="post-excerpt">' + p.excerpt + '</div>';
@@ -431,7 +444,7 @@ if (tag) {
   renderTag(tag, page);
   // highlight nav
   document.querySelectorAll('.nav-inner a').forEach(a => {
-    if (a.getAttribute('href') === 'list.html?tag=' + encodeURIComponent(tag)) a.classList.add('active');
+    if (a.getAttribute('href') === 'list.html?tag=' + tag) a.classList.add('active');
   });
 } else {
   renderArchive();
