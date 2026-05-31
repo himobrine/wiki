@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>[V&N2022公开赛] easy_RSA Writeup - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag tag-red">#CTF</a>
+    <a href="../tags/list.html?tag=RSA" class="tag tag-purple">#RSA</a>
+    <a href="../tags/list.html?tag=Crypto" class="tag tag-cyan">#Crypto</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">[V&N2022公开赛] easy_RSA Writeup</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">RSA</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#description">题目描述</a></li>
+    <li class="toc-h4"><a href="#encrypt">加密脚本</a></li>
+    <li class="toc-h4"><a href="#output">输出数据</a></li>
+    <li class="toc-h4"><a href="#solution">解题思路</a>
+      <ul>
+        <li class="toc-h5"><a href="#factor-n">分解 n 得到 p</a></li>
+        <li class="toc-h5"><a href="#recover-q">利用 d 恢复 q</a></li>
+        <li class="toc-h5"><a href="#decrypt">计算私钥并解密</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#script">解密脚本</a></li>
+    <li class="toc-h4"><a href="#flag">Flag</a></li>
+  </ul>
+</nav>
+
+<h4 id="description">题目描述</h4>
+
+<p>这是一道 V&N2022 公开赛的 RSA 题目。题目给出了加密脚本（Python）以及输出的 n、d、cipher 三个值，需要解密得到 flag。</p>
+
+<p>加密脚本中使用了三个素数 p、q、r，其中 p 由自定义的 <code>getprime</code> 函数生成（通过不断乘上随机小素数直到达到指定位数），q、r 为标准大素数。加密过程分为两步：先用 e=0x10001 对明文在模 n=pqr 下加密得到 cipher，同时额外输出了 d = invert(q², p²)。</p>
+
+<h4 id="encrypt">加密脚本</h4>
+
+<pre><code>from random import randint
+from gmpy2 import *
+from Crypto.Util.number import *
+
+def getprime(bits):
+    while 1:
+        n = 1
+        while n.bit_length() &lt; bits:
+            n *= next_prime(randint(1,1000))
+        if isPrime(n - 1):
+            return n - 1
+
+m = bytes_to_long(b'flag{************************************}')
+
+p = getprime(505)
+q = getPrime(512)
+r = getPrime(512)
+assert m &lt; q
+
+n = p * q * r
+e = 0x10001
+d = invert(q ** 2, p ** 2)
+c = pow(m, 2, r)
+cipher = pow(c, e, n)
+
+print(n)
+print(d)
+print(cipher)</code></pre>
+
+<h4 id="output">输出数据</h4>
+
+<pre><code>n = 7941371739956577280160664419383740967516918938781306610817149744988379280561359039016508679365806108722198157199058807892703837558280678711420411242914059658055366348123106473335186505617418956630780649894945233345985279471106888635177256011468979083320605103256178446993230320443790240285158260236926519042413378204298514714890725325831769281505530787739922007367026883959544239568886349070557272869042275528961483412544495589811933856131557221673534170105409
+
+d = 7515987842794170949444517202158067021118454558360145030399453487603693522695746732547224100845570119375977629070702308991221388721952258969752305904378724402002545947182529859604584400048983091861594720299791743887521228492714135449584003054386457751933095902983841246048952155097668245322664318518861440
+
+cipher = 1618155233923718966393124032999431934705026408748451436388483012584983753140040289666712916510617403356206112730613485227084128314043665913357106301736817062412927135716281544348612150328867226515184078966397180771624148797528036548243343316501503364783092550480439749404301122277056732857399413805293899249313045684662146333448668209567898831091274930053147799756622844119463942087160062353526056879436998061803187343431081504474584816590199768034450005448200</code></pre>
+
+<h4 id="solution">解题思路</h4>
+
+<h5 id="factor-n">分解 n 得到 p</h5>
+
+<p>注意到 <code>getprime(505)</code> 函数的生成方式：不断乘上 1~1000 之间的随机素数直到位数达到 505 位。这种构造使得 p-1 是许多小素数的乘积，因此可以用 Pollard's p-1 方法或其变种 Williams' p+1 方法分解 n。</p>
+
+<p>使用 <code>primefac</code> 工具，指定 p+1 方法：</p>
+
+<pre><code>python2 -m primefac -vs -m=p+1 7941371739956577280160664419383740967516918938781306610817149744988379280561359039016508679365806108722198157199058807892703837558280678711420411242914059658055366348123106473335186505617418956630780649894945233345985279471106888635177256011468979083320605103256178446993230320443790240285158260236926519042413378204298514714890725325831769281505530787739922007367026883959544239568886349070557272869042275528961483412544495589811933856131557221673534170105409</code></pre>
+
+<p>分解得到 p：</p>
+
+<pre><code>p = 102634610559478918970860957918259981057327949366949344137104804864768237961662136189827166317524151288799657758536256924609797810164397005081733039415393</code></pre>
+
+<h5 id="recover-q">利用 d 恢复 q</h5>
+
+<p>已知 d = invert(q², p²)，即：</p>
+
+<p style="text-align:center;font-size:16px;padding:10px">d &middot; q² ≡ 1 (mod p²)</p>
+
+<p>两边取逆元：</p>
+
+<p style="text-align:center;font-size:16px;padding:10px">q² ≡ d⁻¹ (mod p²)</p>
+
+<p>令 q2 = invert(d, p²)，则 q2 = q² + k&middot;p²。通过遍历 k 对 q2 + k&middot;p² 开平方，即可得到 q。</p>
+
+<pre><code>q2 = gmpy2.invert(d, p ** 2)
+for i in range(1000000):
+    q = gmpy2.iroot(q2 + i * p ** 2, 2)
+    if q[1] == 1:
+        print(q[0], i)
+        break
+
+q = q[0]</code></pre>
+
+<p>得到 q：</p>
+
+<pre><code>q = 77375182666615030998510036633750265568063541947733022797101832448947410904798532977467992935036882604066772774000961672568418601065152746265587196171375464334558245737918320078747315315327694116719555638268724841414147051094459140887571384570858712724535832915927019855314685607779371240071082135193582662113</code></pre>
+
+<h5 id="decrypt">计算私钥并解密</h5>
+
+<p>得到 p、q 后，计算 r = n // p // q，得到完整 φ(n) 和私钥 D：</p>
+
+<pre><code>r = n // p // q
+e = 0x10001
+phi = (p - 1) * (q - 1) * (r - 1)
+D = gmpy2.invert(e, phi)
+c = pow(cipher, D, n)</code></pre>
+
+<p>注意加密过程为 c = m² mod r，因此从 c 还需要在模 r 下开平方得到 m。这里使用 Tonelli-Shanks 算法求解二次剩余。</p>
+
+<h4 id="script">解密脚本</h4>
+
+<pre><code>import gmpy2
+from Crypto.Util.number import *
+
+def legendre(a, p):
+    return pow(a, (p - 1) // 2, p)
+
+def tonelli(n, p):
+    assert legendre(n, p) == 1
+    q = p - 1
+    s = 0
+    while q % 2 == 0:
+        q //= 2
+        s += 1
+    if s == 1:
+        return pow(n, (p + 1) // 4, p)
+    for z in range(2, 10000):
+        if p - 1 == legendre(z, p):
+            break
+    c = pow(z, q, p)
+    r = pow(n, (q + 1) // 2, p)
+    t = pow(n, q, p)
+    m = s
+    while (t - 1) % p != 0:
+        t2 = (t * t) % p
+        for i in range(1, m):
+            if (t2 - 1) % p == 0:
+                break
+            t2 = (t2 * t2) % p
+        b = pow(c, 1 &lt;&lt; (m - i - 1), p)
+        r = (r * b) % p
+        c = (b * b) % p
+        t = (t * c) % p
+        m = i
+    return r
+
+n = 7941371739956577280160664419383740967516918938781306610817149744988379280561359039016508679365806108722198157199058807892703837558280678711420411242914059658055366348123106473335186505617418956630780649894945233345985279471106888635177256011468979083320605103256178446993230320443790240285158260236926519042413378204298514714890725325831769281505530787739922007367026883959544239568886349070557272869042275528961483412544495589811933856131557221673534170105409
+d = gmpy2.mpz(7515987842794170949444517202158067021118454558360145030399453487603693522695746732547224100845570119375977629070702308991221388721952258969752305904378724402002545947182529859604584400048983091861594720299791743887521228492714135449584003054386457751933095902983841246048952155097668245322664318518861440)
+cipher = 1618155233923718966393124032999431934705026408748451436388483012584983753140040289666712916510617403356206112730613485227084128314043665913357106301736817062412927135716281544348612150328867226515184078966397180771624148797528036548243343316501503364783092550480439749404301122277056732857399413805293899249313045684662146333448668209567898831091274930053147799756622844119463942087160062353526056879436998061803187343431081504474584816590199768034450005448200
+
+p = gmpy2.mpz(102634610559478918970860957918259981057327949366949344137104804864768237961662136189827166317524151288799657758536256924609797810164397005081733039415393)
+
+q2 = gmpy2.invert(d, p ** 2)
+for i in range(1000000):
+    q = gmpy2.iroot(q2 + i * p ** 2, 2)
+    if q[1] == 1:
+        print(q[0], i)
+        break
+q = q[0]
+
+r = n // p // q
+e = 0x10001
+phi = (p - 1) * (q - 1) * (r - 1)
+D = gmpy2.invert(e, phi)
+c = pow(cipher, D, n)
+print(c)
+
+m = tonelli(c, r)
+print(m)
+print(long_to_bytes(m))</code></pre>
+
+<h4 id="flag">Flag</h4>
+
+<pre><code>flag{fd462593-25e4-4631-a96a-0cd5c72b2d1b}</code></pre>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">
+    ☽
+  </div>
+  <div class="theme-dock-item" data-theme="light">
+    ☀
+  </div>
+  <div class="theme-dock-item" data-theme="crystal">
+    ◇
+  </div>
+  <div class="theme-dock-item" data-theme="ego">
+    ♢
+  </div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+}
+const saved = localStorage.getItem('theme') || 'dark';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
+themeBtn.addEventListener('click', () => {
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

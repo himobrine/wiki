@@ -53,6 +53,70 @@
   --tag-add-border: #66666644;
 }
 
+[data-theme="crystal"] {
+  --bg-primary: #F9F6F0;
+  --bg-elevated: #FFFFFF;
+  --bg-hover: #F0EBE3;
+  --text-primary: #4A4458;
+  --text-secondary: #7A7590;
+  --text-muted: #B0ACC0;
+  --border-color: rgba(74, 68, 88, 0.08);
+  --border-accent: rgba(168, 181, 230, 0.2);
+  --accent-cyan: #A8B5E6;
+  --accent-blue: #8BA88B;
+  --accent-orange: #F2B8C6;
+  --scrollbar-track: #F0EBE3;
+  --scrollbar-thumb: #A8B5E644;
+  --nav-bg: rgba(249, 246, 240, 0.85);
+  --nav-bg-stuck: rgba(249, 246, 240, 0.96);
+  --hero-border: rgba(168, 181, 230, 0.18);
+  --section-title-border: rgba(168, 181, 230, 0.18);
+  --post-hover-border: rgba(242, 184, 198, 0.25);
+  --code-bg: #F0EBE3;
+  --pre-bg: #E8E3D8;
+  --blockquote-bg: #FFFFFF;
+  --th-bg: #F0EBE3;
+  --tag-add-color: #B0ACC0;
+  --tag-add-border: rgba(176, 172, 192, 0.27);
+  --elysia-pink: #F2B8C6;
+  --elysia-blue: #A8B5E6;
+  --elysia-green: #8BA88B;
+  --elysia-white: #F9F6F0;
+  --shadow: 0 8px 20px rgba(242, 184, 198, 0.15);
+}
+
+[data-theme="ego"] {
+  --bg-primary: #FFF4F1;
+  --bg-elevated: #FFFFFF;
+  --bg-hover: #FFE8E2;
+  --text-primary: #5D534F;
+  --text-secondary: #8A7A75;
+  --text-muted: #BBA8A5;
+  --border-color: rgba(93, 83, 79, 0.08);
+  --border-accent: rgba(126, 200, 227, 0.2);
+  --accent-cyan: #7EC8E3;
+  --accent-blue: #FFB7C5;
+  --accent-orange: #FFD5A4;
+  --scrollbar-track: #FFE8E2;
+  --scrollbar-thumb: #FFB7C544;
+  --nav-bg: rgba(255, 244, 241, 0.85);
+  --nav-bg-stuck: rgba(255, 244, 241, 0.96);
+  --hero-border: rgba(255, 183, 197, 0.18);
+  --section-title-border: rgba(255, 183, 197, 0.18);
+  --post-hover-border: rgba(126, 200, 227, 0.25);
+  --code-bg: #FFE8E2;
+  --pre-bg: #FFE0D8;
+  --blockquote-bg: #FFFFFF;
+  --th-bg: #FFE8E2;
+  --tag-add-color: #BBA8A5;
+  --tag-add-border: rgba(187, 168, 165, 0.27);
+  --candy-pink: #FFB7C5;
+  --lake-blue: #7EC8E3;
+  --melon-yellow: #FFD5A4;
+  --sakura-white: #FFF4F1;
+  --badge-new: #FFD5A4;
+}
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body {
   background: var(--bg-primary); color: var(--text-primary);
@@ -80,6 +144,10 @@ body {
 }
 [data-theme="light"] .scanline::after {
   background: linear-gradient(0deg, transparent, rgba(0,0,0,0.04), transparent);
+}
+[data-theme="crystal"] .scanline,
+[data-theme="ego"] .scanline {
+  opacity: 0;
 }
 @keyframes scan { 0% { top: -5%; } 100% { top: 105%; } }
 
@@ -406,6 +474,52 @@ body {
   transform: translateY(0);
 }
 
+/* === Theme dock === */
+.theme-dock {
+  position: fixed;
+  right: calc(24px + 40px + 12px);
+  bottom: calc(24px + 40px + 8px);
+  z-index: 1001;
+  display: flex;
+  flex-direction: row;
+  gap: 2px;
+  padding: 6px 8px;
+  background: var(--nav-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(10px);
+  transition: opacity 0.04s ease, transform 0.04s ease;
+}
+.theme-dock.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+.theme-dock-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 2px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: all 0.15s ease;
+}
+.theme-dock-item:hover {
+  background: color-mix(in srgb, var(--accent-cyan) 10%, transparent);
+  color: var(--accent-cyan);
+}
+.theme-dock-item.active {
+  color: var(--accent-cyan);
+  background: color-mix(in srgb, var(--accent-cyan) 12%, transparent);
+}
+
 /* === Scroll animations === */
 .fade-up { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease-out, transform 0.6s ease-out; }
 .fade-up.visible { opacity: 1; transform: translateY(0); }
@@ -458,4 +572,14 @@ body {
   .tags-bar .tag { font-size: 11px; padding: 3px 10px; }
   .tag-grid { grid-template-columns: 1fr; }
   .tag-row:nth-child(odd) { border-right: none; }
+  .theme-dock {
+    right: calc(12px + 40px + 8px);
+    bottom: calc(12px + 40px + 6px);
+    padding: 4px 6px;
+  }
+  .theme-dock-item {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
 }

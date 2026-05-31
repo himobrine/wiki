@@ -51,6 +51,21 @@
 
 </div>
 
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">
+    ☽
+  </div>
+  <div class="theme-dock-item" data-theme="light">
+    ☀
+  </div>
+  <div class="theme-dock-item" data-theme="crystal">
+    ◇
+  </div>
+  <div class="theme-dock-item" data-theme="ego">
+    ♢
+  </div>
+</div>
+
 <div class="floating-buttons">
   <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
   <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
@@ -59,6 +74,13 @@
 <script>
 /* === post database === */
 const POSTS = [
+  {
+    title: '[V&N2022公开赛] easy_RSA Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/vn2022-easy-rsa.html',
+    excerpt: 'V&N2022 公开赛 easy_RSA 题目 Writeup，涉及多素数 RSA、p+1 分解、模 p² 下逆元恢复 q、Tonelli-Shanks 算法求二次剩余等 RSA 相关技巧。',
+    tags: ['CTF', 'RSA', 'Crypto']
+  },
   {
     title: 'Windows 逆向调试工具速查手册',
     date: '2026 // 05 / 30',
@@ -234,7 +256,7 @@ function renderTag(tag, page) {
       html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
       html += '<div class="post-tags">';
       p.tags.forEach(t => {
-        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f', 'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35' };
+        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f', 'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35', 'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff' };
         const c = colors[t] || '888';
         html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
       });
@@ -330,15 +352,39 @@ document.querySelectorAll('.fade-up').forEach(el => animObserver.observe(el));
 /* === theme toggle === */
 const html = document.documentElement;
 const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+}
 const saved = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', saved);
-themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
 themeBtn.addEventListener('click', () => {
-  const cur = html.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
 });
 
 /* === back to top === */

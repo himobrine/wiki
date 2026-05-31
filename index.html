@@ -47,6 +47,20 @@
 <h2 class="section-title fade-up">// LATEST // DOCUMENT</h2>
 
 <div class="post fade-up">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title"><a href="posts/vn2022-easy-rsa.html">[V&N2022公开赛] easy_RSA Writeup</a></div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">RSA</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
+  </div>
+  <div class="post-excerpt">
+    V&amp;N2022 公开赛 easy_RSA 题目 Writeup，涉及<strong>多素数 RSA</strong>、<strong>p+1 分解</strong>、<strong>模 p² 下逆元恢复 q</strong>、<strong>Tonelli-Shanks 算法</strong>求二次剩余等 RSA 相关技巧。
+  </div>
+  <a href="posts/vn2022-easy-rsa.html" class="read-more">[ + ] READ MORE &rarr;</a>
+</div>
+
+<div class="post fade-up">
   <div class="post-date">2026 // 05 / 30</div>
   <div class="post-title"><a href="posts/reverse-debugging.html">Windows 逆向调试工具速查手册</a></div>
   <div class="post-tags">
@@ -284,7 +298,6 @@
   <div class="tag-row"><a href="tags/list.html?tag=C/C++">#C/C++</a><span class="count">1</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=底层原理">#底层原理</a><span class="count">1</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=OWASP">#OWASP</a><span class="count">0</span></div>
-  <div class="tag-row"><a href="tags/list.html?tag=CTF">#CTF</a><span class="count">0</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=Web安全">#Web安全</a><span class="count">14</span></div>
 
 <div class="tag-row"><a href="tags/list.html?tag=SQL注入">#SQL注入</a><span class="count">1</span></div>
@@ -305,6 +318,9 @@
 <div class="tag-row"><a href="tags/list.html?tag=供应链安全">#供应链安全</a><span class="count">0</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=CVE">#CVE</a><span class="count">0</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=KaliLinux">#KaliLinux</a><span class="count">0</span></div>
+  <div class="tag-row"><a href="tags/list.html?tag=CTF">#CTF</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="tags/list.html?tag=Crypto">#Crypto</a><span class="count">1</span></div>
+  <div class="tag-row"><a href="tags/list.html?tag=RSA">#RSA</a><span class="count">1</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=X64dbg">#X64dbg</a><span class="count">1</span></div>
   <div class="tag-row"><a href="tags/list.html?tag=Windbg">#Windbg</a><span class="count">1</span></div>
   </div>
@@ -321,6 +337,21 @@
   <div class="copy">(c) 2026 // SECURITY BLOG</div>
 </div>
 
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">
+    ☽
+  </div>
+  <div class="theme-dock-item" data-theme="light">
+    ☀
+  </div>
+  <div class="theme-dock-item" data-theme="crystal">
+    ◇
+  </div>
+  <div class="theme-dock-item" data-theme="ego">
+    ♢
+  </div>
 </div>
 
 <div class="floating-buttons">
@@ -354,15 +385,39 @@ document.querySelectorAll('.fade-up').forEach(el => animObserver.observe(el));
 /* theme toggle */
 const html = document.documentElement;
 const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+}
 const saved = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', saved);
-themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
 themeBtn.addEventListener('click', () => {
-  const cur = html.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
 });
 
 /* back to top */

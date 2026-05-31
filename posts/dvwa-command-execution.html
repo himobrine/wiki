@@ -329,6 +329,21 @@ generateSessionToken();
 
 </div>
 
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">
+    ☽
+  </div>
+  <div class="theme-dock-item" data-theme="light">
+    ☀
+  </div>
+  <div class="theme-dock-item" data-theme="crystal">
+    ◇
+  </div>
+  <div class="theme-dock-item" data-theme="ego">
+    ♢
+  </div>
+</div>
+
 <div class="floating-buttons">
   <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
   <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
@@ -337,15 +352,39 @@ generateSessionToken();
 <script>
 const html = document.documentElement;
 const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+}
 const saved = localStorage.getItem('theme') || 'dark';
-html.setAttribute('data-theme', saved);
-themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
 themeBtn.addEventListener('click', () => {
-  const cur = html.getAttribute('data-theme');
-  const next = cur === 'dark' ? 'light' : 'dark';
-  html.setAttribute('data-theme', next);
-  localStorage.setItem('theme', next);
-  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
 });
 const topBtn = document.getElementById('backToTop');
 topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
