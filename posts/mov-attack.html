@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MOV Attack — ECC Crypto Writeup - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=Crypto" class="tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">#Crypto</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">MOV Attack — ECC Crypto Writeup</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#description">题目描述</a></li>
+    <li class="toc-h3"><a href="#analysis">思路分析</a></li>
+    <li class="toc-h3"><a href="#code">SageMath 攻击脚本</a></li>
+    <li class="toc-h3"><a href="#result">运行结果</a></li>
+  </ul>
+</nav>
+
+<h4 id="description">题目描述</h4>
+
+<p><img src="../assets/mov_image001.png" alt="题目" style="max-width:100%"></p>
+
+<p>密文使用的是 <code>aes-cbc</code> 加密，密钥通过 ECDH 密钥交换协议协商：<code>S = aB = abG</code>，取 <code>x</code> 坐标作为共享密钥。</p>
+
+<p>已知 <code>p</code>（大素数）、<code>G</code>（基点 <code>x</code> 坐标）、<code>A</code>（公钥 <code>x</code> 坐标）、<code>B</code>（公钥 <code>x</code> 坐标），以及 <code>iv</code> 和密文 <code>ct</code>。需要利用 MOV 攻击求解共享秘密，从而解密 flag。</p>
+
+<h4 id="analysis">思路分析</h4>
+
+<p>MOV（Menezes–Okamoto–Vanstone）攻击的核心思想：利用 <strong>Tate Pairing</strong>（或 Weil Pairing）将椭圆曲线上的离散对数问题（ECDLP）归约到有限域扩展域上的离散对数问题（DLP）。由于本题椭圆曲线为 <code>y² = x³ + x</code>（<code>a = 1, b = 0</code>），属于超奇异椭圆曲线，存在有效的 <strong>distortion map</strong>，使得 MOV 攻击可行。</p>
+
+<p>攻击流程：</p>
+<ol>
+  <li>将曲线提升到二次扩域 <code>GF(p²)</code></li>
+  <li>使用 distortion map 将基点 <code>G</code> 映射到扩域上的点 <code>φ(G)</code></li>
+  <li>计算 Tate pairing <code>e(G, φ(G))</code> 作为 DLP 的底</li>
+  <li>计算 Tate pairing <code>e(A, φ(G))</code> 作为 DLP 的目标</li>
+  <li>在扩域上求解 DLP 得到私钥 <code>a</code></li>
+  <li>计算共享秘密 <code>S = aB</code>，取 <code>x</code> 坐标派生 AES 密钥</li>
+  <li>AES-CBC 解密得到 flag</li>
+</ol>
+
+<p><img src="../assets/mov_image002.png" alt="MOV Attack 示意图" style="max-width:100%"></p>
+
+<h4 id="code">SageMath 攻击脚本</h4>
+
+<pre><code>#!/usr/bin/env sage-python
+
+from sage.all import *
+from hashlib import sha256
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
+
+# Given data
+p = 11758811435299197782325894202410990650649601282525961620527876664622930378615087
+Gx = 246940630984360367198777777917942309731789700393587038646467058370636374388694
+Ax = 1227149150917613863955629279240024528868616016808343910406685156976840720601489
+Bx = 8827065846723574379455440495801260174628053954669240449781141038653567984952299
+iv_hex = "b7e803357c74bd4e630e1b09e0701b40"
+ct_hex = "17b7bd4b6a070c732db1d692a5544cec646139199102552824910cd1bd5a7d7927624d903ca4cc686369b0dcfb96e00bfe01468841b16d38183b49da69f833b9"
+
+# Convert hex to bytes
+iv = bytes.fromhex(iv_hex)
+ct = bytes.fromhex(ct_hex)
+
+print(f"p = {p}")
+print(f"Gx = {Gx}")
+print(f"Ax = {Ax}")
+print(f"Bx = {Bx}")
+
+# Setup curve
+F = GF(p)
+E = EllipticCurve(F, [1, 0])
+
+# Lift points
+G = E.lift_x(F(Gx))
+A = E.lift_x(F(Ax))
+B = E.lift_x(F(Bx))
+
+print(f"G = {G}")
+print(f"A = {A}")
+print(f"B = {B}")
+
+FIELD_BYTES = (ZZ(p).nbits() + 7) // 8
+
+def derive_key(P):
+    x = int(P[0])
+    key_material = x.to_bytes(FIELD_BYTES, "big")
+    return sha256(key_material).digest()
+
+def decrypt_flag(key, iv, ct):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    pt = unpad(cipher.decrypt(ct), 16)
+    return pt
+
+# MOV Attack
+print("\n" + "="*50)
+print("Using MOV attack...")
+print("="*50)
+
+# Create quadratic extension
+R = PolynomialRing(F, 'x')
+x = R.gen()
+F2 = GF(p**2, modulus=x**2 + 1, name='i')
+i = F2.gen()
+
+E2 = EllipticCurve(F2, [1, 0])
+
+# Map points
+G2 = E2(G)
+A2 = E2(A)
+B2 = E2(B)
+
+# Distortion map
+def distortion_map(P):
+    x_coord, y_coord = P.xy()
+    return E2(-x_coord, i*y_coord)
+
+phi_G = distortion_map(G2)
+phi_A = distortion_map(A2)
+
+# Get order
+n = G.order()
+print(f"Group order: {n}")
+print("Computing Tate pairings...")
+
+pairing_base = G2.tate_pairing(phi_G, n, 2)
+pairing_target = G2.tate_pairing(phi_A, n, 2)
+
+print("Solving discrete log...")
+a = discrete_log(pairing_target, pairing_base)
+print(f"Found a = {a}")
+
+# Verify
+if a*G == A:
+    print("Verification successful!")
+    S = a * B
+elif a*G == -A:
+    print("Using negated A")
+    A = -A
+    S = a * B
+else:
+    print("Trying to find b instead...")
+    phi_B = distortion_map(B2)
+    pairing_target_b = G2.tate_pairing(phi_B, n, 2)
+    b = discrete_log(pairing_target_b, pairing_base)
+    print(f"Found b = {b}")
+    S = b * A
+
+print(f"Shared secret x: {S[0]}")
+
+# Decrypt
+key = derive_key(S)
+print(f"Key: {key.hex()}")
+flag = decrypt_flag(key, iv, ct)
+print(f"\nFlag: {flag.decode()}")</code></pre>
+
+<h4 id="result">运行结果</h4>
+
+<p>脚本通过 MOV 攻击成功计算出私钥 <code>a</code>，验证通过后计算共享秘密 <code>S</code>，派生 AES 密钥并解密出 flag。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>

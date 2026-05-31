@@ -75,6 +75,27 @@
 /* === post database === */
 const POSTS = [
   {
+    title: '栈溢出2（500分）Writeup — ret2syscall',
+    date: '2026 // 05 / 31',
+    url: '../posts/stack-overflow2-500pt.html',
+    excerpt: '栈溢出2 500pt Writeup：ret2syscall 利用 ROP 链（pop rax/rdi/rsi/rdx/rcx gadgets）在 64 位程序上执行 execve("/bin/bash")，offset 280 字节，pwntools 自动化利用。',
+    tags: ['CTF', 'Pwn', '栈溢出']
+  },
+  {
+    title: '栈溢出（500分）Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/stack-overflow-500pt.html',
+    excerpt: '栈溢出 500pt Writeup：IDA 分析二进制 → 发现 hackme 函数 → 动态调试改目标 → gets 溢出 → 计算偏移 → 执行 shell 获取 flag。',
+    tags: ['CTF', 'Pwn', '栈溢出']
+  },
+  {
+    title: 'MOV Attack — ECC Crypto Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/mov-attack.html',
+    excerpt: 'MOV Attack Writeup：利用 Tate pairing 将 ECC 上的离散对数问题归约到有限域扩展域上的 DLP，通过 SageMath 实现攻击并解密 flag。',
+    tags: ['CTF', 'Crypto']
+  },
+  {
     title: '蓝桥杯 Writeup',
     date: '2026 // 05 / 31',
     url: '../posts/re-蓝桥杯wp.html',

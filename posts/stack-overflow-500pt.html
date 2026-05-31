@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>栈溢出（500分）Writeup - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=Pwn" class="tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">#Pwn</a>
+    <a href="../tags/list.html?tag=栈溢出" class="tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">#栈溢出</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">栈溢出（500分）Writeup</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
+    <span class="post-tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">栈溢出</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#overview">题目概览</a></li>
+    <li class="toc-h3"><a href="#analysis">IDA 分析</a></li>
+    <li class="toc-h3"><a href="#hackme">hackme 函数</a></li>
+    <li class="toc-h3"><a href="#exploit">漏洞利用</a></li>
+  </ul>
+</nav>
+
+<h4 id="overview">题目概览</h4>
+
+<p>比较简单，没什么说的，大概十几分钟就可以完成了。</p>
+
+<p><img src="../assets/so_image002.png" alt="题目" style="max-width:100%"></p>
+
+<h4 id="analysis">IDA 分析</h4>
+
+<p><img src="../assets/so_image004.png" alt="程序入口" style="max-width:100%"></p>
+
+<p>打开之后直接 F5 反编译。</p>
+
+<p><img src="../assets/so_image006.png" alt="F5 反编译" style="max-width:100%"></p>
+
+<p>此处 v4 是 32 的长度。</p>
+
+<p><img src="../assets/so_image008.png" alt="v4 长度分析" style="max-width:100%"></p>
+
+<p>然后就函数了，看一下函数。</p>
+
+<p><img src="../assets/so_image010.png" alt="函数列表" style="max-width:100%"></p>
+
+<p>看到下面 main 里头有个 hackme。</p>
+
+<p><img src="../assets/so_image011.png" alt="main 函数" style="max-width:100%"></p>
+
+<p>去看。</p>
+
+<h4 id="hackme">hackme 函数</h4>
+
+<p><img src="../assets/so_image013.png" alt="hackme 函数" style="max-width:100%"></p>
+
+<p>点进去看一下 F5。</p>
+
+<p><img src="../assets/so_image015.png" alt="hackme F5" style="max-width:100%"></p>
+
+<p>要 v1 为 1 执行 shell。</p>
+
+<p>也就是说，只要转一下目标，动态调试。</p>
+
+<p>第一大步完成。</p>
+
+<p><img src="../assets/so_image017.png" alt="动态调试" style="max-width:100%"></p>
+
+<p>然后 n。</p>
+
+<p><img src="../assets/so_image019.png" alt="下一步" style="max-width:100%"></p>
+
+<h4 id="exploit">漏洞利用</h4>
+
+<p>是 gets 溢出。</p>
+
+<p><img src="../assets/so_image021.png" alt="gets 溢出" style="max-width:100%"></p>
+
+<p>算一下。</p>
+
+<p><img src="../assets/so_image023.png" alt="计算偏移" style="max-width:100%"></p>
+
+<p>运行实例，完美。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>
