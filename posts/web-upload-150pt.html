@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>123 150pt —— 一句话木马文件上传 Writeup - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">#Web安全</a>
+    <a href="../tags/list.html?tag=文件上传" class="tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">#文件上传</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">123 150pt —— 一句话木马文件上传 Writeup</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件上传</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#step1">第一步：发现登录页面</a></li>
+    <li class="toc-h3"><a href="#step2">第二步：扫描后台 &amp; 找到备份文件</a></li>
+    <li class="toc-h3"><a href="#step3">第三步：爆破年份 + 登录</a></li>
+    <li class="toc-h3"><a href="#step4">第四步：F12 发现上传点</a></li>
+    <li class="toc-h3"><a href="#step5">第五步：一句话木马上传绕过</a></li>
+    <li class="toc-h3"><a href="#step6">第六步：读取 flag</a></li>
+  </ul>
+</nav>
+
+<h3 id="step1">第一步：发现登录页面</h3>
+
+<p>打开题目，看到登录页面，尝试用默认密码跟提供的例子都试了，什么都没出来。</p>
+
+<p><img src="../assets/ws_image002.gif" alt="页面截图" style="max-width:100%"></p>
+
+<p>点击去一个登录窗口，看到一个文件和一个例子，都试了啥也没有，这不是欺负老实人吗！</p>
+
+<p><img src="../assets/ws_image004.gif" alt="登录页面" style="max-width:100%"></p>
+
+<h3 id="step2">第二步：扫描后台 &amp; 找到备份文件</h3>
+
+<p>我扫了后台也没有发现什么，用源码下载工具尝试了一下，没什么能用的数据，难道是其他备份文件？</p>
+
+<p><img src="../assets/ws_image006.gif" alt="扫描后台" style="max-width:100%"></p>
+
+<p>试试 .swp .swo 都无果，后面才发现是 .bak 备份文件。</p>
+
+<p><img src="../assets/ws_image008.gif" alt="发现.bak" style="max-width:100%"></p>
+
+<p>打开发现都是人名（乱码）：</p>
+
+<p><img src="../assets/ws_image010.gif" alt="bak文件内容" style="max-width:100%"></p>
+
+<h3 id="step3">第三步：爆破年份 + 登录</h3>
+
+<p>想起了题目的提示：</p>
+
+<p><img src="../assets/ws_image012.gif" alt="题目提示" style="max-width:100%"></p>
+
+<p>开始爆破：</p>
+
+<p><img src="../assets/ws_image014.gif" alt="开始爆破" style="max-width:100%"></p>
+
+<p><img src="../assets/ws_image016.gif" alt="爆破过程" style="max-width:100%"></p>
+
+<p>记得选这个模式，你所选的地方都会替换成你输入的 payload。</p>
+
+<p><img src="../assets/ws_image018.gif" alt="爆破模式" style="max-width:100%"></p>
+
+<p>我试了 1999（年份）发现没有反应，回去看题目，"12341234" 就出来了，我就用二分法，从 1995 开始，所以年份就是 1995（纯是运气好）。</p>
+
+<p>得到凭据：</p>
+<ul>
+  <li><strong>username：</strong>zhangyuzhen</li>
+  <li><strong>password：</strong>zhangyuzhen1995</li>
+</ul>
+
+<p>进来发现什么都没有，上帝之眼！（F12）</p>
+
+<p><img src="../assets/ws_image020.gif" alt="F12开发者工具" style="max-width:100%"></p>
+
+<h3 id="step4">第四步：F12 发现上传点</h3>
+
+<p>文件上传，还是个表单（复制出来演示一下）：</p>
+
+<p><img src="../assets/ws_image022.gif" alt="上传表单" style="max-width:100%"></p>
+
+<p>所以试试能不能把注释删除（右击，编辑 HTML）：</p>
+
+<p><img src="../assets/ws_image024.gif" alt="编辑HTML" style="max-width:100%"></p>
+
+<p><img src="../assets/ws_image026.gif" alt="编辑结果" style="max-width:100%"></p>
+
+<p>结果如下图：</p>
+
+<p><img src="../assets/ws_image028.gif" alt="修改后效果" style="max-width:100%"></p>
+
+<h3 id="step5">第五步：一句话木马上传绕过</h3>
+
+<p>参考：一句话木马大全</p>
+
+<blockquote>
+  <a href="https://www.cnblogs.com/Rcsec/p/9426301.html">https://www.cnblogs.com/Rcsec/p/9426301.html</a>
+</blockquote>
+
+<p>补充知识：一句话木马的文件后缀名；php 的一些别名都可以尝试一下：php2, php3, php4, php5, phps, pht, phtm, phtml。有些只允许上传 .jpg, .png, .gif, .bmp 后缀的文件，这些都是题外话。只要回显成功就行。</p>
+
+<p><img src="../assets/ws_image030.gif" alt="一句话木马上传" style="max-width:100%"></p>
+
+<p>说什么来什么（上传成功）：</p>
+
+<p><img src="../assets/ws_image032.gif" alt="上传成功" style="max-width:100%"></p>
+
+<p>这样就过了，去访问一下这个文件：</p>
+
+<p><img src="../assets/ws_image034.gif" alt="访问上传文件" style="max-width:100%"></p>
+
+<h3 id="step6">第六步：读取 flag</h3>
+
+<p>找到 flag 文件，尝试读取：</p>
+
+<p><img src="../assets/ws_image036.gif" alt="尝试读取" style="max-width:100%"></p>
+
+<p>过滤了？试了双写 cat（flflagag），不行，干脆不带 cat：</p>
+
+<p><img src="../assets/ws_image038.gif" alt="拿到flag" style="max-width:100%"></p>
+
+<p>拿到 flag！</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>

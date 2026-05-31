@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>简单的JAVA逆向 Writeup - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="../tags/list.html?tag=Java" class="tag" style="background:#e34f2622;color:#e34f26;border:1px solid #e34f2644">#Java</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">简单的JAVA逆向 Writeup</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#e34f2622;color:#e34f26;border:1px solid #e34f2644">Java</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#tools">一、工具</a></li>
+    <li class="toc-h3"><a href="#easyapp">二、XOR 题 — easyapp</a></li>
+    <li class="toc-h4"><a href="#easyapp-info">步骤一：查信息</a></li>
+    <li class="toc-h4"><a href="#easyapp-decompile">步骤二：反编译看</a></li>
+    <li class="toc-h4"><a href="#easyapp-reverse">步骤三：逆着写脚本</a></li>
+    <li class="toc-h3"><a href="#astjs">三、.json 文件题 — astJS cjian</a></li>
+    <li class="toc-h3"><a href="#easy">四、水题</a></li>
+    <li class="toc-h3"><a href="#summary">五、总结</a></li>
+  </ul>
+</nav>
+
+<h3 id="tools">一、工具</h3>
+
+<p>常用工具：JEB、Jadx 和 Die。</p>
+
+<p>JEB / Jadx 具体怎么好用，目前谁也说不准谁最好，有的人觉得 JEB 好用些，有的人觉得 Jadx 也好用。注意：弄这两个必须熟悉 Java 语言。</p>
+
+<p>Die 是目前我见过的，识别最准的查壳信息工具。</p>
+
+<h3 id="easyapp">二、XOR 题 — [SWPUCTF 2021 新生赛] easyapp</h3>
+
+<h4 id="easyapp-info">步骤一：查信息</h4>
+
+<p>压缩文件把文件扩展名改为 .Zip 取出内部文件。</p>
+
+<p><img src="../assets/jr_image002.jpg" alt="查信息" style="max-width:100%"></p>
+
+<h4 id="easyapp-decompile">步骤二：反编译看</h4>
+
+<p>直接拿 Jadx 打开。</p>
+
+<p><img src="../assets/jr_image004.jpg" alt="Jadx 反编译" style="max-width:100%"></p>
+
+<p>这么简单的 JAVA 逆向去找关键代码，一般通过文件扩展名就可以判断出代码的撰写类型，一般不太会弄混 .so 和 .dex 文件，jar 包和 apk 包直接展开就好了，其余的类型可以看代码，例如：encoder 和 mainXXX 什么的。</p>
+
+<p>关键计算：</p>
+
+<p><img src="../assets/jr_image006.jpg" alt="关键计算 1" style="max-width:100%"></p>
+<p><img src="../assets/jr_image008.jpg" alt="关键计算 2" style="max-width:100%"></p>
+<p><img src="../assets/jr_image010.jpg" alt="关键计算 3" style="max-width:100%"></p>
+
+<p>关键计算，第二张图应该是加密部分，第一张应该是对 key 的处理。根据分析 key = 123456789，在图中做了颠倒处理，所以实际 Key = 987654321。</p>
+
+<h4 id="easyapp-reverse">步骤三：逆着写脚本</h4>
+
+<p><img src="../assets/jr_image012.gif" alt="XOR 脚本" style="max-width:100%"></p>
+
+<h3 id="astjs">三、.json 文件题 — [SWPUCTF 2021 新生赛] astJS cjian</h3>
+
+<p>步骤一：使用 npm 和 escodegen 还原，生成 js 代码，运行即可。如果没有 node 环境就去网上找在线工具，或者直接看 .json 文件。</p>
+
+<p><img src="../assets/jr_image014.jpg" alt="astJS 步骤 1" style="max-width:100%"></p>
+
+<p>步骤二：脚本。</p>
+
+<p><img src="../assets/jr_image016.jpg" alt="astJS 脚本" style="max-width:100%"></p>
+
+<h3 id="easy">四、水题</h3>
+
+<p>步骤一：了解文件结构，一般直接在 com 文件夹找到对应的目录，找 main 点开。</p>
+
+<p><img src="../assets/jr_image018.jpg" alt="水题" style="max-width:100%"></p>
+
+<p>直接看，签到题。</p>
+
+<h3 id="summary">五、总结</h3>
+
+<p>Java 题目还是偏简单的，不会太难。JAVA 的代码风格有差异，习惯看什么就比较熟悉什么，当然主要还是要熟悉 JAVA 基础。建议还是多刷一些简单的题，加强工具的使用，也增加视野的广度，遇到问题也可以尝试一下。</p>
+
+<p>好了，就本期的 Java 逆向学习，水一篇帖子，懂的人保证简单的题都能抓就行。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>

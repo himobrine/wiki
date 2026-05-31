@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.re RC4-500pt —— 两种解题方法 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="../tags/list.html?tag=RC4" class="tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">#RC4</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">4.re RC4-500pt —— 两种解题方法</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">RC4</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#method1">方法一：Patch + IDA 动调</a></li>
+    <ul>
+      <li class="toc-h5"><a href="#m1-step1">（1）查壳</a></li>
+      <li class="toc-h5"><a href="#m1-step2">（2）分析 main 函数</a></li>
+      <li class="toc-h5"><a href="#m1-step3">（3）准备 IDA 动调</a></li>
+      <li class="toc-h5"><a href="#m1-step4">（4）分析汇编并修改</a></li>
+      <li class="toc-h5"><a href="#m1-step5">（5）调试</a></li>
+    </ul>
+    <li class="toc-h4"><a href="#method2">方法二：直接动调</a></li>
+    <ul>
+      <li class="toc-h5"><a href="#m2-step1">（1）下断点，直接动调</a></li>
+      <li class="toc-h5"><a href="#m2-step2">（2）堆栈出结果</a></li>
+    </ul>
+  </ul>
+</nav>
+
+<p>这是一个 RC4 500pt 的逆向题目，下面介绍两种不同的解题方法。</p>
+
+<h4 id="method1">方法一：Patch + IDA 动调</h4>
+
+<h5 id="m1-step1">（1）查壳</h5>
+
+<p>首先查壳，确定程序无壳或已知壳类型。</p>
+
+<h5 id="m1-step2">（2）分析 main 函数</h5>
+
+<p>main 函数伪代码很大，不方便直接看。定位 <code>sub_</code> 开头的函数，按 <code>Tab</code> 键切换到汇编视图，分析汇编代码。</p>
+
+<p><img src="../assets/rc4_m1_image001.jpg" alt="main函数分析" style="max-width:100%"></p>
+
+<p><img src="../assets/rc4_m1_image002.jpg" alt="汇编分析" style="max-width:100%"></p>
+
+<h5 id="m1-step3">（3）准备 IDA 动调</h5>
+
+<p>下断点 <code>F2</code>，断点位置如图所示。设置好后回到汇编窗口。</p>
+
+<p><img src="../assets/rc4_m1_image003.jpg" alt="断点位置" style="max-width:100%"></p>
+
+<h5 id="m1-step4">（4）根据对汇编代码的分析</h5>
+
+<p>根据对汇编代码的分析，需要修改数据。找到这个位置：</p>
+
+<p><img src="../assets/rc4_m1_image004.jpg" alt="修改数据1" style="max-width:100%"></p>
+
+<p>修改：</p>
+
+<p><img src="../assets/rc4_m1_image005.jpg" alt="修改数据2" style="max-width:100%"></p>
+
+<p>这一行：</p>
+
+<p><img src="../assets/rc4_m1_image006.jpg" alt="修改数据3" style="max-width:100%"></p>
+
+<p><img src="../assets/rc4_m1_image007.gif" alt="修改数据4" style="max-width:100%"></p>
+
+<p>修改它的地址：</p>
+
+<p><img src="../assets/rc4_m1_image008.jpg" alt="修改地址" style="max-width:100%"></p>
+
+<p>改成这样，<code>patch</code> 一下，成这样：</p>
+
+<p><img src="../assets/rc4_m1_image009.jpg" alt="Patch结果" style="max-width:100%"></p>
+
+<p>再保存一下，点这个：</p>
+
+<p><img src="../assets/rc4_m1_image010.gif" alt="保存1" style="max-width:100%"></p>
+
+<p><img src="../assets/rc4_m1_image011.gif" alt="保存2" style="max-width:100%"></p>
+
+<p>好了，准备工作完成，开始调试。</p>
+
+<h5 id="m1-step5">（5）调试</h5>
+
+<p>选这个调试器：</p>
+
+<p><img src="../assets/rc4_m1_image012.jpg" alt="选择调试器" style="max-width:100%"></p>
+
+<p>运行后 <code>F8</code> 单步，观察运行窗口，出现结果：</p>
+
+<p><img src="../assets/rc4_m1_image013.jpg" alt="运行结果" style="max-width:100%"></p>
+
+<hr>
+
+<h4 id="method2">方法二：直接动调</h4>
+
+<p>由于这个题有缺陷，才诞生的这个方法（不适用别的题）。其实还有几个方法，但不细讲。面对 RC4，逆向有逆向的做法，pwn 有 pwn 的做法，密码有密码的做法。Ok，进入正题。</p>
+
+<p><b>注意：方法一的文件已经不适合用方法 2 了，因为方法一已经把文件损坏了。方法二需要使用原始文件。</b></p>
+
+<h5 id="m2-step1">（1）下断点，直接动调</h5>
+
+<p><img src="../assets/rc4_m2_image001.jpg" alt="动调截图" style="max-width:100%"></p>
+
+<h5 id="m2-step2">（2）动调</h5>
+
+<p>直接看堆栈窗口出结果，秒了。</p>
+
+<p><img src="../assets/rc4_m2_image002.jpg" alt="堆栈结果" style="max-width:100%"></p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>

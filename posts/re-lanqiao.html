@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>4.re 蓝桥杯逆向三道WP - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="../tags/list.html?tag=蓝桥杯" class="tag" style="background:#ec489922;color:#ec4899;border:1px solid #ec489944">#蓝桥杯</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">4.re 蓝桥杯逆向三道WP</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#ec489922;color:#ec4899;border:1px solid #ec489944">蓝桥杯</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#xor">1. XOR</a></li>
+    <li class="toc-h3"><a href="#base64">2. base64++</a></li>
+    <li class="toc-h3"><a href="#map">3. Map</a></li>
+  </ul>
+</nav>
+
+<h2 id="xor">1. XOR</h2>
+
+<p><b>（1）</b>使用 exeinfope 探查文件得出为 64 位。</p>
+
+<p><b>（2）</b>使用 IDA 查看代码：</p>
+
+<p><img src="../assets/lq_image002.gif" alt="IDA查看代码" style="max-width:100%"></p>
+
+<p><b>（3）</b>根据这个写脚本：</p>
+
+<p><img src="../assets/lq_image004.jpg" alt="XOR脚本" style="max-width:100%"></p>
+
+<p><b>（4）</b>得出 flag：<code>flag{a83ee6c1-2296-4d3e-9d3c-42604f76f7d5}</code></p>
+
+<hr>
+
+<h2 id="base64">2. base64++</h2>
+
+<p><b>（1）</b>探查。</p>
+
+<p><b>（2）</b>IDA 的 shift+F12 大法：</p>
+
+<p><img src="../assets/lq_image006.gif" alt="shift+F12字符串" style="max-width:100%"></p>
+
+<p><b>（3）</b>网站跑结果：</p>
+
+<p><img src="../assets/lq_image008.jpg" alt="base64解码结果" style="max-width:100%"></p>
+
+<hr>
+
+<h2 id="map">3. Map</h2>
+
+<p><b>（1）</b>探查。</p>
+
+<p><b>（2）</b>F5 查看伪代码：</p>
+
+<p><img src="../assets/lq_image010.jpg" alt="F5伪代码" style="max-width:100%"></p>
+
+<p>根据这里，用 IDApython 写以下内容：</p>
+
+<pre><code>print(''.join([x+"\n" for x in ''.join([chr(get_wide_byte(i+0x202020)) for i in range(0x21e2-0x2020)]).replace("li","0").replace("il","1").replace("|","").split("\x00\x00\x00\x00")]))</code></pre>
+
+<p><b>（3）</b>生成迷宫：</p>
+
+<p><img src="../assets/lq_image012.jpg" alt="生成迷宫" style="max-width:100%"></p>
+
+<p><b>（4）</b>用 dfs 算法或自己手写出结果：</p>
+
+<p><img src="../assets/lq_image014.gif" alt="手写路径" style="max-width:100%"></p>
+
+<p>解出：<code>sddddssdddssddssds</code></p>
+
+<p><b>（5）</b>由题意输入字符串的 32 位小写 MD5 值：</p>
+
+<pre><code>import hashlib
+input_string = "sddddssdddssddssds"
+md5_hash = hashlib.md5(input_string.encode()).hexdigest()[:32]
+print(md5_hash)</code></pre>
+
+<p>解出 flag。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>

