@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>crack实验 — IDA + x64dbg 逆向破解 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="../tags/list.html?tag=调试" class="tag tag-green">#调试</a>
+    <a href="../tags/list.html?tag=学习笔记" class="tag tag-orange">#学习笔记</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 05 / 31</div>
+  <div class="post-title">crack实验 — IDA + x64dbg 逆向破解</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a></li>
+    <li class="toc-h4"><a href="#ida">IDA 静态分析</a></li>
+    <li class="toc-h4"><a href="#x64dbg">x64dbg 动态调试</a></li>
+    <li class="toc-h4"><a href="#patch">修改跳转指令</a></li>
+    <li class="toc-h4"><a href="#binary">二进制补丁</a></li>
+    <li class="toc-h4"><a href="#result">验证结果</a></li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述</h4>
+
+<p>这是一个简单的条件判断程序。通过 IDA 静态分析和 x64dbg 动态调试，修改程序的跳转逻辑，实现破解。</p>
+
+<p><strong>源代码</strong>：<a href="https://download.csdn.net/download/m0_73248913/88833211" target="_blank" rel="nofollow">CSDN 下载 crack 实验源码（需积分）</a></p>
+
+<p><img src="../assets/cr_image002.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/cr_image004.png" alt="" style="max-width:100%"></p>
+
+<p><strong>源码</strong></p>
+
+<p><img src="../assets/cr_image006.png" alt="" style="max-width:100%"></p>
+
+<p>这是一次简单的条件判断程序。</p>
+
+<h4 id="ida">IDA 静态分析</h4>
+
+<p>exe 直接拖入 IDA 进行分析——release 版的 exe。</p>
+
+<p><img src="../assets/cr_image008.png" alt="" style="max-width:100%"></p>
+
+<p>选中分支直接按空格。</p>
+
+<p><img src="../assets/cr_image010.png" alt="" style="max-width:100%"></p>
+
+<p>此时 VA 地址为 <code>0010106e</code>。用动态调试来看一下，看看怎么修改这个分支。</p>
+
+<p><img src="../assets/cr_image012.png" alt="" style="max-width:100%"></p>
+
+<h4 id="x64dbg">x64dbg 动态调试</h4>
+
+<p>转换空格找到的地址。</p>
+
+<p><img src="../assets/cr_image013.png" alt="" style="max-width:100%"></p>
+
+<p>默认不是从 main 开始执行，F8 可以单步来看，看看开始之前干了什么。</p>
+
+<p><img src="../assets/cr_image014.png" alt="" style="max-width:100%"></p>
+
+<p>add push 压栈。</p>
+
+<p><img src="../assets/cr_image015.png" alt="" style="max-width:100%"></p>
+
+<p>F7 能看见函数的代码（如果遇到了 F8 会翻车的函数）。按 Win+G 直接跳转到刚刚的地址。选择后 F2 下断点。</p>
+
+<p><img src="../assets/cr_image016.png" alt="" style="max-width:100%"></p>
+
+<p>运行程序，F9 跑起来，弹出程序。</p>
+
+<p><img src="../assets/cr_image018.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/cr_image019.png" alt="" style="max-width:100%"></p>
+
+<p>此时 EAX 寄存器内的值是 <code>ffffffff</code>。</p>
+
+<p><img src="../assets/cr_image020.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/cr_image021.png" alt="" style="max-width:100%"></p>
+
+<h4 id="patch">修改跳转指令</h4>
+
+<p>条件跳转是通过 <code>test</code> 和 <code>je</code> 实现的。将 <code>je</code> 修改为 <code>jne</code> 就可以实现反着来跳转。或者将 <code>test</code> 修改为 <code>xor</code> 的话，无论前面是什么结果，后面都会继续执行。双击之后就可以修改。</p>
+
+<p><img src="../assets/cr_image022.png" alt="" style="max-width:100%"></p>
+
+<p><img src="../assets/cr_image023.png" alt="" style="max-width:100%"></p>
+
+<h4 id="binary">二进制补丁</h4>
+
+<p>此时需要在二进制文件之中修改对应的字节。</p>
+
+<p>已知 <code>va = 00401106E</code></p>
+
+<p>文件偏移地址 = 虚拟内存（va）- 装载地址（image base）- 节偏移 = <code>0040106e - 00400000 - (00001000 - 00001000) = 106e</code></p>
+
+<p>修改二进制文件，刚刚用 Win+G 跳转到：</p>
+
+<p><img src="../assets/cr_image025.png" alt="" style="max-width:100%"></p>
+
+<p>把此处的字节 <code>74</code>（JE）改为 <code>75</code>（JNE）。</p>
+
+<p>参考：<a href="https://blog.csdn.net/ssihc0/article/details/5215044" target="_blank" rel="nofollow">跳转指令机器码对照: JO/JNO/JB/JNB/JE/JNE/JBE/JA/JS/JNS/JP/JNP/JL/JNL/JNG/JG/JCXZ/JECXZ/JMP/JMPE - CSDN博客</a></p>
+
+<p><img src="../assets/cr_image027.png" alt="" style="max-width:100%"></p>
+
+<h4 id="result">验证结果</h4>
+
+<p>再次运行程序：</p>
+
+<p><img src="../assets/cr_image028.png" alt="" style="max-width:100%"></p>
+
+<p>此时 <code>1234567</code> 的字符串修改成功。</p>
+
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+  else if (t === 'rei') qToggle = 'dark';
+  else qToggle = 'dark';
+}
+const saved = localStorage.getItem('theme') || 'dark';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+else if (saved === 'rei') qToggle = 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
+themeBtn.addEventListener('click', () => {
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+  const lines = pre.textContent.split('\n').length;
+  const header = document.createElement('div');
+  header.className = 'code-header';
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = 'CODE // ' + lines + ' line' + (lines === 1 ? '' : 's');
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>

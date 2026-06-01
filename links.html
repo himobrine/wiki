@@ -49,7 +49,7 @@
 </div>
 
 <div class="footer fade-up">
-  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0 <span class="rei-symbol">◈</span></div>
   <div class="motto">&gt; 道可道，非常道，名可名，非常名 </div>
   <div class="links">
     <a href="https://github.com/himobrine/wiki">GitHub</a>
@@ -74,10 +74,14 @@
   <div class="theme-dock-item" data-theme="ego">
     ♢
   </div>
+  <div class="theme-dock-item" data-theme="rei">
+    レ
+  </div>
 </div>
 
 <div class="floating-buttons">
   <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+
   <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
@@ -110,7 +114,7 @@ document.querySelectorAll('.fade-up').forEach(el => animObserver.observe(el));
 const html = document.documentElement;
 const themeBtn = document.getElementById('themeToggle');
 const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢' };
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
 const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 let qToggle = 'light';
 function setTheme(t) {
@@ -120,10 +124,13 @@ function setTheme(t) {
   document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
   if (t === 'dark') qToggle = 'light';
   else if (t === 'light') qToggle = 'dark';
+  else if (t === 'rei') qToggle = 'dark';
+  else qToggle = 'dark';
 }
 const saved = localStorage.getItem('theme') || 'dark';
 setTheme(saved);
 if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+else if (saved === 'rei') qToggle = 'dark';
 document.querySelectorAll('.theme-dock-item').forEach(el =>
   el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
 );
@@ -152,6 +159,7 @@ const topObs = new IntersectionObserver(
   { threshold: [0] }
 );
 topObs.observe(document.getElementById('navSentinel'));
+
 </script>
 
 </body>
