@@ -657,6 +657,7 @@ body {
 
 /* Title red underline animation */
 [data-theme="rei"] .post-title a {
+  color: var(--rei-red);
   background-image: linear-gradient(var(--rei-red), var(--rei-red));
   background-repeat: no-repeat;
   background-position: left bottom;
@@ -667,6 +668,30 @@ body {
 [data-theme="rei"] .post-title a:hover {
   background-size: 100% 2px;
   color: var(--rei-red);
+}
+
+/* Article content links */
+[data-theme="rei"] .post-content a {
+  color: var(--rei-red);
+}
+[data-theme="rei"] .post-content a:hover {
+  color: var(--text-primary);
+  text-shadow: 0 0 8px color-mix(in srgb, var(--rei-red) 30%, transparent);
+}
+
+/* TOC links */
+[data-theme="rei"] .post-toc a:hover,
+[data-theme="rei"] .post-toc a.active {
+  color: var(--rei-red);
+  border-left-color: var(--rei-red);
+}
+
+/* Back link */
+[data-theme="rei"] .back-link {
+  color: var(--rei-red);
+}
+[data-theme="rei"] .back-link:hover {
+  color: var(--text-primary);
 }
 
 /* Tag pill shape with red hover */

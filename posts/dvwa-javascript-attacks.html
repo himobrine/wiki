@@ -275,7 +275,8 @@ function setTheme(t) {
   document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
   if (t === 'dark') qToggle = 'light';
   else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';\r\n  else qToggle = 'dark';
+  else if (t === 'rei') qToggle = 'dark';
+  else qToggle = 'dark';
 }
 const saved = localStorage.getItem('theme') || 'dark';
 setTheme(saved);
