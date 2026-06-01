@@ -178,7 +178,8 @@ body {
   background: linear-gradient(0deg, transparent, rgba(0,0,0,0.04), transparent);
 }
 [data-theme="crystal"] .scanline,
-[data-theme="ego"] .scanline {
+[data-theme="ego"] .scanline,
+[data-theme="rei"] .scanline {
   opacity: 0;
 }
 @keyframes scan { 0% { top: -5%; } 100% { top: 105%; } }
@@ -246,7 +247,7 @@ body {
 .nav-sticky-wrapper.fixed {
   position: fixed; top: 0; left: 0; right: 0;
   border-bottom-color: color-mix(in srgb, var(--accent-cyan) 25%, transparent);
-  box-shadow: 0 2px 20px rgba(0,0,0,0.6), 0 0 30px color-mix(in srgb, var(--accent-cyan) 6%, transparent);
+  box-shadow: 0 2px 20px color-mix(in srgb, var(--text-primary) 20%, transparent), 0 0 30px color-mix(in srgb, var(--accent-cyan) 6%, transparent);
   background: var(--nav-bg-stuck);
   margin-left: 0;  margin-right: 0;
   padding-left: 20px;  padding-right: 20px;
