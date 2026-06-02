@@ -531,13 +531,13 @@ body {
   border-radius: 4px;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(10px);
-  transition: opacity 0.04s ease, transform 0.04s ease;
+  transform: translateX(20px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 .theme-dock.visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
+  transform: translateX(0);
 }
 .theme-dock-item {
   display: flex;
