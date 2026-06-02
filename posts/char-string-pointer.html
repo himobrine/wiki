@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>C/C++ 字符、字符串与指针 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="../tags/list.html?tag=C/C++" class="tag tag-blue">#C/C++</a>
+    <a href="../tags/list.html?tag=底层原理" class="tag tag-orange">#底层原理</a>
+    <a href="../tags/list.html?tag=学习笔记" class="tag tag-orange">#学习笔记</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 02</div>
+  <div class="post-title">C/C++ 字符、字符串与指针</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</span>
+    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</span>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#char-string">字符与字符串</a>
+      <ul>
+        <li class="toc-h5"><a href="#encoding">字符的编码</a></li>
+        <li class="toc-h5"><a href="#string-storage">字符串的存储方式</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#address-pointer">地址与指针的概念</a>
+      <ul>
+        <li class="toc-h5"><a href="#ptr-vs-addr">指针与地址的区别</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#pointer-detail">指针详解</a>
+      <ul>
+        <li class="toc-h5"><a href="#same-addr-diff-type">不同指针指向同一地址</a></li>
+        <li class="toc-h5"><a href="#pointer-offset">指针的偏移寻址方式</a></li>
+        <li class="toc-h5"><a href="#pointer-arithmetic">指针运算规则</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#reference">引用</a>
+      <ul>
+        <li class="toc-h5"><a href="#ref-basic">引用的基本用法</a></li>
+        <li class="toc-h5"><a href="#ref-parameter">引用作为函数参数</a></li>
+        <li class="toc-h5"><a href="#ref-summary">引用本质</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="char-string">字符与字符串</h4>
+
+<p>字符与字符串是 C/C++ 编程的基础。<code>\0</code> 作为字符串的终止标志。</p>
+
+<h5 id="encoding">字符的编码</h5>
+
+<p>编码格式主要分为两种：ASCII 和 Unicode。ASCII 只占 1 字节，值在 0-255 之间。</p>
+
+<p>使用 <code>char</code> 存储 ASCII 格式的字符，使用 <code>wchar_t</code> 存储 Unicode 格式的字符。<code>wchar_t</code> 中兼容 ASCII 的字符高位为 0。</p>
+
+<p>参考：<a href="https://c.biancheng.net/c/ascii/">ASCII 码一览表（非常详细） - C 语言中文网</a></p>
+
+<h5 id="string-storage">字符串的存储方式</h5>
+
+<p>字符串的存储方式主要有两种：</p>
+
+<ol>
+  <li>
+    <p><strong>定长方式</strong></p>
+    <p>优点：获取字符串长度不需要遍历。</p>
+    <p>缺点：要存储字符串长度 n 的额外开销，且字符串不能超过长度范围。</p>
+  </li>
+  <li>
+    <p><strong>终结符方式</strong></p>
+    <p>优点：没有长度限制，可存储任意长度的字符串。</p>
+    <p>缺点：需要遍历计算长度，效率不高。</p>
+  </li>
+</ol>
+
+<p>C/C++ 使用 <code>\0</code> 作为终止标志。ASCII 使用 1 字节的 <code>\0</code>，Unicode 使用 2 字节的 <code>\0</code>。注意：需要使用一个变量存储字符串的第一个字符位置，以便遍历操作。</p>
+
+<p>逻辑判断中，<code>0</code> 和 <code>0.0</code> 为假，非 0 为真。</p>
+
+<h4 id="address-pointer">地址与指针的概念</h4>
+
+<p>C/C++ 中的地址用 16 进制表示。取一个变量的地址使用 <code>&amp;</code> 运算符。只有变量才能取地址，没有地址的（如 <code>const</code> 常量、字面量）无法取地址。</p>
+
+<p>指针使用 <code>TYPE*</code> 的形式定义，<code>type</code> 为指向的数据类型。任何数据都可以定义为指针，指针本身也是一种数据类型，也存储在内存中，也有自己的地址，因此可以有多级指针。</p>
+
+<h5 id="ptr-vs-addr">指针与地址的区别</h5>
+
+<p style="text-align:center"><strong>不同点</strong></p>
+
+<table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1px solid var(--border-color);width:100%">
+<tr style="background:var(--bg-secondary)">
+  <td width="50%" style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">指针</p></td>
+  <td width="50%" style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">地址</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">存放变量，可修改指向</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">位置在内存中</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">可修改，重新赋值指向新地址</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">不可修改</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">可对自己执行取地址操作</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">不能对自己取地址</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">携带被指向类型的类型信息</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">仅有地址值，无法获取类型信息</p></td>
+</tr>
+</table>
+
+<p style="text-align:center"><strong>相同点</strong></p>
+
+<table class="MsoTableGrid" border="1" cellspacing="0" cellpadding="0" style="border-collapse:collapse;border:1px solid var(--border-color);width:100%">
+<tr style="background:var(--bg-secondary)">
+  <td width="50%" style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">指针</p></td>
+  <td width="50%" style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">地址</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">取指针值得到对应内存的数据</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">取地址值得到对应内存的数据</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">对地址偏移后取数据</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">偏移后取数据，类型丢失</p></td>
+</tr>
+<tr>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">可以计算两个地址值的差</p></td>
+  <td style="padding:6pt;border:1px solid var(--border-color)"><p style="text-align:center">可以计算两个地址的差</p></td>
+</tr>
+</table>
+
+<h4 id="pointer-detail">指针详解</h4>
+
+<h5 id="same-addr-diff-type">不同指针指向同一地址</h5>
+
+<p>不同类型的指针指向同一地址时，读取的数据宽度不同。</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(){
+    int n = 0x12345678;
+    int *p1 = &amp;n;
+    char *p2 = (char*)&amp;n;
+    short *p3 = (short*)&amp;n;
+    printf("%08x", *p1);
+    printf("%08x", *p2);
+    printf("%08x", *p3);
+    return 0;
+}</code></pre>
+
+<p><strong>C — MinGW 64</strong></p>
+
+<pre><code>main:
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x40,%rsp
+    call    0x7ff6f3591877          ; &lt;__main&gt;
+    movl    $0x12345678,-0x1c(%rbp) ; n = 0x12345678
+    lea     -0x1c(%rbp),%rax
+    mov     %rax,-0x8(%rbp)         ; int *p1 = &amp;n
+    lea     -0x1c(%rbp),%rax
+    mov     %rax,-0x10(%rbp)        ; char *p2 = &amp;n
+    lea     -0x1c(%rbp),%rax
+    mov     %rax,-0x18(%rbp)        ; short *p3 = &amp;n
+    mov     -0x8(%rbp),%rax         ; *p1
+    mov     (%rax),%eax             ; 读取4字节
+    mov     %eax,%edx               ; 参数2 p1
+    lea     0x8894(%rip),%rax       ; 参数1 %08x
+    mov     %rax,%rcx
+    call    printf
+    mov     -0x10(%rbp),%rax        ; *p2
+    movzbl  (%rax),%eax             ; 读取1字节
+    movsbl  %al,%eax                ; 扩展32位
+    mov     %eax,%edx
+    lea     0x8879(%rip),%rax       ; 参数1 %08x
+    mov     %rax,%rcx
+    call    printf
+    mov     -0x18(%rbp),%rax        ; *p3
+    movzwl  (%rax),%eax             ; 读取2字节
+    cwtl                           ; ax扩展为eax
+    mov     %eax,%edx
+    lea     0x8860(%rip),%rax       ; 参数1 %08x
+    mov     %rax,%rcx
+    call    printf
+    mov     $0x0,%eax
+    add     $0x40,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>C — MSVC x64</strong></p>
+
+<pre><code>main(...):
+    pushq   %rdi
+    subq    $0x50, %rsp
+    leaq    0x20(%rsp), %rdi
+    movl    $0xc, %ecx
+    movl    $0xcccccccc, %eax
+    rep     stosl %eax, %es:(%rdi)
+    movl    $0x12345678, 0x24(%rsp) ; int n = 0x12345678
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x38(%rsp)        ; int *p1 = &amp;n
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x40(%rsp)        ; char *p2 = &amp;n
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x48(%rsp)        ; short *p3 = &amp;n
+    movq    0x38(%rsp), %rax        ; *p1
+    movl    (%rax), %edx            ; 参数2 p1
+    leaq    0xaaf5(%rip), %rcx      ; 参数1 %08x
+    callq   printf
+    movq    0x40(%rsp), %rax        ; *p2
+    movsbl  (%rax), %eax            ; 读取1字节扩展32位
+    movl    %eax, %edx              ; 参数2 p2
+    leaq    0xaae7(%rip), %rcx      ; 参数1 %08x
+    callq   printf
+    movq    0x48(%rsp), %rax        ; *p3
+    movswl  (%rax), %eax            ; 读取2字节扩展为32位
+    movl    %eax, %edx              ; 参数2 p3
+    leaq    0xaad9(%rip), %rcx      ; 参数1 %08x
+    callq   printf
+    xorl    %eax, %eax
+    movl    %eax, %edi
+    movq    %rsp, %rcx
+    leaq    0x8736(%rip), %rdx
+    callq   _RTC_CheckStackVars
+    movl    %edi, %eax
+    addq    $0x50, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<p><strong>C — MSVC x86</strong></p>
+
+<pre><code>main(...):
+    pushl   %ebp
+    movl    %esp, %ebp
+    subl    $0x18, %esp
+    movl    $0xcccccccc, %eax
+    movl    %eax, -0x18(%ebp)
+    movl    %eax, -0x14(%ebp)
+    movl    %eax, -0x10(%ebp)
+    movl    %eax, -0xc(%ebp)
+    movl    %eax, -0x8(%ebp)
+    movl    %eax, -0x4(%ebp)
+    movl    $0x12345678, -0x8(%ebp) ; int n = 0x12345678
+    leal    -0x8(%ebp), %eax
+    movl    %eax, -0x10(%ebp)       ; int *p1 = &amp;n
+    leal    -0x8(%ebp), %ecx
+    movl    %ecx, -0x14(%ebp)       ; char *p2 = &amp;n
+    leal    -0x8(%ebp), %edx
+    movl    %edx, -0x18(%ebp)       ; short *p3 = &amp;n
+    movl    -0x10(%ebp), %eax       ; *p1
+    movl    (%eax), %ecx
+    pushl   %ecx                    ; 参数2 *p1
+    pushl   $0x919000               ; 参数1 %08x
+    calll   _printf
+    addl    $0x8, %esp
+    movl    -0x14(%ebp), %edx       ; *p2
+    movsbl  (%edx), %eax            ; 取1字节扩展32位
+    pushl   %eax                    ; 参数2 *p2
+    pushl   $0x919008               ; 参数1 %08x
+    calll   _printf
+    addl    $0x8, %esp
+    movl    -0x18(%ebp), %ecx       ; *p3
+    movswl  (%ecx), %edx            ; 取2字节扩展32位
+    pushl   %edx                    ; 参数2 *p3
+    pushl   $0x919010               ; 参数1 %08x
+    calll   _printf
+    addl    $0x8, %esp
+    xorl    %eax, %eax
+    pushl   %edx
+    movl    %ebp, %ecx
+    pushl   %eax
+    leal    0x911554, %edx
+    calll   @_RTC_CheckStackVars@8
+    popl    %eax
+    popl    %edx
+    addl    $0x18, %esp
+    cmpl    %esp, %ebp
+    calll   __RTC_CheckEsp
+    movl    %ebp, %esp
+    popl    %ebp
+    retl</code></pre>
+
+<h5 id="pointer-offset">指针的偏移寻址方式</h5>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[]){
+    char ary[5] = {(char)0x01, (char)0x23, (char)0x45, (char)0x67, (char)0x89};
+    int *p1 = (int*)ary;
+    char *p2 = (char*)ary;
+    short *p3 = (short*)ary;
+
+    p1 += 1;
+    p2 += 1;
+    p3 += 1;
+    return 0;
+}</code></pre>
+
+<p><strong>C — MinGW 64</strong></p>
+
+<pre><code>main(int, char**):
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x40,%rsp
+    mov     %ecx,0x10(%rbp)
+    mov     %rdx,0x18(%rbp)
+    call    __main
+    movl    $0x67452301,-0x1d(%rbp)
+    movb    $0x89,-0x19(%rbp)        ; char ary[5]
+    lea     -0x1d(%rbp),%rax
+    mov     %rax,-0x8(%rbp)          ; int *p1
+    lea     -0x1d(%rbp),%rax
+    mov     %rax,-0x10(%rbp)         ; char *p2
+    lea     -0x1d(%rbp),%rax
+    mov     %rax,-0x18(%rbp)         ; short *p3
+    addq    $0x4,-0x8(%rbp)          ; p1 += 1 (偏移4字节)
+    addq    $0x1,-0x10(%rbp)         ; p2 += 1 (偏移1字节)
+    addq    $0x2,-0x18(%rbp)         ; p3 += 1 (偏移2字节)
+    mov     $0x0,%eax
+    add     $0x40,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>C — MSVC x64</strong></p>
+
+<pre><code>main(int,char **):
+    movq    %rdx, 0x10(%rsp)
+    movl    %ecx, 0x8(%rsp)
+    pushq   %rdi
+    subq    $0x60, %rsp
+    leaq    0x20(%rsp), %rdi
+    movl    $0x10, %ecx
+    movl    $0xcccccccc, %eax
+    rep     stosl %eax, %es:(%rdi)
+    movl    0x70(%rsp), %ecx
+    movq    0xab26(%rip), %rax       ; __security_cookie (canary)
+    xorq    %rsp, %rax
+    movq    %rax, 0x58(%rsp)
+    movb    $0x1, 0x24(%rsp)
+    movb    $0x23, 0x25(%rsp)
+    movb    $0x45, 0x26(%rsp)
+    movb    $0x67, 0x27(%rsp)
+    movb    $-0x77, 0x28(%rsp)       ; 写入 char ary[5]
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x38(%rsp)         ; int *p1
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x40(%rsp)         ; char *p2
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x48(%rsp)         ; short *p3
+    movq    0x38(%rsp), %rax
+    addq    $0x4, %rax
+    movq    %rax, 0x38(%rsp)         ; *p1 += 1
+    movq    0x40(%rsp), %rax
+    incq    %rax
+    movq    %rax, 0x40(%rsp)         ; *p2 += 1
+    movq    0x48(%rsp), %rax
+    addq    $0x2, %rax
+    movq    %rax, 0x48(%rsp)         ; *p3 += 1
+    xorl    %eax, %eax
+    movl    %eax, %edi
+    movq    %rsp, %rcx
+    leaq    0x86b0(%rip), %rdx
+    callq   _RTC_CheckStackVars
+    movl    %edi, %eax
+    movq    0x58(%rsp), %rcx
+    xorq    %rsp, %rcx
+    callq   __security_check_cookie  ; canary
+    addq    $0x60, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<p><strong>C — MSVC x86</strong></p>
+
+<pre><code>main(int,char **):
+    pushl   %ebp
+    movl    %esp, %ebp
+    subl    $0x20, %esp
+    movl    $0xcccccccc, %eax
+    movl    %eax, -0x20(%ebp)
+    movl    %eax, -0x1c(%ebp)
+    movl    %eax, -0x18(%ebp)
+    movl    %eax, -0x14(%ebp)
+    movl    %eax, -0x10(%ebp)
+    movl    %eax, -0xc(%ebp)
+    movl    %eax, -0x8(%ebp)
+    movl    %eax, -0x4(%ebp)
+    movl    0x949000, %eax
+    xorl    %ebp, %eax
+    movl    %eax, -0x4(%ebp)
+    movb    $0x1, -0x10(%ebp)
+    movb    $0x23, -0xf(%ebp)
+    movb    $0x45, -0xe(%ebp)
+    movb    $0x67, -0xd(%ebp)
+    movb    $-0x77, -0xc(%ebp)       ; char ary[5]
+    leal    -0x10(%ebp), %eax
+    movl    %eax, -0x18(%ebp)        ; int *p1
+    leal    -0x10(%ebp), %ecx
+    movl    %ecx, -0x1c(%ebp)        ; char *p2
+    leal    -0x10(%ebp), %edx
+    movl    %edx, -0x20(%ebp)        ; short *p3
+    movl    -0x18(%ebp), %eax
+    addl    $0x4, %eax
+    movl    %eax, -0x18(%ebp)        ; p1 += 1
+    movl    -0x1c(%ebp), %ecx
+    addl    $0x1, %ecx
+    movl    %ecx, -0x1c(%ebp)        ; p2 += 1
+    movl    -0x20(%ebp), %edx
+    addl    $0x2, %edx
+    movl    %edx, -0x20(%ebp)        ; p3 += 1
+    xorl    %eax, %eax
+    pushl   %edx
+    movl    %ebp, %ecx
+    pushl   %eax
+    leal    0x941540, %edx
+    calll   @_RTC_CheckStackVars@8
+    popl    %eax
+    popl    %edx
+    movl    -0x4(%ebp), %ecx
+    xorl    %ebp, %ecx
+    calll   @__security_check_cookie@4 ; canary
+    movl    %ebp, %esp
+    popl    %ebp
+    retl</code></pre>
+
+<h5 id="pointer-arithmetic">指针运算规则</h5>
+
+<p>指针保存的地址作为基址进行寻址，以 <code>[基地址 + 偏移量]</code> 的方式访问目标地址。地址寻址方式如下：</p>
+
+<pre><code>type *p; // type 为指向的数据类型
+p + n : 目标地址 = 基地址 + sizeof(type) * n</code></pre>
+
+<p>注意：两个指针的值不可以相加（两个地址值相加得到的是一个新的地址，但该地址无法确定是否有意义，因此不允许相加）。</p>
+
+<p>指针可以减法运算，乘法和除法没有意义（原因同上）。两个同类型指针（强转也可以）相减，得到的是指针指向的元素的个数。</p>
+
+<pre><code>type *p;
+type *q;
+p - q = ((int)p - (int)q) / sizeof(type)</code></pre>
+
+<h4 id="reference">引用</h4>
+
+<p>C++ 为简化操作，对指针操作进行了封装，提供了引用（Reference）类型。</p>
+
+<h5 id="ref-basic">引用的基本用法</h5>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+void add(int &amp;ref){
+    ref++;
+}
+
+int main(int argc, char argv[]){
+    int n = 0x12345678;
+    int &amp;ref = n;
+    add(ref);
+    return 0;
+}</code></pre>
+
+<p><strong>C++ — MinGW 64</strong></p>
+
+<pre><code>main(int, char*):
+    push    %rbp
+    mov     %rsp,%rbp
+    sub     $0x30,%rsp
+    mov     %ecx,0x10(%rbp)
+    mov     %rdx,0x18(%rbp)
+    call    __main
+    movl    $0x12345678,-0xc(%rbp)   ; int n = 0x12345678
+    lea     -0xc(%rbp),%rax
+    mov     %rax,-0x8(%rbp)          ; int &amp;ref = n (存地址)
+    mov     -0x8(%rbp),%rax          ; 取n的地址
+    mov     %rax,%rcx                ; 传递n的地址
+    call    add(int&amp;)                 ; 传地址
+    mov     $0x0,%eax
+    add     $0x30,%rsp
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>C++ — MSVC x64</strong></p>
+
+<pre><code>main(int,char *):
+    movq    %rdx, 0x10(%rsp)
+    movl    %ecx, 0x8(%rsp)
+    pushq   %rdi
+    subq    $0x40, %rsp
+    leaq    0x20(%rsp), %rdi
+    movl    $0x8, %ecx
+    movl    $0xcccccccc, %eax
+    rep     stosl %eax, %es:(%rdi)
+    movl    0x50(%rsp), %ecx
+    movl    $0x12345678, 0x24(%rsp)  ; int n = 0x12345678
+    leaq    0x24(%rsp), %rax
+    movq    %rax, 0x38(%rsp)
+    movq    0x38(%rsp), %rcx         ; int &amp;ref = n
+    callq   add(int &amp; __ptr64)        ; 传地址
+    xorl    %eax, %eax
+    movl    %eax, %edi
+    movq    %rsp, %rcx
+    leaq    0x86d3(%rip), %rdx
+    callq   _RTC_CheckStackVars
+    movl    %edi, %eax
+    addq    $0x40, %rsp
+    popq    %rdi
+    retq</code></pre>
+
+<p><strong>C++ — MSVC x86</strong></p>
+
+<pre><code>main(int,char *):
+    pushl   %ebp
+    movl    %esp, %ebp
+    subl    $0x10, %esp
+    movl    $0xcccccccc, %eax
+    movl    %eax, -0x10(%ebp)
+    movl    %eax, -0xc(%ebp)
+    movl    %eax, -0x8(%ebp)
+    movl    %eax, -0x4(%ebp)
+    movl    $0x12345678, -0x8(%ebp)  ; int n = 0x12345678
+    leal    -0x8(%ebp), %eax
+    movl    %eax, -0x10(%ebp)        ; int &amp;ref = n
+    movl    -0x10(%ebp), %ecx
+    pushl   %ecx                     ; 传递n的地址
+    calll   add(int &amp;)
+    addl    $0x4, %esp
+    xorl    %eax, %eax
+    pushl   %edx
+    movl    %ebp, %ecx
+    pushl   %eax
+    leal    0x311534, %edx
+    calll   @_RTC_CheckStackVars@8
+    popl    %eax
+    popl    %edx
+    addl    $0x10, %esp
+    cmpl    %esp, %ebp
+    calll   __RTC_CheckEsp
+    movl    %ebp, %esp
+    popl    %ebp
+    retl</code></pre>
+
+<h5 id="ref-parameter">引用作为函数参数</h5>
+
+<pre><code>void add(int &amp;ref){
+    ref++;
+}</code></pre>
+
+<p><strong>C++ — MinGW 64</strong></p>
+
+<pre><code>add(int&amp;):
+    push    %rbp
+    mov     %rsp,%rbp
+    mov     %rcx,0x10(%rbp)          ; 存入指针（引用地址）
+    mov     0x10(%rbp),%rax
+    mov     (%rax),%eax              ; 取出ref的数据
+    lea     0x1(%rax),%edx           ; +1
+    mov     0x10(%rbp),%rax
+    mov     %edx,(%rax)              ; 写回去
+    nop
+    pop     %rbp
+    ret</code></pre>
+
+<p><strong>C++ — MSVC x64</strong></p>
+
+<pre><code>add(int &amp;):
+    movq    %rcx, 0x8(%rsp)          ; 存入指针
+    pushq   %rdi
+    movq    0x10(%rsp), %rax         ; 取出ref的地址
+    movl    (%rax), %eax
+    incl    %eax                     ; +1
+    movq    0x10(%rsp), %rcx
+    movl    %eax, (%rcx)             ; 写回去
+    popq    %rdi
+    retq
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3</code></pre>
+
+<p><strong>C++ — MSVC x86</strong></p>
+
+<pre><code>add(int &amp;):
+    pushl   %ebp
+    movl    %esp, %ebp
+    movl    0x8(%ebp), %eax
+    movl    (%eax), %ecx             ; 取出ref数据
+    addl    $0x1, %ecx               ; +1
+    movl    0x8(%ebp), %edx
+    movl    %ecx, (%edx)             ; 写回去
+    popl    %ebp
+    retl
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3
+    int3</code></pre>
+
+<h5 id="ref-summary">引用本质</h5>
+
+<p>引用在底层实现上就是一个指针，编译器自动完成了取地址和解引用的操作，除此之外与指针没有太大区别。</p>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+  else if (t === 'rei') qToggle = 'dark';
+  else qToggle = 'dark';
+}
+const saved = localStorage.getItem('theme') || 'dark';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+else if (saved === 'rei') qToggle = 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
+themeBtn.addEventListener('click', () => {
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+</body>
+</html>
