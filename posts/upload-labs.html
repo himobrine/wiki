@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>upload-labs 搭建 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/style.css">
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=upload-labs" class="tag tag-green">#upload-labs</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2024 // 01 / 27</div>
+  <div class="post-title">upload-labs 搭建</div>
+  <div class="post-tags">
+    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
+    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">upload-labs</span>
+  </div>
+</div>
+
+<div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+<nav class="post-toc">
+  <span class="post-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#about">关于 upload-labs</a></li>
+    <li class="toc-h4"><a href="#docker">Docker 搭建</a></li>
+    <li class="toc-h4"><a href="#windows">Windows 搭建</a></li>
+  </ul>
+</nav>
+
+<h4 id="about">关于 upload-labs</h4>
+
+<p>upload-labs 是一个使用 php 语言编写的，专门收集渗透测试过程中遇到的各种文件上传漏洞的靶场，用于学习文件上传漏洞攻击和防御。</p>
+
+<p>项目地址：<a href="https://github.com/c0ny1/upload-labs" target="_blank" rel="noopener">https://github.com/c0ny1/upload-labs</a></p>
+
+<h4 id="docker">Docker 搭建</h4>
+
+<p>使用 Docker 可以快速完成部署：</p>
+
+<pre><code>docker pull c0ny1/upload-labs</code></pre>
+
+<p>拉取完成后启动容器：</p>
+
+<pre><code>docker run -d -p 80:80 c0ny1/upload-labs</code></pre>
+
+<p>启动后直接访问 <code>http://127.0.0.1</code> 即可进入靶场。</p>
+
+<h4 id="windows">Windows 搭建</h4>
+
+<p>下载 upload-labs 源码（建议从 GitHub 下载 zip 包）：</p>
+
+<p><a href="https://github.com/c0ny1/upload-labs" target="_blank" rel="noopener">https://github.com/c0ny1/upload-labs</a></p>
+
+<p>将解压后的文件夹复制到 phpstudy 的 WWW 目录下。<br>
+无需数据库，直接访问 <code>http://127.0.0.1/upload-labs</code> 即可。<br>
+注意需要在靶场目录下手动创建一个 <code>upload</code> 文件夹用于存放上传的文件。</p>
+
+
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const html = document.documentElement;
+const themeBtn = document.getElementById('themeToggle');
+const themeDock = document.getElementById('themeDock');
+const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
+const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+let qToggle = 'light';
+function setTheme(t) {
+  html.setAttribute('data-theme', t);
+  localStorage.setItem('theme', t);
+  themeBtn.textContent = themeIcons[t] || '☽';
+  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
+  if (t === 'dark') qToggle = 'light';
+  else if (t === 'light') qToggle = 'dark';
+  else if (t === 'rei') qToggle = 'dark';
+  else qToggle = 'dark';
+}
+const saved = localStorage.getItem('theme') || 'dark';
+setTheme(saved);
+if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
+else if (saved === 'rei') qToggle = 'dark';
+document.querySelectorAll('.theme-dock-item').forEach(el =>
+  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
+);
+themeBtn.addEventListener('click', () => {
+  if (isTouch) { themeDock.classList.toggle('visible'); }
+  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
+});
+if (!isTouch) {
+  let dockTimer;
+  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
+  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
+  themeBtn.addEventListener('mouseenter', showDock);
+  themeBtn.addEventListener('mouseleave', hideDock);
+  themeDock.addEventListener('mouseenter', showDock);
+  themeDock.addEventListener('mouseleave', hideDock);
+}
+document.addEventListener('click', e => {
+  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
+});
+const topBtn = document.getElementById('backToTop');
+topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
+
+/* sticky nav */
+const navSentinel = document.getElementById('navSentinel');
+const navWrap = document.getElementById('navWrap');
+let navSpacer = null;
+const navObs = new IntersectionObserver(([e]) => {
+  const stuck = !e.isIntersecting;
+  navWrap.classList.toggle('fixed', stuck);
+  if (stuck && !navSpacer) {
+    navSpacer = document.createElement('div');
+    navSpacer.style.height = navWrap.offsetHeight + 'px';
+    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
+  } else if (!stuck && navSpacer) {
+    navSpacer.remove(); navSpacer = null;
+  }
+}, { threshold: [0] });
+navObs.observe(navSentinel);
+
+/* TOC active highlight */
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+
+</script>
+
+</body>
+</html>

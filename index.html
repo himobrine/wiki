@@ -46,509 +46,7 @@
 
 <h2 class="section-title fade-up">// LATEST // DOCUMENT</h2>
 
-<div class="post fade-up">
-  <div class="post-date">2026 // 06 / 04</div>
-  <div class="post-title"><a href="posts/cpp-constants.html">C/C++ 常量：#define 与 const</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</span>
-  </div>
-  <div class="post-excerpt">
-    深入解析 C/C++ 中 #define 和 const 两种常量定义方式的区别，通过 MinGW 和 MSVC 的预处理器输出对比展示 #define 的宏替换机制，并演示如何通过指针修改 const 变量以及编译器常量传播优化的底层原理（x64 / x86 多平台汇编分析）。
-  </div>
-  <a href="posts/cpp-constants.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 06 / 02</div>
-  <div class="post-title"><a href="posts/char-string-pointer.html">C/C++ 字符、字符串与指针</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</span>
-  </div>
-  <div class="post-excerpt">
-    深入解析 C/C++ 中字符编码（ASCII/Unicode）、字符串存储方式（定长/终结符）、指针与地址的概念与区别、不同指针类型指向同一地址的汇编对比、指针偏移寻址原理，以及 C++ 引用的底层实现（MinGW / MSVC x64 / x86 多平台汇编分析）。
-  </div>
-  <a href="posts/char-string-pointer.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/cr-crack-experiment.html">crack实验 — IDA + x64dbg 逆向破解</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</span>
-  </div>
-  <div class="post-excerpt">
-    使用 IDA 静态分析和 x64dbg 动态调试对一个 CrackMe 程序进行逆向破解，通过修改 je→jne 跳转指令绕过验证，并计算文件偏移进行二进制补丁。
-  </div>
-  <a href="posts/cr-crack-experiment.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/stack-overflow2-500pt.html">栈溢出2（500分）Writeup — ret2syscall</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
-    <span class="post-tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">栈溢出</span>
-  </div>
-  <div class="post-excerpt">
-    栈溢出2 500pt Writeup：ret2syscall 利用 ROP 链（pop rax/rdi/rsi/rdx/rcx gadgets）在 64 位程序上执行 execve("/bin/bash")，offset 280 字节，pwntools 自动化利用。
-  </div>
-  <a href="posts/stack-overflow2-500pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/stack-overflow-500pt.html">栈溢出（500分）Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
-    <span class="post-tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">栈溢出</span>
-  </div>
-  <div class="post-excerpt">
-    栈溢出 500pt Writeup：IDA 分析二进制 → 发现 hackme 函数 → 动态调试改目标 → gets 溢出 → 计算偏移 → 执行 shell 获取 flag。
-  </div>
-  <a href="posts/stack-overflow-500pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/mov-attack.html">MOV Attack — ECC Crypto Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
-  </div>
-  <div class="post-excerpt">
-    MOV Attack Writeup：利用 Tate pairing 将 ECC 上的离散对数问题归约到有限域扩展域上的 DLP，通过 SageMath 实现攻击并解密 flag。
-  </div>
-  <a href="posts/mov-attack.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-蓝桥杯wp.html">蓝桥杯 Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
-    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">RSA</span>
-  </div>
-  <div class="post-excerpt">
-    蓝桥杯 Writeup：packet 题目抓包分析 &rarr; 分解 n（p q 接近，Fermat 分解）&rarr; RSA 解密脚本 &rarr; 获取 flag
-  </div>
-  <a href="posts/re-蓝桥杯wp.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/web11-500pt.html">Web11 500pt 目录扫描+Webshell+后台提权 Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-  </div>
-  <div class="post-excerpt">
-    Web11 500pt Writeup：目录扫描发现 dama.php 后门 &rarr; 307 跳转绕过 &rarr; 登录后台发现 root 用户 &rarr; 系统目录遍历获取 flag
-  </div>
-  <a href="posts/web11-500pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/web-xss-tag-500pt.html">Web10 500pt XSS 标签注入 Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">XSS</span>
-  </div>
-  <div class="post-excerpt">
-    Web10 500pt XSS Writeup：标签系统注入 &lt;script&gt;alert("flag")&lt;/script&gt; &rarr; 6 个标签逐一执行 &rarr; 获取 flag
-  </div>
-  <a href="posts/web-xss-tag-500pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/web-php-areyouok.html">web 06 300pt php的areyouok和strpos绕过 Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#777bb322;color:#777bb3;border:1px solid #777bb344">PHP</span>
-  </div>
-  <div class="post-excerpt">
-    web 06 300pt PHP Writeup：index.php.swp 源码泄露 &rarr; areyouok(preg_match)/strpos 绕过 &rarr; 获取 flag
-  </div>
-  <a href="posts/web-php-areyouok.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/newstar-wp.html">newstar Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
-    <span class="post-tag" style="background:#f9731622;color:#f97316;border:1px solid #f9731644">MISC</span>
-  </div>
-  <div class="post-excerpt">
-    newstar Writeup
-  </div>
-  <a href="posts/newstar-wp.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-java-reverse.html">简单的JAVA逆向 Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#e34f2622;color:#e34f26;border:1px solid #e34f2644">Java</span>
-  </div>
-  <div class="post-excerpt">
-    简单的 JAVA 逆向 Writeup：JEB/Jadx/Die 工具选择 → XOR 题 easyapp（key 颠倒 987654321）→ .json 文件题 → 水题实战分析
-  </div>
-  <a href="posts/re-java-reverse.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-loding-50pt.html">loding (50分)</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
-  </div>
-  <div class="post-excerpt">
-    loding (50分) Pwn 题 Writeup：32 位 ELF 利用 mmap 分配可执行内存，scanf 读入整数转 float/2333.0 后执行，通过 IEEE 754 浮点编码将 shellcode 字节编码为对应整数输入，最终获取 shell。
-  </div>
-  <a href="posts/re-loding-50pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/web-getflag-50pt.html">GetFlag 50pt</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">MD5碰撞</span>
-  </div>
-  <div class="post-excerpt">
-    GetFlag 50pt Web 题 Writeup：CAPTCHA 验证码 MD5 前 6 位碰撞 → Python 脚本爆破 → SQL 注入万能密码登录 → PHP eval 参数过滤绕过 + 分号截断获取 flag
-  </div>
-  <a href="posts/web-getflag-50pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-smali.html">4.re Smali — Smali CTF Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-  </div>
-  <div class="post-excerpt">
-    Smali 逆向分析 —— JEB / jadx 双工具对比，Base64 + AES ECB 解密
-  </div>
-  <a href="posts/re-smali.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-rc4-500pt.html">4.re RC4-500pt —— 两种解题方法</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">RC4</span>
-  </div>
-  <div class="post-excerpt">
-    RC4-500pt 逆向题两种解题方法：Patch + IDA 动态调试与直接动调堆栈秒出结果
-  </div>
-  <a href="posts/re-rc4-500pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-lanqiao.html">4.re 蓝桥杯逆向三道WP</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#ec489922;color:#ec4899;border:1px solid #ec489944">蓝桥杯</span>
-  </div>
-  <div class="post-excerpt">
-    蓝桥杯逆向三道 Writeup：XOR（exeinfope + IDA 脚本 → flag）、base64++（shift+F12 + 在线解码）、Map（IDApython 迷宫 + DFS → 路径 MD5）
-  </div>
-  <a href="posts/re-lanqiao.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/web-upload-150pt.html">123 150pt —— 一句话木马文件上传 Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件上传</span>
-  </div>
-  <div class="post-excerpt">
-    123 150pt 文件上传 Writeup：后台扫描 .bak 备份文件 → 爆破年份 1995 登录 → F12 发现上传表单 → 一句话木马 PHP 后缀绕过 → 双写绕过 cat 过滤拿到 flag
-  </div>
-  <a href="posts/web-upload-150pt.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/re-crackme01.html">4.re CrackMe01 Writeup — IDA 逆向分析</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-  </div>
-  <div class="post-excerpt">
-    32 位无壳 CrackMe 逆向分析，使用 IDA 定位 <strong>DefWindowProc</strong> 回调函数，F5 反编译后提取关键数组 <strong>chText</strong> 和常量 <strong>v6</strong>，通过 XOR 运算求解 flag。
-  </div>
-  <a href="posts/re-crackme01.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 31</div>
-  <div class="post-title"><a href="posts/vn2022-easy-rsa.html">[V&N2022公开赛] easy_RSA Writeup</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">RSA</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
-  </div>
-  <div class="post-excerpt">
-    V&amp;N2022 公开赛 easy_RSA 题目 Writeup，涉及<strong>多素数 RSA</strong>、<strong>p+1 分解</strong>、<strong>模 p² 下逆元恢复 q</strong>、<strong>Tonelli-Shanks 算法</strong>求二次剩余等 RSA 相关技巧。
-  </div>
-  <a href="posts/vn2022-easy-rsa.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 30</div>
-  <div class="post-title"><a href="posts/reverse-debugging.html">Windows 逆向调试工具速查手册</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">X64dbg</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Windbg</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</span>
-  </div>
-  <div class="post-excerpt">
-    一份全面系统的 Windows 逆向工程与调试工具速查手册，涵盖 <strong>X64dbg</strong>（快捷键/断点管理/硬件断点/内存断点/图形化管理）、<strong>Windbg</strong>（流程控制/内存读写搜索/断点/反汇编/堆栈回溯/进程线程/模块符号）及 <strong>OllyDbg</strong>（快捷键/断点/命令行/反汇编窗口）三大调试器的完整操作指南，附带 42 张实操截图。适合逆向初学者和日常开发调试查阅。
-  </div>
-  <a href="posts/reverse-debugging.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 03 / 02</div>
-  <div class="post-title"><a href="posts/dvwa-weak-session-ids.html">DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">会话安全</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Weak Session IDs（弱会话 IDs）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（递增 Session 预测、时间戳 Cookie 劫持、MD5 加密枚举、SHA1 随机数防御）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-weak-session-ids.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 30</div>
-  <div class="post-title"><a href="posts/variable-memory-layout.html">C/C++ 基本变量数据类型的内存表示</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</span>
-    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</span>
-  </div>
-  <div class="post-excerpt">
-    深入分析 C/C++ 基本数据类型（int、unsigned int、float、double）在内存中的表示方式，涵盖<strong>有符号/无符号整型的补码存储</strong>、<strong>IEEE 754 浮点编码</strong>、以及 MinGW、MSVC（x86/x64）不同编译环境下的<strong>汇编级对比</strong>。附带 float→int 截断转换、函数返回浮点数的寄存器传递等实际调试演示。
-  </div>
-  <a href="posts/variable-memory-layout.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 05 / 27</div>
-  <div class="post-title"><a href="posts/dvwa-command-execution.html">DVWA 靶场 Command Injection 全难度教程（附带代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">命令注入</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Command Injection（命令注入）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的<strong>漏洞原理</strong>、<strong>实际利用</strong>（写入一句话木马 + 蚁剑连接）及<strong>PHP 代码分析</strong>。详细讲解各难度下黑名单策略的绕过方式与 Impossible 级别的安全修复方案。
-  </div>
-  <a href="posts/dvwa-command-execution.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 04 / 27</div>
-  <div class="post-title"><a href="posts/dvwa-setup.html">DVWA 靶场搭建 - Windows phpstudy &amp; Kali Docker 部署教程</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">靶场搭建</span>
-  </div>
-  <div class="post-excerpt">
-    利用 phpstudy 搭建 DVWA 靶场完整流程，以及 基于 Docker 的 DVWA 部署方法，涵盖<strong>源码下载</strong>、<strong>配置文件修改</strong>、<strong>数据库初始化</strong>、<strong>Docker 换源与镜像部署</strong>，以及常见问题（allow_url_include、reCAPTCHA key）的解决方案。
-  </div>
-  <a href="posts/dvwa-setup.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 04 / 12</div>
-  <div class="post-title"><a href="posts/dvwa-file-inclusion.html">DVWA 靶场 File Inclusion 全难度教程（附代码解析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件包含</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 File Inclusion（文件包含）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（本地文件读取、远程文件包含、伪协议利用）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-file-inclusion.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2025 // 05 / 08</div>
-  <div class="post-title"><a href="posts/dvwa-file-upload.html">DVWA 靶场 File Upload 全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件上传</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 File Upload（文件上传）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（一句话木马上传、图片马制作、Burp 改后缀绕过、文件包含配合利用）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-file-upload.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2025 // 07 / 05</div>
-  <div class="post-title"><a href="posts/dvwa-insecure-captcha.html">DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">验证码</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（两步验证绕过、passed_captcha 参数伪造、User-Agent 与隐藏值绕过、PDO 预编译+原密码验证）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-insecure-captcha.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 03 / 28</div>
-  <div class="post-title"><a href="posts/dvwa-brute-force.html">DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">暴力破解</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Brute Force（暴力破解）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（Burp Suite 抓包爆破、Resource Pool 时停设置、Anti-CSRF Token 绕过、Python 脚本自动化爆破）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-brute-force.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2026 // 03 / 06</div>
-  <div class="post-title"><a href="posts/dvwa-csrf.html">DVWA 靶场 CSRF（跨站请求伪造）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CSRF</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 CSRF（跨站请求伪造）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（URL 直接修改密码、Referer 绕过、XSS+CSRF 结合获取 Token、PDO 预编译+原密码验证）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-csrf.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2024 // 05 / 14</div>
-  <div class="post-title"><a href="posts/dvwa-csp-bypass.html">DVWA 靶场 Content Security Policy (CSP) Bypass(CSP绕过)全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">CSP绕过</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Content Security Policy (CSP) Bypass 全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（CSP 白名单绕过、unsafe-inline + nonce 绕过、JSONP 回调函数注入）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-csp-bypass.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2024 // 05 / 14</div>
-  <div class="post-title"><a href="posts/dvwa-javascript-attacks.html">DVWA 靶场 JavaScript Attacks(js攻击)全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">JS攻击</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 JavaScript Attacks（JS 攻击）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（MD5+ROT13 Token 计算、字符串反转绕过、SHA256 混淆 JS 逆向分析）及 PHP/JS 代码分析。
-  </div>
-  <a href="posts/dvwa-javascript-attacks.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2024 // 05 / 18</div>
-  <div class="post-title"><a href="posts/dvwa-xss-reflected.html">DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">XSS</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（<code>&lt;script&gt;</code> 注入、大小写绕过、<code>&lt;img onerror&gt;</code> 绕过）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-xss-reflected.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2024 // 05 / 19</div>
-  <div class="post-title"><a href="posts/dvwa-auth-bypass.html">DVWA 靶场 Authorisation Bypass（未授权访问）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">未授权访问</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Authorisation Bypass（未授权访问）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（直接 URL 访问、<code>get_user_data.php</code> 越权、POST 参数篡改）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-auth-bypass.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2024 // 05 / 20</div>
-  <div class="post-title"><a href="posts/dvwa-open-http-redirect.html">DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">URL重定向</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（直接 URL 跳转、路径穿越绕过、参数注入绕过）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-open-http-redirect.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
-
-<div class="post fade-up">
-  <div class="post-date">2023 // 04 / 04</div>
-  <div class="post-title"><a href="posts/dvwa-sql-injection.html">DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）</a></div>
-  <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">SQL注入</span>
-  </div>
-  <div class="post-excerpt">
-    DVWA 靶场 SQL Injection（SQL 注入）全难度通关教程，涵盖 <strong>Low / Medium / High / Impossible</strong> 四个级别的漏洞原理、实际利用（手工联合查询注入、sqlmap 自动化注入、POST 注入绕过）及 PHP 代码分析。
-  </div>
-  <a href="posts/dvwa-sql-injection.html" class="read-more">[ + ] READ MORE &rarr;</a>
-</div>
+<div id="latestPosts"></div>
 
 <div class="rei-sidebar" data-rei-only>
   <div class="rei-friend-links">
@@ -643,6 +141,381 @@
 </div>
 
 <script>
+/* === post database === */
+const POSTS = [
+  {
+    title: 'upload-labs 搭建',
+    date: '2024 // 01 / 27',
+    url: 'posts/upload-labs.html',
+    excerpt: 'upload-labs 是一个使用 php 语言编写的文件上传漏洞靶场，本文介绍 Docker 和 Windows 两种搭建方式。',
+    tags: ['Web安全', 'upload-labs']
+  },
+  {
+    title: 'C/C++ 常量：#define 与 const',
+    date: '2026 // 06 / 04',
+    url: 'posts/cpp-constants.html',
+    excerpt: '深入解析 C/C++ 中 #define 和 const 两种常量定义方式的区别，通过 MinGW 和 MSVC 的预处理器输出对比展示 #define 的宏替换机制，并演示如何通过指针修改 const 变量以及编译器常量传播优化的底层原理（x64 / x86 多平台汇编分析）。',
+    tags: ['C/C++', '底层原理', '学习笔记']
+  },
+  {
+    title: 'C/C++ 字符、字符串与指针',
+    date: '2026 // 06 / 02',
+    url: 'posts/char-string-pointer.html',
+    excerpt: '深入解析 C/C++ 中字符编码（ASCII/Unicode）、字符串存储方式（定长/终结符）、指针与地址的概念与区别、不同指针类型指向同一地址的汇编对比、指针偏移寻址原理，以及 C++ 引用的底层实现（MinGW / MSVC x64 / x86 多平台汇编分析）。',
+    tags: ['逆向', 'C/C++', '底层原理', '学习笔记']
+  },
+  {
+    title: 'crack实验 — IDA + x64dbg 逆向破解',
+    date: '2026 // 05 / 31',
+    url: 'posts/cr-crack-experiment.html',
+    excerpt: '使用 IDA 静态分析和 x64dbg 动态调试对一个 CrackMe 程序进行逆向破解，通过修改 je→jne 跳转指令绕过验证，并计算文件偏移进行二进制补丁。',
+    tags: ['逆向', '调试', '学习笔记']
+  },
+  {
+    title: '栈溢出2（500分）Writeup — ret2syscall',
+    date: '2026 // 05 / 31',
+    url: 'posts/stack-overflow2-500pt.html',
+    excerpt: '栈溢出2 500pt Writeup：ret2syscall 利用 ROP 链（pop rax/rdi/rsi/rdx/rcx gadgets）在 64 位程序上执行 execve("/bin/bash")，offset 280 字节，pwntools 自动化利用。',
+    tags: ['CTF', 'Pwn', '栈溢出']
+  },
+  {
+    title: '栈溢出（500分）Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/stack-overflow-500pt.html',
+    excerpt: '栈溢出 500pt Writeup：IDA 分析二进制 → 发现 hackme 函数 → 动态调试改目标 → gets 溢出 → 计算偏移 → 执行 shell 获取 flag。',
+    tags: ['CTF', 'Pwn', '栈溢出']
+  },
+  {
+    title: 'MOV Attack — ECC Crypto Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/mov-attack.html',
+    excerpt: 'MOV Attack Writeup：利用 Tate pairing 将 ECC 上的离散对数问题归约到有限域扩展域上的 DLP，通过 SageMath 实现攻击并解密 flag。',
+    tags: ['CTF', 'Crypto']
+  },
+  {
+    title: '蓝桥杯 Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-蓝桥杯wp.html',
+    excerpt: '蓝桥杯 Writeup：packet 题目抓包分析 → 分解 n（p q 接近，Fermat 分解）→ RSA 解密脚本 → 获取 flag',
+    tags: ['CTF', 'Crypto', 'RSA']
+  },
+  {
+    title: 'Web11 500pt 目录扫描+Webshell+后台提权 Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/web11-500pt.html',
+    excerpt: 'Web11 500pt Writeup：目录扫描发现 dama.php 后门 → 307 跳转绕过 → 登录后台发现 root 用户 → 系统目录遍历获取 flag',
+    tags: ['CTF', 'Web安全']
+  },
+  {
+    title: 'Web10 500pt XSS 标签注入 Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/web-xss-tag-500pt.html',
+    excerpt: 'Web10 500pt XSS Writeup：标签系统注入 <script>alert("flag")<\/script> → 6 个标签逐一执行 → 获取 flag',
+    tags: ['CTF', 'Web安全', 'XSS']
+  },
+  {
+    title: 'web 06 300pt php的areyouok和strpos绕过 Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/web-php-areyouok.html',
+    excerpt: 'web 06 300pt PHP Writeup：index.php.swp 源码泄露 → areyouok(preg_match)/strpos 绕过 → 获取 flag',
+    tags: ['CTF', 'Web安全', 'PHP']
+  },
+  {
+    title: 'newstar Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/newstar-wp.html',
+    excerpt: 'newstar Writeup',
+    tags: ['CTF', 'Pwn', 'Crypto', 'MISC']
+  },
+  {
+    title: '简单的JAVA逆向 Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-java-reverse.html',
+    excerpt: '简单的 JAVA 逆向 Writeup：JEB/Jadx/Die 工具选择 → XOR 题 easyapp（key 颠倒 987654321）→ .json 文件题 → 水题实战分析',
+    tags: ['CTF', '逆向', 'Java']
+  },
+  {
+    title: 'loding (50分)',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-loding-50pt.html',
+    excerpt: 'loding (50分) Pwn 题 Writeup：32 位 ELF 利用 mmap 分配可执行内存，scanf 读入整数转 float/2333.0 后执行，通过 IEEE 754 浮点编码将 shellcode 字节编码为对应整数输入，最终获取 shell。',
+    tags: ['CTF', '逆向', 'Pwn']
+  },
+  {
+    title: 'GetFlag 50pt',
+    date: '2026 // 05 / 31',
+    url: 'posts/web-getflag-50pt.html',
+    excerpt: 'GetFlag 50pt Web 题 Writeup：CAPTCHA 验证码 MD5 前 6 位碰撞 → Python 脚本爆破 → SQL 注入万能密码登录 → PHP eval 参数过滤绕过 + 分号截断获取 flag',
+    tags: ['CTF', 'Web安全', 'MD5碰撞']
+  },
+  {
+    title: '4.re Smali — Smali CTF Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-smali.html',
+    excerpt: 'Smali 逆向分析 —— JEB / jadx 双工具对比，Base64 + AES ECB 解密',
+    tags: ['CTF', '逆向']
+  },
+  {
+    title: '4.re RC4-500pt —— 两种解题方法',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-rc4-500pt.html',
+    excerpt: 'RC4-500pt 逆向题两种解题方法：Patch + IDA 动态调试与直接动调堆栈秒出结果',
+    tags: ['CTF', '逆向', 'RC4']
+  },
+  {
+    title: '4.re 蓝桥杯逆向三道WP',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-lanqiao.html',
+    excerpt: '蓝桥杯逆向三道 Writeup：XOR（exeinfope + IDA 脚本 → flag）、base64++（shift+F12 + 在线解码）、Map（IDApython 迷宫 + DFS → 路径 MD5）',
+    tags: ['CTF', '逆向', '蓝桥杯']
+  },
+  {
+    title: '123 150pt —— 一句话木马文件上传 Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/web-upload-150pt.html',
+    excerpt: '123 150pt 文件上传 Writeup：后台扫描 .bak 备份文件 → 爆破年份 1995 登录 → F12 发现上传表单 → 一句话木马 PHP 后缀绕过 → 双写绕过 cat 过滤拿到 flag',
+    tags: ['CTF', 'Web安全', '文件上传']
+  },
+  {
+    title: '4.re CrackMe01 Writeup — IDA 逆向分析',
+    date: '2026 // 05 / 31',
+    url: 'posts/re-crackme01.html',
+    excerpt: '32 位无壳 CrackMe 逆向分析，使用 IDA 定位 DefWindowProc 回调函数，F5 反编译后提取关键数组 chText 和常量 v6，通过 XOR 运算求解 flag。',
+    tags: ['逆向']
+  },
+  {
+    title: '[V&N2022公开赛] easy_RSA Writeup',
+    date: '2026 // 05 / 31',
+    url: 'posts/vn2022-easy-rsa.html',
+    excerpt: 'V&N2022 公开赛 easy_RSA 题目 Writeup，涉及多素数 RSA、p+1 分解、模 p² 下逆元恢复 q、Tonelli-Shanks 算法求二次剩余等 RSA 相关技巧。',
+    tags: ['CTF', 'RSA', 'Crypto']
+  },
+  {
+    title: 'Windows 逆向调试工具速查手册',
+    date: '2026 // 05 / 30',
+    url: 'posts/reverse-debugging.html',
+    excerpt: '一份全面系统的 Windows 逆向工程与调试工具速查手册，涵盖 X64dbg、Windbg 及 OllyDbg 三大调试器的完整操作指南，附带 42 张实操截图。',
+    tags: ['逆向', '调试', 'X64dbg', 'Windbg', '学习笔记']
+  },
+  {
+    title: 'C/C++ 基本变量数据类型的内存表示',
+    date: '2026 // 05 / 30',
+    url: 'posts/variable-memory-layout.html',
+    excerpt: '深入分析 C/C++ 基本数据类型（int、unsigned int、float、double）在内存中的表示方式，涵盖有符号/无符号整型的补码存储、IEEE 754 浮点编码等。',
+    tags: ['逆向', 'C/C++', '底层原理', '调试']
+  },
+  {
+    title: 'DVWA 靶场 Command Injection 全难度教程（附带代码分析）',
+    date: '2026 // 05 / 27',
+    url: 'posts/dvwa-command-execution.html',
+    excerpt: 'DVWA 靶场 Command Injection 全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '命令注入']
+  },
+  {
+    title: 'DVWA 靶场搭建 - Windows phpstudy & Kali Docker 部署教程',
+    date: '2026 // 04 / 27',
+    url: 'posts/dvwa-setup.html',
+    excerpt: '利用 phpstudy 搭建 DVWA 靶场完整流程，以及 基于 Docker 的 DVWA 部署方法，涵盖源码下载、配置文件修改、数据库初始化、Docker 换源与镜像部署，以及常见问题（allow_url_include、reCAPTCHA key）的解决方案。',
+    tags: ['Web安全', 'DVWA', '靶场搭建']
+  },
+  {
+    title: 'DVWA 靶场 File Inclusion 全难度教程（附代码解析）',
+    date: '2026 // 04 / 12',
+    url: 'posts/dvwa-file-inclusion.html',
+    excerpt: 'DVWA 靶场 File Inclusion（文件包含）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（本地文件读取、远程文件包含、伪协议利用）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '文件包含']
+  },
+  {
+    title: 'DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析）',
+    date: '2026 // 03 / 28',
+    url: 'posts/dvwa-brute-force.html',
+    excerpt: 'DVWA 靶场 Brute Force（暴力破解）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（Burp Suite 抓包爆破、Resource Pool 时停设置、Anti-CSRF Token 绕过、Python 脚本自动化爆破）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '暴力破解']
+  },
+  {
+    title: 'DVWA 靶场 CSRF（跨站请求伪造）全难度教程（附代码分析）',
+    date: '2026 // 03 / 06',
+    url: 'posts/dvwa-csrf.html',
+    excerpt: 'DVWA 靶场 CSRF（跨站请求伪造）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（URL 直接修改密码、Referer 绕过、XSS+CSRF 结合获取 Token、PDO 预编译+原密码验证）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'CSRF']
+  },
+  {
+    title: 'DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析）',
+    date: '2026 // 03 / 02',
+    url: 'posts/dvwa-weak-session-ids.html',
+    excerpt: 'DVWA 靶场 Weak Session IDs（弱会话 IDs）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（递增 Session 预测、时间戳 Cookie 劫持、MD5 加密枚举、SHA1 随机数防御）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '会话安全']
+  },
+  {
+    title: 'DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度教程（附代码分析）',
+    date: '2025 // 07 / 05',
+    url: 'posts/dvwa-insecure-captcha.html',
+    excerpt: 'DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（两步验证绕过、passed_captcha 参数伪造、User-Agent 与隐藏值绕过、PDO 预编译+原密码验证）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '验证码']
+  },
+  {
+    title: 'DVWA 靶场 File Upload 全难度教程（附代码分析）',
+    date: '2025 // 05 / 08',
+    url: 'posts/dvwa-file-upload.html',
+    excerpt: 'DVWA 靶场 File Upload（文件上传）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（一句话木马上传、图片马制作、Burp 改后缀绕过、文件包含配合利用）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '文件上传']
+  },
+  {
+    title: 'DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度教程（附代码分析）',
+    date: '2024 // 05 / 18',
+    url: 'posts/dvwa-xss-reflected.html',
+    excerpt: 'DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（&lt;script&gt; 注入、大小写绕过、&lt;img onerror&gt; 绕过）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'XSS']
+  },
+  {
+    title: 'DVWA 靶场 Authorisation Bypass（未授权访问）全难度教程（附代码分析）',
+    date: '2024 // 05 / 19',
+    url: 'posts/dvwa-auth-bypass.html',
+    excerpt: 'DVWA 靶场 Authorisation Bypass（未授权访问）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（直接 URL 访问、get_user_data.php 越权、POST 参数篡改）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', '未授权访问']
+  },
+  {
+    title: 'DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度教程（附代码分析）',
+    date: '2024 // 05 / 20',
+    url: 'posts/dvwa-open-http-redirect.html',
+    excerpt: 'DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（直接 URL 跳转、路径穿越绕过、参数注入绕过）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'URL重定向']
+  },
+  {
+    title: 'DVWA 靶场 Content Security Policy (CSP) Bypass(CSP绕过)全难度教程（附代码分析）',
+    date: '2024 // 05 / 14',
+    url: 'posts/dvwa-csp-bypass.html',
+    excerpt: 'DVWA 靶场 Content Security Policy (CSP) Bypass 全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（CSP 白名单绕过、unsafe-inline + nonce 绕过、JSONP 回调函数注入）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'CSP绕过']
+  },
+  {
+    title: 'DVWA 靶场 JavaScript Attacks(js攻击)全难度教程（附代码分析）',
+    date: '2024 // 05 / 14',
+    url: 'posts/dvwa-javascript-attacks.html',
+    excerpt: 'DVWA 靶场 JavaScript Attacks（JS 攻击）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（MD5+ROT13 Token 计算、字符串反转绕过、SHA256 混淆 JS 逆向分析）及 PHP/JS 代码分析。',
+    tags: ['Web安全', 'DVWA', 'JS攻击']
+  },
+  {
+    title: 'DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）',
+    date: '2023 // 04 / 04',
+    url: 'posts/dvwa-sql-injection.html',
+    excerpt: 'DVWA 靶场 SQL Injection（SQL 注入）全难度通关教程，涵盖 Low / Medium / High / Impossible 四个级别的漏洞原理、实际利用（手工联合查询注入、sqlmap 自动化注入、POST 注入绕过）及 PHP 代码分析。',
+    tags: ['Web安全', 'DVWA', 'SQL注入']
+  },
+  {
+    title: 'upload-labs 第一二关',
+    date: '2024 // 01 / 27',
+    url: 'posts/upload-labs-pass1-2.html',
+    excerpt: 'upload-labs Pass-1 和 Pass-2 通关教程：前端 JS 校验绕过、Burp 抓包改后缀、禁用 JavaScript 上传、Content-Type 类型绕过，附源码分析。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第三四关',
+    date: '2024 // 04 / 12',
+    url: 'posts/upload-labs-pass3-4.html',
+    excerpt: 'upload-labs Pass-3 和 Pass-4 通关教程：Apache2 httpd.conf 配置修改、反弹 shell 连接、免杀木马使用、webshell 获取 shell。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第五六关',
+    date: '2024 // 10 / 28',
+    url: 'posts/upload-labs-pass5-6.html',
+    excerpt: 'upload-labs Pass-5 和 Pass-6 通关教程：黑名单大小写绕过（.Php）、后缀加空格绕过黑名单检测。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第七八关',
+    date: '2025 // 12 / 29',
+    url: 'posts/upload-labs-pass7-8.html',
+    excerpt: 'upload-labs Pass-7 和 Pass-9 通关教程：后缀加空格绕过黑名单、点空格点双写绕过黑名单检测。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第九十关',
+    date: '2025 // 05 / 17',
+    url: 'posts/upload-labs-pass9-10.html',
+    excerpt: 'upload-labs Pass-9 和 Pass-10 通关教程：点空格点绕过黑名单、str_ireplace 双写绕过（pphphp）。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第十一十二关',
+    date: '2024 // 04 / 18',
+    url: 'posts/upload-labs-pass11-12.html',
+    excerpt: 'upload-labs Pass-11 和 Pass-12 通关教程：%00截断（GET，PHP<5.3.4）、POST 00截断修改 hex，以及 PHP 版本切换方法。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第十三十四关',
+    date: '2024 // 04 / 18',
+    url: 'posts/upload-labs-pass13-14.html',
+    excerpt: 'upload-labs Pass-13 和 Pass-14 通关教程：文件头检测绕过（getReailFileType 读前2字节判断格式）、图片马制作与文件包含配合利用。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第十五十六关',
+    date: '2024 // 04 / 18',
+    url: 'posts/upload-labs-pass15-16.html',
+    excerpt: 'upload-labs Pass-15 和 Pass-16 通关教程：exif_imagetype 检测绕过（开启 php_exif 模块）、图片二次渲染绕过（010 editor 对比找未修改位置插入木马）。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第十七十八关',
+    date: '2024 // 04 / 18',
+    url: 'posts/upload-labs-pass17-18.html',
+    excerpt: 'upload-labs Pass-17 和 Pass-18 通关教程：条件竞争绕过（先上传后判断，Python+Burp 窗口期利用）、MyUpload 白名单图片马配合文件包含解析。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'upload-labs 第十九二十关',
+    date: '2024 // 12 / 19',
+    url: 'posts/upload-labs-pass19-20.html',
+    excerpt: 'upload-labs Pass-19 和 Pass-20 通关教程：00截断绕过（save_name + pathinfo 黑名单）、数组绕过（save_name 传数组使 end() 返回合法后缀绕过检测）。',
+    tags: ['Web安全', 'upload-labs', '文件上传']
+  }
+];
+
+/* === TAG_COLORS === */
+const TAG_COLORS = {
+  '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff',
+  '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6',
+  '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f',
+  'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f',
+  '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f',
+  '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35',
+  'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff', 'RC4': 'f59e0b',
+  '蓝桥杯': 'ec4899', 'MD5碰撞': 'f59e0b', 'Java': 'e34f26',
+  'MISC': 'f97316', 'Pwn': '10b981', 'PHP': '777bb3',
+  '栈溢出': 'f97316', '漏洞分析': 'e4405f', '安全工具': '00d4ff',
+  'OWASP': 'e4405f', '供应链安全': 'ff6b35', 'CVE': 'e4405f', 'KaliLinux': '3366ff',
+  'upload-labs': '10b981'
+};
+
+/* === render latest 10 posts sorted by date desc === */
+(function() {
+  const sorted = [...POSTS].sort((a, b) => {
+    const da = a.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
+    const db = b.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
+    return db.localeCompare(da);
+  });
+  const top = sorted.slice(0, 10);
+  let html = '';
+  top.forEach(p => {
+    html += '<div class="post fade-up">';
+    html += '<div class="post-date">' + p.date + '</div>';
+    html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
+    html += '<div class="post-tags">';
+    p.tags.forEach(t => {
+      const c = TAG_COLORS[t] || '888888';
+      html += '<span class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + t + '</span>';
+    });
+    html += '</div>';
+    html += '<div class="post-excerpt">' + p.excerpt + '</div>';
+    html += '<a href="' + p.url + '" class="read-more">[ + ] READ MORE &rarr;</a>';
+    html += '</div>';
+  });
+  document.getElementById('latestPosts').innerHTML = html;
+})();
+
 const sentinel = document.getElementById('navSentinel');
 const navWrap = document.getElementById('navWrap');
 let spacer = null;
@@ -714,26 +587,6 @@ const topObs = new IntersectionObserver(
   { threshold: [0] }
 );
 topObs.observe(document.getElementById('navSentinel'));
-
-/* tag colors for TAGS INDEX */
-const TAG_COLORS = {
-  '逆向': '7b2d8e', '调试': '2ea44f', 'X64dbg': '00d4ff', 'Windbg': '3366ff',
-  '学习笔记': 'ff6b35', 'C/C++': '3366ff', 'CSRF': 'e4405f', 'SQL注入': '8b5cf6',
-  '验证码': 'f59e0b', '会话安全': 'f59e0b', 'CSP绕过': '8b5cf6', 'XSS': 'e4405f',
-  'JS攻击': 'e4405f', '未授权访问': 'f59e0b', 'URL重定向': 'e4405f',
-  '底层原理': 'ff6b35', 'Web安全': '3366ff', 'DVWA': '00d4ff', '命令注入': '2ea44f',
-  '文件包含': 'ff6b35', '文件上传': 'ff6b35', '暴力破解': 'ff6b35', '靶场搭建': 'ff6b35',
-  'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff', 'RC4': 'f59e0b',
-  '蓝桥杯': 'ec4899', 'MD5碰撞': 'f59e0b', 'Java': 'e34f26',
-  'MISC': 'f97316', 'Pwn': '10b981', 'PHP': '777bb3',
-  '栈溢出': 'f97316', '漏洞分析': 'e4405f', '安全工具': '00d4ff',
-  'OWASP': 'e4405f', '供应链安全': 'ff6b35', 'CVE': 'e4405f', 'KaliLinux': '3366ff'
-};
-document.querySelectorAll('.tag-grid a').forEach(a => {
-  const name = a.textContent.replace(/^#/, '');
-  const c = TAG_COLORS[name];
-  if (c) a.style.color = '#' + c;
-});
 
 </script>
 
