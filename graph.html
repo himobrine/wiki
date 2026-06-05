@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>关系图谱 — himobrine</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/style.css">
+<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<style>
+.graph-page { max-width: 900px; margin: 0 auto; padding: 20px; }
+.graph-page .graph-title { font-size: 14px; margin-bottom: 12px; }
+.graph-page #graphContainer { width: 100%; height: 65vh; border: 1px solid var(--border-color); border-radius: 4px; }
+.graph-page #graphContainer canvas { border-radius: 2px; background: #fff; }
+</style>
+</head>
+<body>
+<div class="scanline"></div>
+
+<div class="hero fade-up">
+  <div class="container">
+  <h1>// BLOG : himobrine</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="tags/list.html?tag=漏洞分析" class="tag tag-cyan">#漏洞分析</a>
+    <a href="tags/list.html?tag=安全工具" class="tag tag-blue">#安全工具</a>
+    <a href="tags/list.html?tag=学习笔记" class="tag tag-orange">#学习笔记</a>
+    <a href="tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
+    <a href="tags/list.html?tag=调试" class="tag tag-green">#调试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+  </div>
+</div>
+
+<div class="container" style="padding-top:0">
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper fade-up" id="navWrap">
+  <div class="nav-inner">
+    <a href="index.html">首页</a>
+    <a href="tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="tags/list.html?tag=安全工具">安全工具</a>
+    <a href="tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="tags/list.html?tag=逆向">逆向</a>
+    <a href="tags/list.html?tag=调试">调试</a>
+    <a href="tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<div class="graph-page">
+  <div class="section-title">// 关系图谱（全站文章关联）</div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="footer fade-up">
+  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="links">
+    <a href="index.html">首页</a>
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script src="assets/posts-data.js"></script>
+<script>const POSTS = POSTS_DATA;</script>
+<script>
+(function(){
+var c=document.getElementById('graphContainer');
+if(!c||typeof vis==='undefined'||typeof POSTS==='undefined')return;
+function gc(p){var t=PRIMARY_COLORS[p.primary]||'888888';return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
+function gsh(p){var s=p.secondary;if(s==='DVWA'||s==='Pwn'||s==='Crack'||s==='基础')return'dot';if(s==='upload-labs'||s==='Reverse')return'square';if(s==='Crypto'||s==='工具')return'diamond';if(s==='Web')return'triangle';return'dot';}
+var groups={};
+groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
+groups['CTF']={color:{background:'#e4405f',border:'#e4405f',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
+groups['逆向']={color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
+groups['C/C++']={color:{background:'#f59e0b',border:'#f59e0b',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
+var nodes=new vis.DataSet(POSTS.map(function(p,i){return{id:i,title:p.title,url:p.url,value:1,size:8,color:gc(p),group:p.primary,shape:gsh(p)};}));
+var edges=[];var seen={};
+for(var i=0;i<POSTS.length;i++){for(var j=i+1;j<POSTS.length;j++){
+var shared=POSTS[i].tags.filter(function(t){return POSTS[j].tags.indexOf(t)!==-1;});
+if(shared.length>0){var key=i+'-'+j;if(!seen[key]){seen[key]=true;
+edges.push({from:i,to:j,value:Math.min(shared.length,3),title:'共享: '+shared.join(', '),color:{inherit:'both',opacity:0.2+shared.length*0.15}});}}}}
+var options={nodes:{shape:'dot',font:{size:0},borderWidth:0,borderWidthSelected:2,scaling:{min:6,max:14}},groups:groups,
+edges:{width:1,smooth:{type:'continuous'}},
+physics:{solver:'forceAtlas2Based',forceAtlas2Based:{gravitationalConstant:-80,centralGravity:0.003,springLength:200,springConstant:0.008,damping:0.4},stabilization:{iterations:150}},
+interaction:{hover:true,tooltipDelay:200,zoomView:true,dragView:true,hoverConnectedEdges:true}};
+var network=new vis.Network(c,{nodes:nodes,edges:edges},options);
+network.on('click',function(params){if(params.nodes.length>0){var node=nodes.get(params.nodes[0]);if(node&&node.url)window.location.href=node.url;}});
+network.on('dragStart',function(){network.setOptions({physics:{enabled:false}});});network.on('hoverNode',function(){network.setOptions({physics:{enabled:false}});});c.addEventListener('mouseleave',function(){network.setOptions({physics:{enabled:true}});});
+})();
+</script>
+<script>
+(function(){
+var h=document.documentElement,tb=document.getElementById('themeToggle'),td=document.getElementById('themeDock');
+var ti={dark:'☽',light:'☀',crystal:'◇',ego:'♢',rei:'レ'},qt='light';
+function st(t){h.setAttribute('data-theme',t);localStorage.setItem('theme',t);tb.textContent=ti[t]||'☽';document.querySelectorAll('.theme-dock-item').forEach(function(e){e.classList.toggle('active',e.dataset.theme===t);});if(t==='dark')qt='light';else if(t==='light')qt='dark';else if(t==='rei')qt='dark';else qt='dark';}
+var sv=localStorage.getItem('theme')||'dark';st(sv);
+document.querySelectorAll('.theme-dock-item').forEach(function(e){e.addEventListener('click',function(){st(e.dataset.theme);td.classList.remove('visible');});});
+tb.addEventListener('click',function(){td.classList.toggle('visible');});
+document.addEventListener('click',function(e){if(!td.contains(e.target)&&e.target!==tb)td.classList.remove('visible');});
+})();
+
+(function(){
+var t=document.getElementById('backToTop');
+t.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
+new IntersectionObserver(function(e){t.classList.toggle('show',!e[0].isIntersecting);},{threshold:[0]}).observe(document.getElementById('navSentinel'));
+})();
+
+(function(){
+var o=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');o.unobserve(x.target);}});},{threshold:0.1});
+document.querySelectorAll('.fade-up').forEach(function(el){o.observe(el);});
+})();
+</script>
+
+</body>
+</html>
