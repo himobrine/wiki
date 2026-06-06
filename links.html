@@ -6,8 +6,10 @@
 <title>友情链接 - himobrine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -85,82 +87,7 @@
   <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
-<script>
-/* === sticky nav === */
-const sentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let spacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !spacer) {
-    spacer = document.createElement('div');
-    spacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(spacer, navWrap.nextSibling);
-  } else if (!stuck && spacer) {
-    spacer.remove(); spacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(sentinel);
-
-/* === scroll animation === */
-const animObserver = new IntersectionObserver(
-  (entries) => entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); animObserver.unobserve(e.target); } }),
-  { threshold: 0.1 }
-);
-document.querySelectorAll('.fade-up').forEach(el => animObserver.observe(el));
-
-/* === theme toggle === */
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-
-/* === back to top === */
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-const topObs = new IntersectionObserver(
-  ([e]) => topBtn.classList.toggle('show', !e.isIntersecting),
-  { threshold: [0] }
-);
-topObs.observe(document.getElementById('navSentinel'));
-
-</script>
+<script src="assets/common.js"></script>
 
 </body>
 </html>

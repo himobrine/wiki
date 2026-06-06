@@ -6,8 +6,10 @@
 <title>GetFlag 50pt - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 05 / 31</div>
   <div class="post-title">GetFlag 50pt</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">MD5碰撞</span>
+    <a href="../tags/list.html?tag=CTF" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
+    <a href="../tags/list.html?tag=MD5碰撞" class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">MD5碰撞</a>
   </div>
 </div>
 
@@ -66,7 +68,7 @@
 
 <p>题目首页：</p>
 
-<p><img src="../assets/gf_image002.gif" alt="题目首页" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image002.gif" alt="题目首页" style="max-width:100%"></p>
 
 <h3 id="captcha">验证码分析</h3>
 
@@ -113,11 +115,11 @@ input('ok')</code></pre>
 
 <p>跑出来得到结果：</p>
 
-<p><img src="../assets/gf_image006.gif" alt="运行结果" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image006.gif" alt="运行结果" style="max-width:100%"></p>
 
 <p><code>11658568</code></p>
 
-<p><img src="../assets/gf_image008.gif" alt="验证成功" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image008.gif" alt="验证成功" style="max-width:100%"></p>
 
 <h3 id="sqli">SQL 注入登录</h3>
 
@@ -126,35 +128,35 @@ input('ok')</code></pre>
 <pre><code>username: ' or 1#
 password: 1</code></pre>
 
-<p><img src="../assets/gf_image012.gif" alt="登录成功" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image012.gif" alt="登录成功" style="max-width:100%"></p>
 
 <p>这样就进来了。</p>
 
-<p><img src="../assets/gf_image014.gif" alt="后台页面" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image014.gif" alt="后台页面" style="max-width:100%"></p>
 
 <h3 id="lfi">文件包含</h3>
 
 <p>这到底怎么回事，源码没有一句能用的，只能靠图片来猜？继续看下一个操作。</p>
 
-<p><img src="../assets/gf_image016.gif" alt="页面源码" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image016.gif" alt="页面源码" style="max-width:100%"></p>
 
 <p>文件包含标志：</p>
 
-<p><img src="../assets/gf_image018.gif" alt="文件包含" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image018.gif" alt="文件包含" style="max-width:100%"></p>
 
 <p>不知道是什么，抓包看看里面长什么样：</p>
 
-<p><img src="../assets/gf_image020.gif" alt="抓包分析" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image020.gif" alt="抓包分析" style="max-width:100%"></p>
 
-<p><img src="../assets/gf_image022.gif" alt="抓包结果" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image022.gif" alt="抓包结果" style="max-width:100%"></p>
 
 <p>居然能读，直接读！</p>
 
-<p><img src="../assets/gf_image024.gif" alt="读取文件" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image024.gif" alt="读取文件" style="max-width:100%"></p>
 
 <p>最终 payload：<code>/var/www/html/Challenges/flag.php</code></p>
 
-<p><img src="../assets/gf_image026.jpg" alt="flag.php内容" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image026.jpg" alt="flag.php内容" style="max-width:100%"></p>
 
 <h3 id="eval">eval 绕过获取 flag</h3>
 
@@ -191,11 +193,11 @@ if ($spaceone === 'flag'){
 
 <p>所以 <code>$spaceone</code> 要等于 <code>'flag'</code>，但 <code>$f</code> 不能被过滤成其它东西。直接 POST 传 <code>flag=flag;</code> 即可，使用分号结束语句，这样 <code>eval("\$spaceone = flag;")</code> 执行后 <code>$spaceone</code> 的值就是常量 <code>flag</code>（PHP 中未定义常量会转为同名字符串）。</p>
 
-<p><img src="../assets/gf_image028.gif" alt="提交payload" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image028.gif" alt="提交payload" style="max-width:100%"></p>
 
 <p>记得修改提交路径。提交之后查看源代码：</p>
 
-<p><img src="../assets/gf_image030.gif" alt="拿到flag" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/gf_image030.gif" alt="拿到flag" style="max-width:100%"></p>
 
 </div>
 
@@ -239,65 +241,6 @@ if ($spaceone === 'flag'){
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -321,5 +264,35 @@ tocTargets.forEach(t => tocObs.observe(t.el));
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

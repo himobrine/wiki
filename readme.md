@@ -10,8 +10,12 @@
 mywiki/
 ├── index.html              # 首页 — 最新文章列表 + 标签索引
 ├── links.html              # 友情链接页
+├── graph.html              # 知识图谱可视化
 ├── assets/
 │   ├── style.css           # 全局样式（5 套主题）
+│   ├── posts-data.js       # 文章数据（POSTS_DATA）+ 标签颜色（TAG_COLORS）
+│   ├── graph.js            # 知识图谱逻辑
+│   ├── vis-network.min.js  # 图谱可视化库
 │   └── *.gif / *.png       # 文章配图
 ├── posts/                  # 所有文章 HTML（每篇一个文件）
 ├── tags/
@@ -29,13 +33,28 @@ mywiki/
 
 在 `posts/` 下新建 `.html` 文件，遵循下方的**文章模板规范**。
 
-### 步骤 2：更新首页数据
+关键要点：
+- `<head>` 中使用 `preconnect` / `preload` / `media="print" onload="this.media='all'"` 优化字体和 CSS 加载（参考模板）
+- **不要**在 `<head>` 中引用 `vis-network.min.js`（图谱是懒加载的）
+- 文章底部必须引用 `<script src="../assets/common.js"></script>` — 它提供主题切换、回到顶部、滚动动画、WebP 自动检测切换
+- 每篇文章底部必须包含图谱侧边栏和懒加载脚本（直接从已有文章复制）
 
-打开 `index.html`，找到 `const POSTS = [...]` 数组，在末尾添加新条目：
+### 步骤 2：准备文章图片
+
+1. 截图放入 `assets/`，使用文章缩写前缀 + 序号命名（见下方**图片命名规范**）
+2. **必须同时提供 `.png` 和 `.webp` 两种格式** — `common.js` 会自动检测浏览器支持并切换
+   - WebP 转换工具：浏览器另存、ffmpeg、cwebp 等
+   - 如 `rd_image001.png` + `rd_image001.webp`
+
+### 步骤 3：更新数据文件
+
+打开 `assets/posts-data.js`，在 `POSTS_DATA` 数组末尾添加新条目：
 
 ```js
 {
   title: '文章标题',
+  primary: '主分类',       // Web安全 / CTF / 逆向 / C/C++
+  secondary: '子分类',     // 如 DVWA / Pwn / Crack 等
   date: '2026 // 06 / 05',
   url: 'posts/your-article.html',
   excerpt: '文章摘要，1-2 句话概述内容',
@@ -46,32 +65,63 @@ mywiki/
 | 字段 | 说明 |
 |------|------|
 | `title` | 文章标题 |
+| `primary` | 主分类（用于知识图谱群组聚类，影响节点颜色） |
+| `secondary` | 子分类（用于知识图谱节点形状） |
 | `date` | 日期格式 `YYYY // MM / DD`，用于排序 |
-| `url` | 相对于 `index.html` 的路径 |
+| `url` | 相对于站点根目录的路径 |
 | `excerpt` | 首页展示的摘要文字 |
 | `tags` | 标签数组，用于筛选和颜色标注 |
 
-### 步骤 3：更新标签页数据
+> `index.html` 和 `tags/list.html` 会自动从 `POSTS_DATA` 加载数据，无需手动编辑。
+> **知识图谱**也会自动从 `POSTS_DATA` 渲染节点和关系边，确保 `primary` / `secondary` / `tags` 填写正确。
 
-打开 `tags/list.html`，找到 `const POSTS = [...]` 数组（与首页结构相同），在末尾添加相同条目。`url` 字段需加上 `../` 前缀：
+### 步骤 4：添加新标签颜色和 CSS 类
 
-```js
-{
-  ...,
-  url: '../posts/your-article.html',
-  ...
-}
-```
+如果使用了全新标签，需要做两件事：
 
-### 步骤 4：添加新标签颜色（可选）
-
-如果使用了全新标签，在 `index.html` 和 `tags/list.html` 的 `TAG_COLORS` 对象中增加颜色映射：
+**4a. 在 `assets/posts-data.js` 的 `TAG_COLORS` 对象中增加颜色映射：**
 
 ```js
 '新标签': '颜色十六进制（不含 #）'
 ```
 
 颜色值参考：`00d4ff` / `3366ff` / `ff6b35` / `7b2d8e` / `2ea44f` / `e4405f` / `8b5cf6` / `f59e0b` / `10b981`
+
+**4b. 在 `assets/style.css` 中为标签添加对应的 `tag-xxx` CSS class（用于文章 hero 区的标签导航栏）：**
+
+```css
+.tag-xxx { color: #xxxxxx; border-color: #xxxxxx44; }
+```
+
+然后在文章的 `.tags-bar` 中使用 `<a class="tag tag-xxx">#标签名</a>`。
+
+### 步骤 5：检查导航栏同步
+
+文章内的 `.nav-inner` 导航栏包含指向特定标签的快捷链接，必须与首页 `index.html` 的导航栏保持一致：
+
+```html
+<div class="nav-inner">
+  <a href="../index.html">首页</a>
+  <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+  <a href="../tags/list.html?tag=安全工具">安全工具</a>
+  <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+  <a href="../tags/list.html?tag=逆向">逆向</a>
+  <a href="../tags/list.html?tag=调试">调试</a>
+  <a href="../tags/list.html">标签归档</a>
+</div>
+```
+
+如需增删导航项，必须同步更新 **所有文章** + `index.html` + `tags/list.html`。
+
+### 步骤 6：本地验证
+
+用浏览器打开页面，检查：
+- 文章内容正常显示，图片无 404
+- 主题切换正常（`common.js` 已生效）
+- 代码块 copy / fold 按钮正常
+- 回到顶部按钮正常
+- 图谱侧边栏懒加载正常
+- 首页新文章条目出现在最新列表
 
 ---
 
@@ -88,8 +138,10 @@ mywiki/
 <title>文章标题 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -100,7 +152,7 @@ mywiki/
   <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
   <div class="tags-bar">
     <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <!-- 为每个标签添加对应颜色的 tag -->
+    <!-- 标签颜色 class 映射见下方「标签色值映射」表 -->
     <a href="../tags/list.html?tag=标签名" class="tag tag-xxx">#标签名</a>
   </div>
   <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
@@ -111,6 +163,7 @@ mywiki/
 <div class="nav-sticky-wrapper" id="navWrap">
   <div class="nav-inner">
     <a href="../index.html">首页</a>
+    <!-- 导航栏必须与 index.html 同步 -->
     <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
     <a href="../tags/list.html?tag=安全工具">安全工具</a>
     <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
@@ -126,7 +179,7 @@ mywiki/
   <div class="post-date">YYYY // MM / DD</div>
   <div class="post-title">文章标题</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#xxxxxx22;color:#xxxxxx;border:1px solid #xxxxxx44">标签名</span>
+    <a href="../tags/list.html?tag=标签名" class="post-tag" style="background:#xxxxxx22;color:#xxxxxx;border:1px solid #xxxxxx44">标签名</a>
   </div>
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
@@ -149,25 +202,50 @@ mywiki/
 </div>
 
 <div class="footer">
-  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
   <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
   <div class="links">
     <a href="https://github.com/himobrine/wiki">GitHub</a>
     <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
   </div>
   <div class="copy">(c) 2026 // SECURITY BLOG</div>
 </div>
 
 </div>
 
-<div class="theme-dock" id="themeDock">...</div>
-<div class="floating-buttons">...</div>
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
 
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<!--
+  TOC 高亮 + 代码块头栏（copy/fold）+ 图谱侧边栏懒加载
+  直接从已有文章（如 posts/cpp-constants.html）复制完整 script 块
+-->
 <script>
-/* === 主题切换 + 回到顶部 + TOC 高亮 + 页面滚动动画 === */
-// 从其他文章复制完整 script 块
+// 从已有文章复制：TOC IntersectionObserver + 代码块头栏自动生成 + 图谱懒加载
 </script>
 
+<!-- 图谱侧边栏 + 懒加载 -->
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+<script>
+// 从已有文章复制图谱懒加载脚本
+</script>
+
+<!-- common.js：主题切换、回到顶部、滚动动画、WebP 自适应（必须放在最后） -->
+<script src="../assets/common.js"></script>
 </body>
 </html>
 ```
@@ -287,11 +365,13 @@ mywiki/
 - [ ] 文章内标签导航栏的 tag 链接颜色 class 匹配
 - [ ] 文章内 `post-tag` 的 inline style 颜色值正确
 - [ ] TOC 侧边栏的链接与正文 `id` 锚点一一对应
-- [ ] `index.html` 的 `POSTS` 数组已添加新条目
-- [ ] `tags/list.html` 的 `POSTS` 数组已添加新条目（`url` 带 `../` 前缀）
-- [ ] 新标签已在两处 `TAG_COLORS` 中添加颜色映射（如需要）
-- [ ] 图片已放入 `assets/` 且路径引用正确
-- [ ] 页面在浏览器打开测试正常（无 404 资源）
+- [ ] 文章内 `.nav-inner` 导航栏与首页 `index.html` 同步
+- [ ] `assets/posts-data.js` 的 `POSTS_DATA` 数组已添加新条目
+- [ ] 新标签已在 `assets/posts-data.js` 的 `TAG_COLORS` 中添加颜色映射，并在 `style.css` 中添加 `tag-xxx` class
+- [ ] 图片已放入 `assets/` 且同时提供了 `.png` 和 `.webp` 两份文件
+- [ ] `<script src="../assets/common.js"></script>` 已在页面最后引用
+- [ ] 图谱侧边栏和懒加载脚本已包含
+- [ ] 页面在浏览器打开测试正常（主题切换、代码块按钮、回到顶部、图谱均正常，无 404 资源）
 
 ---
 

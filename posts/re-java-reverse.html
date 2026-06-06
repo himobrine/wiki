@@ -6,8 +6,10 @@
 <title>简单的JAVA逆向 Writeup - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 05 / 31</div>
   <div class="post-title">简单的JAVA逆向 Writeup</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#e34f2622;color:#e34f26;border:1px solid #e34f2644">Java</span>
+    <a href="../tags/list.html?tag=CTF" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=Java" class="post-tag" style="background:#e34f2622;color:#e34f26;border:1px solid #e34f2644">Java</a>
   </div>
 </div>
 
@@ -81,43 +83,43 @@
 
 <p>压缩文件把文件扩展名改为 .Zip 取出内部文件。</p>
 
-<p><img src="../assets/jr_image002.jpg" alt="查信息" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image002.jpg" alt="查信息" style="max-width:100%"></p>
 
 <h4 id="easyapp-decompile">步骤二：反编译看</h4>
 
 <p>直接拿 Jadx 打开。</p>
 
-<p><img src="../assets/jr_image004.jpg" alt="Jadx 反编译" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image004.jpg" alt="Jadx 反编译" style="max-width:100%"></p>
 
 <p>这么简单的 JAVA 逆向去找关键代码，一般通过文件扩展名就可以判断出代码的撰写类型，一般不太会弄混 .so 和 .dex 文件，jar 包和 apk 包直接展开就好了，其余的类型可以看代码，例如：encoder 和 mainXXX 什么的。</p>
 
 <p>关键计算：</p>
 
-<p><img src="../assets/jr_image006.jpg" alt="关键计算 1" style="max-width:100%"></p>
-<p><img src="../assets/jr_image008.jpg" alt="关键计算 2" style="max-width:100%"></p>
-<p><img src="../assets/jr_image010.jpg" alt="关键计算 3" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image006.jpg" alt="关键计算 1" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image008.jpg" alt="关键计算 2" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image010.jpg" alt="关键计算 3" style="max-width:100%"></p>
 
 <p>关键计算，第二张图应该是加密部分，第一张应该是对 key 的处理。根据分析 key = 123456789，在图中做了颠倒处理，所以实际 Key = 987654321。</p>
 
 <h4 id="easyapp-reverse">步骤三：逆着写脚本</h4>
 
-<p><img src="../assets/jr_image012.gif" alt="XOR 脚本" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image012.gif" alt="XOR 脚本" style="max-width:100%"></p>
 
 <h3 id="astjs">三、.json 文件题 — [SWPUCTF 2021 新生赛] astJS cjian</h3>
 
 <p>步骤一：使用 npm 和 escodegen 还原，生成 js 代码，运行即可。如果没有 node 环境就去网上找在线工具，或者直接看 .json 文件。</p>
 
-<p><img src="../assets/jr_image014.jpg" alt="astJS 步骤 1" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image014.jpg" alt="astJS 步骤 1" style="max-width:100%"></p>
 
 <p>步骤二：脚本。</p>
 
-<p><img src="../assets/jr_image016.jpg" alt="astJS 脚本" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image016.jpg" alt="astJS 脚本" style="max-width:100%"></p>
 
 <h3 id="easy">四、水题</h3>
 
 <p>步骤一：了解文件结构，一般直接在 com 文件夹找到对应的目录，找 main 点开。</p>
 
-<p><img src="../assets/jr_image018.jpg" alt="水题" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/jr_image018.jpg" alt="水题" style="max-width:100%"></p>
 
 <p>直接看，签到题。</p>
 
@@ -169,65 +171,6 @@
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('active');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -251,5 +194,35 @@ tocTargets.forEach(t => tocObs.observe(t.el));
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

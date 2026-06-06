@@ -333,6 +333,42 @@ const POSTS_DATA = [
     tags: ['Web安全', 'DVWA', 'SQL注入']
   },
   {
+    title: 'CVE-2019-11043 PHP 远程代码执行漏洞',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2023 // 02 / 17',
+    url: 'posts/vulhub-cve-2019-11043.html',
+    excerpt: 'CVE-2019-11043 是 Nginx+php-fpm 环境下的 PHP RCE 漏洞，通过 fastcgi_split_path_info 处理 %0a 的缺陷导致任意代码执行。',
+    tags: ['Web安全', 'Vulhub', 'CVE']
+  },
+  {
+    title: 'CVE-2018-19518 PHP imap 远程命令执行漏洞',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2023 // 02 / 17',
+    url: 'posts/vulhub-cve-2018-19518.html',
+    excerpt: 'CVE-2018-19518 是 PHP imap 扩展中的远程命令执行漏洞，影响多个 PHP 版本及 Debian Linux。通过 imap_open 函数的 ProxyCommand 参数注入实现命令执行。',
+    tags: ['Web安全', 'Vulhub', 'CVE']
+  },
+  {
+    title: 'CVE-2012-1823 PHP-CGI 远程代码执行漏洞',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2023 // 02 / 12',
+    url: 'posts/vulhub-cve-2012-1823.html',
+    excerpt: 'CVE-2012-1823 是 PHP-CGI 模式下的高危 RCE 漏洞，影响 PHP < 5.3.12 / < 5.4.2。利用 querystring 参数注入配合 Metasploit 实现远程代码执行。',
+    tags: ['Web安全', 'Vulhub', 'CVE']
+  },
+  {
+    title: 'Vulhub 搭建方法',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2023 // 02 / 13',
+    url: 'posts/vulhub-setup.html',
+    excerpt: 'Vulhub 是一个基于 docker 和 docker-compose 的漏洞环境集合，进入对应目录并执行一条语句即可启动一个全新的漏洞环境。',
+    tags: ['靶场搭建', 'Vulhub']
+  },
+  {
     title: 'upload-labs 第一二关',
     primary: 'Web安全',
     secondary: 'upload-labs',
@@ -421,6 +457,33 @@ const POSTS_DATA = [
     url: 'posts/upload-labs-pass19-20.html',
     excerpt: 'upload-labs Pass-19 和 Pass-20 通关教程：00截断绕过（save_name + pathinfo 黑名单）、数组绕过（save_name 传数组使 end() 返回合法后缀绕过检测）。',
     tags: ['Web安全', 'upload-labs', '文件上传']
+  },
+  {
+    title: 'vulhub靶机activemq环境下的CVE-2015-5254（ActiveMQ 反序列化漏洞）',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2026 // 06 / 02',
+    url: 'posts/vulhub-cve-2015-5254.html',
+    excerpt: 'Apache ActiveMQ 5.x ~ 5.13.0 版本中存在反序列化漏洞，远程攻击者可通过制作特制的序列化 Java 消息服务 (JMS) ObjectMessage 对象执行任意代码。使用 vulhub 搭建漏洞环境并利用 jmet 工具实现反弹 shell。',
+    tags: ['Web安全', 'Vulhub', 'CVE']
+  },
+  {
+    title: 'vulhub靶机activemq环境下的CVE-2016-3088（ActiveMQ任意文件写入漏洞）',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2026 // 04 / 23',
+    url: 'posts/vulhub-cve-2016-3088.html',
+    excerpt: 'Apache ActiveMQ 5.x~5.14.0 版本中 fileserver 接口存在任意文件写入漏洞，可通过 PUT 上传文件结合 MOVE 请求移动至可执行目录，实现 webshell 上传和反弹 shell。',
+    tags: ['Web安全', 'Vulhub', 'CVE']
+  },
+  {
+    title: 'vulhub靶机struts2环境下的s2-032（CVE-2016-3081）（远程命令执行漏洞）',
+    primary: 'Web安全',
+    secondary: 'Vulhub',
+    date: '2024 // 08 / 07',
+    url: 'posts/vulhub-cve-2016-3081.html',
+    excerpt: 'Struts 2.3.19~2.3.28 版本中动态方法调用（DMI）功能存在远程命令执行漏洞，攻击者可通过 method: 前缀构造恶意 OGNL 表达式实现任意命令执行。',
+    tags: ['Web安全', 'Vulhub', 'CVE']
   }
 ];
 
@@ -436,10 +499,11 @@ const TAG_COLORS = {
   'MISC': 'f97316', 'Pwn': '10b981', 'PHP': '777bb3',
   '栈溢出': 'f97316', '漏洞分析': 'e4405f', '安全工具': '00d4ff',
   'OWASP': 'e4405f', '供应链安全': 'ff6b35', 'CVE': 'e4405f', 'KaliLinux': '3366ff',
-  'upload-labs': '10b981'
+  'upload-labs': '10b981',
+  'Vulhub': '00d4ff'
 };
 
-const PRIMARY_COLORS = {
+var PRIMARY_COLORS = {
   'Web安全': '3366ff',
   'CTF': 'e4405f',
   '逆向': '7b2d8e',

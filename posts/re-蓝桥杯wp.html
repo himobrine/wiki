@@ -6,8 +6,10 @@
 <title>蓝桥杯 Writeup — 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 05 / 31</div>
   <div class="post-title">蓝桥杯 Writeup</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</span>
-    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">RSA</span>
+    <a href="../tags/list.html?tag=CTF" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+    <a href="../tags/list.html?tag=Crypto" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Crypto</a>
+    <a href="../tags/list.html?tag=RSA" class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">RSA</a>
   </div>
 </div>
 
@@ -65,15 +67,15 @@
 
 <h4 id="packet">packet</h4>
 
-<p><img src="../assets/lq_image001.png" alt="Wireshark 数据包" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image001.png" alt="Wireshark 数据包" style="max-width:100%"></p>
 
-<p><img src="../assets/lq_image002.png" alt="数据包详情" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image002.png" alt="数据包详情" style="max-width:100%"></p>
 
 <h4 id="theorem">Theorem — RSA 分解 n</h4>
 
 <p>分解 n</p>
 
-<p><img src="../assets/lq_image003.png" alt="RSA 分解 n" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image003.png" alt="RSA 分解 n" style="max-width:100%"></p>
 
 <h4 id="script">解密脚本</h4>
 
@@ -99,19 +101,19 @@ print(string)
 
 <p>某种协议</p>
 
-<p><img src="../assets/lq_image004.png" alt="解密结果" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image004.png" alt="解密结果" style="max-width:100%"></p>
 
-<p><img src="../assets/lq_image005.png" alt="结果 2" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image005.png" alt="结果 2" style="max-width:100%"></p>
 
-<p><img src="../assets/lq_image006.png" alt="结果 3" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image006.png" alt="结果 3" style="max-width:100%"></p>
 
-<p><img src="../assets/lq_image007.png" alt="结果 4" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image007.png" alt="结果 4" style="max-width:100%"></p>
 
-<p><img src="../assets/lq_image008.png" alt="结果 5" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image008.png" alt="结果 5" style="max-width:100%"></p>
 
 <h4 id="flag">Flag</h4>
 
-<p><img src="../assets/lq_image009.png" alt="Flag" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/lq_image009.png" alt="Flag" style="max-width:100%"></p>
 
 </div>
 
@@ -145,69 +147,37 @@ print(string)
   <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
-<script>
-const sentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let spacer = null;
-const obs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !spacer) {
-    spacer = document.createElement('div');
-    spacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(spacer, navWrap.nextSibling);
-  } else if (!stuck && spacer) {
-    spacer.remove(); spacer = null;
-  }
-}, { threshold: [0] });
-obs.observe(sentinel);
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-const topObs = new IntersectionObserver(
-  ([e]) => topBtn.classList.toggle('show', !e.isIntersecting),
-  { threshold: [0] }
-);
-topObs.observe(document.getElementById('navSentinel'));
-</script>
 
-</body>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

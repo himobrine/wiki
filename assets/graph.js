@@ -1,8 +1,8 @@
 (function(){
 var c=document.getElementById('graphContainer');
 if(!c||typeof vis==='undefined'||typeof POSTS==='undefined')return;
-
-function gc(p){var t=PRIMARY_COLORS[p.primary]||'888888';return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
+var PC=typeof PRIMARY_COLORS!=='undefined'?PRIMARY_COLORS:typeof window!=='undefined'&&window.PRIMARY_COLORS?window.PRIMARY_COLORS:{};
+function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
 function gsh(p){var s=p.secondary;if(s==='DVWA'||s==='Pwn'||s==='Crack'||s==='基础')return'dot';if(s==='upload-labs'||s==='Reverse')return'square';if(s==='Crypto'||s==='工具')return'diamond';if(s==='Web')return'triangle';return'dot';}
 
 var f=window.location.pathname.split('/').pop();

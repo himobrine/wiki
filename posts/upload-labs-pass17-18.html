@@ -6,8 +6,10 @@
 <title>upload-labs 第十七十八关 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2024 // 04 / 18</div>
   <div class="post-title">upload-labs 第十七十八关</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">upload-labs</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件上传</span>
+    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
+    <a href="../tags/list.html?tag=upload-labs" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">upload-labs</a>
+    <a href="../tags/list.html?tag=文件上传" class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">文件上传</a>
   </div>
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
@@ -90,7 +92,7 @@ if(isset($_POST['submit'])){
 
 <p>由于这个是先上传在判断我们就可以使用木马让木马写文件。只需要不停的上传然后自己不停的访问</p>
 
-<img src="../assets/ws_ul-pass17-18_image001.png" alt="条件竞争代码">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image001.png" alt="条件竞争代码">
 
 <pre><code>import requests
 url = 'http://127.0.0.1/upload/upload/1.php'
@@ -103,11 +105,11 @@ while True:
 
 <p>先运行py脚本再上传（或者直接脚本上传），记得上传的时候抓一个包</p>
 
-<img src="../assets/ws_ul-pass17-18_image002.png" alt="Burp抓包">
-<img src="../assets/ws_ul-pass17-18_image003.png" alt="Burp上传">
-<img src="../assets/ws_ul-pass17-18_image004.png" alt="无限发包">
-<img src="../assets/ws_ul-pass17-18_image005.png" alt="访问成功">
-<img src="../assets/ws_ul-pass17-18_image006.png" alt="上传完成">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image002.png" alt="Burp抓包">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image003.png" alt="Burp上传">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image004.png" alt="无限发包">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image005.png" alt="访问成功">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image006.png" alt="上传完成">
 
 <h4 id="pass-18">第十八关</h4>
 
@@ -217,13 +219,13 @@ class MyUpload{
 
 <p>这一关有点麻烦，由于过滤无法上传php文件只能做图片马。可以直接修改后缀。需要写一个文件包含漏洞页面</p>
 
-<img src="../assets/ws_ul-pass17-18_image007.png" alt="文件包含1">
-<img src="../assets/ws_ul-pass17-18_image008.png" alt="文件包含2">
-<img src="../assets/ws_ul-pass17-18_image009.png" alt="文件包含3">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image007.png" alt="文件包含1">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image008.png" alt="文件包含2">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image009.png" alt="文件包含3">
 
 <p>解析完成</p>
 
-<img src="../assets/ws_ul-pass17-18_image010.png" alt="解析成功">
+<img loading="lazy" src="../assets/ws_ul-pass17-18_image010.png" alt="解析成功">
 
 </div>
 </div>
@@ -255,67 +257,6 @@ class MyUpload{
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-/* sticky nav */
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
-/* TOC active highlight */
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -389,5 +330,35 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

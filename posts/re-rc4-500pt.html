@@ -6,8 +6,10 @@
 <title>4.re RC4-500pt —— 两种解题方法 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 05 / 31</div>
   <div class="post-title">4.re RC4-500pt —— 两种解题方法</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">RC4</span>
+    <a href="../tags/list.html?tag=CTF" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=RC4" class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">RC4</a>
   </div>
 </div>
 
@@ -84,45 +86,45 @@
 
 <p>main 函数伪代码很大，不方便直接看。定位 <code>sub_</code> 开头的函数，按 <code>Tab</code> 键切换到汇编视图，分析汇编代码。</p>
 
-<p><img src="../assets/rc4_m1_image001.jpg" alt="main函数分析" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image001.jpg" alt="main函数分析" style="max-width:100%"></p>
 
-<p><img src="../assets/rc4_m1_image002.jpg" alt="汇编分析" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image002.jpg" alt="汇编分析" style="max-width:100%"></p>
 
 <h5 id="m1-step3">（3）准备 IDA 动调</h5>
 
 <p>下断点 <code>F2</code>，断点位置如图所示。设置好后回到汇编窗口。</p>
 
-<p><img src="../assets/rc4_m1_image003.jpg" alt="断点位置" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image003.jpg" alt="断点位置" style="max-width:100%"></p>
 
 <h5 id="m1-step4">（4）根据对汇编代码的分析</h5>
 
 <p>根据对汇编代码的分析，需要修改数据。找到这个位置：</p>
 
-<p><img src="../assets/rc4_m1_image004.jpg" alt="修改数据1" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image004.jpg" alt="修改数据1" style="max-width:100%"></p>
 
 <p>修改：</p>
 
-<p><img src="../assets/rc4_m1_image005.jpg" alt="修改数据2" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image005.jpg" alt="修改数据2" style="max-width:100%"></p>
 
 <p>这一行：</p>
 
-<p><img src="../assets/rc4_m1_image006.jpg" alt="修改数据3" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image006.jpg" alt="修改数据3" style="max-width:100%"></p>
 
-<p><img src="../assets/rc4_m1_image007.gif" alt="修改数据4" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image007.gif" alt="修改数据4" style="max-width:100%"></p>
 
 <p>修改它的地址：</p>
 
-<p><img src="../assets/rc4_m1_image008.jpg" alt="修改地址" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image008.jpg" alt="修改地址" style="max-width:100%"></p>
 
 <p>改成这样，<code>patch</code> 一下，成这样：</p>
 
-<p><img src="../assets/rc4_m1_image009.jpg" alt="Patch结果" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image009.jpg" alt="Patch结果" style="max-width:100%"></p>
 
 <p>再保存一下，点这个：</p>
 
-<p><img src="../assets/rc4_m1_image010.gif" alt="保存1" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image010.gif" alt="保存1" style="max-width:100%"></p>
 
-<p><img src="../assets/rc4_m1_image011.gif" alt="保存2" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image011.gif" alt="保存2" style="max-width:100%"></p>
 
 <p>好了，准备工作完成，开始调试。</p>
 
@@ -130,11 +132,11 @@
 
 <p>选这个调试器：</p>
 
-<p><img src="../assets/rc4_m1_image012.jpg" alt="选择调试器" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image012.jpg" alt="选择调试器" style="max-width:100%"></p>
 
 <p>运行后 <code>F8</code> 单步，观察运行窗口，出现结果：</p>
 
-<p><img src="../assets/rc4_m1_image013.jpg" alt="运行结果" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m1_image013.jpg" alt="运行结果" style="max-width:100%"></p>
 
 <hr>
 
@@ -146,13 +148,13 @@
 
 <h5 id="m2-step1">（1）下断点，直接动调</h5>
 
-<p><img src="../assets/rc4_m2_image001.jpg" alt="动调截图" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m2_image001.jpg" alt="动调截图" style="max-width:100%"></p>
 
 <h5 id="m2-step2">（2）动调</h5>
 
 <p>直接看堆栈窗口出结果，秒了。</p>
 
-<p><img src="../assets/rc4_m2_image002.jpg" alt="堆栈结果" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/rc4_m2_image002.jpg" alt="堆栈结果" style="max-width:100%"></p>
 
 </div>
 
@@ -196,65 +198,6 @@
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -278,5 +221,35 @@ tocTargets.forEach(t => tocObs.observe(t.el));
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

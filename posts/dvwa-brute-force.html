@@ -6,8 +6,10 @@
 <title>DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析） - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 03 / 28</div>
   <div class="post-title">DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析）</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">暴力破解</span>
+    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</a>
+    <a href="../tags/list.html?tag=暴力破解" class="post-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">暴力破解</a>
   </div>
 </div>
 
@@ -105,25 +107,25 @@
 
 <p>打开 Burp 对此网站抓包，用户和密码随便输入，只是为了抓包：</p>
 
-<p><img src="../assets/bf_image001.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image001.png" alt="" style="max-width:100%"></p>
 
 <p>将此数据包发送到 Intruder 模块：</p>
 
-<p><img src="../assets/bf_image002.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image002.png" alt="" style="max-width:100%"></p>
 
-<p><img src="../assets/bf_image003.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image003.png" alt="" style="max-width:100%"></p>
 
 <p>这里会有几个标出来的字段，直接选择 Clear，选中需要爆破的 username 和 password 的值利用 Add 添加（也可以直接爆破密码，前提是要知道用户名，建议直接 admin）：</p>
 
-<p><img src="../assets/bf_image004.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image004.png" alt="" style="max-width:100%"></p>
 
 <p>选中 Payloads 模块进行设置，直接在 Payload Options 选择 Load 去添加字典，或者用 Add 添加单个字段：</p>
 
-<p><img src="../assets/bf_image005.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image005.png" alt="" style="max-width:100%"></p>
 
 <p>点击右上角的 Start Attack 就行，等待一下就可以。通过 Status 和 Length 筛选可以看到密码：</p>
 
-<p><img src="../assets/bf_image006.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image006.png" alt="" style="max-width:100%"></p>
 
 <h5 id="low-code">代码分析</h5>
 
@@ -168,7 +170,7 @@ if( isset( $_GET[ 'Login' ] ) ) {
 
 <p>与上一难度一样，但是需要设置时停。修改 Burp 的 Resource Pool 模块（本模块是修改攻击速度）：</p>
 
-<p><img src="../assets/bf_image007.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image007.png" alt="" style="max-width:100%"></p>
 
 <p>按此配置就行，可以试试能不能更快爆破，只要大于网站要求请求时间即可。结果与上面一样（爆破会很慢的，就不放出来了）。</p>
 
@@ -222,13 +224,13 @@ if( isset( $_GET[ 'Login' ] ) ) {
 
 <p>前面一样，修改 Options 下的 Grep-Extract：</p>
 
-<p><img src="../assets/bf_image008.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image008.png" alt="" style="max-width:100%"></p>
 
-<p><img src="../assets/bf_image009.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image009.png" alt="" style="max-width:100%"></p>
 
 <p>找到 token，先修改值，再单击 Refetch Response：</p>
 
-<p><img src="../assets/bf_image010.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/bf_image010.png" alt="" style="max-width:100%"></p>
 
 <p>将 Payloads 下的 Payload Set 改为 2，就可以攻击了。</p>
 
@@ -495,67 +497,6 @@ generateSessionToken();
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-/* sticky nav */
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
-/* TOC active highlight */
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -629,5 +570,35 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

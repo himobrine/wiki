@@ -6,8 +6,10 @@
 <title>DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析） - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 03 / 02</div>
   <div class="post-title">DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析）</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">会话安全</span>
+    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</a>
+    <a href="../tags/list.html?tag=会话安全" class="post-tag" style="background:#f59e0b22;color:#f59e0b;border:1px solid #f59e0b44">会话安全</a>
   </div>
 </div>
 
@@ -88,19 +90,19 @@
 
 <p>点击 Generate 按钮，抓包观察 Cookie 的变化：</p>
 
-<p><img src="../assets/ws_image001.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image001.png" alt="" style="max-width:100%"></p>
 
 <p>第一次请求返回的 Set-Cookie 中 dvwaSession=1：</p>
 
-<p><img src="../assets/ws_image002.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image002.png" alt="" style="max-width:100%"></p>
 
 <p>再次点击 Generate，Cookie 变为 2，多次尝试后发现是简单的递增关系：</p>
 
-<p><img src="../assets/ws_image003.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image003.png" alt="" style="max-width:100%"></p>
 
 <p>构造 payload 即可进行会话劫持：</p>
 
-<p><img src="../assets/ws_image004.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image004.png" alt="" style="max-width:100%"></p>
 
 <h5 id="low-code">代码分析</h5>
 
@@ -126,19 +128,19 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 <p>抓包观察：</p>
 
-<p><img src="../assets/ws_image005.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image005.png" alt="" style="max-width:100%"></p>
 
 <p>回包中的 Cookie 值看起来像时间戳：</p>
 
-<p><img src="../assets/ws_image006.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image006.png" alt="" style="max-width:100%"></p>
 
 <p>将时间戳转换为可读时间验证：</p>
 
-<p><img src="../assets/ws_image007.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image007.png" alt="" style="max-width:100%"></p>
 
 <p>攻击者可以在特定时间点获取 Cookie 值后进行会话劫持：</p>
 
-<p><img src="../assets/ws_image008.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image008.png" alt="" style="max-width:100%"></p>
 
 <h5 id="medium-code">代码分析</h5>
 
@@ -160,21 +162,21 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 
 <p>抓包观察 Cookie：</p>
 
-<p><img src="../assets/ws_image009.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image009.png" alt="" style="max-width:100%"></p>
 
 <p>回包中的 Cookie 值长度固定，前后无关联规律，推测为哈希值：</p>
 
-<p><img src="../assets/ws_image010.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image010.png" alt="" style="max-width:100%"></p>
 
 <p>将返回值进行 MD5 解密验证：</p>
 
-<p><img src="../assets/ws_image011.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image011.png" alt="" style="max-width:100%"></p>
 
 <p>确定是 MD5 加密，可以进行暴力破解：</p>
 
-<p><img src="../assets/ws_image012.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image012.png" alt="" style="max-width:100%"></p>
 
-<p><img src="../assets/ws_image013.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ws_image013.png" alt="" style="max-width:100%"></p>
 
 <h5 id="high-code">代码分析</h5>
 
@@ -253,67 +255,6 @@ if ($_SERVER['REQUEST_METHOD'] == "POST") {
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-/* sticky nav */
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
-/* TOC active highlight */
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -387,5 +328,35 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

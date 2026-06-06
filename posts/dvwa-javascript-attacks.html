@@ -6,8 +6,10 @@
 <title>DVWA 靶场 JavaScript Attacks(js攻击)全难度教程（附代码分析） - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2024 // 05 / 14</div>
   <div class="post-title">DVWA 靶场 JavaScript Attacks(js攻击)全难度教程（附代码分析）</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</span>
-    <span class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</span>
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">JS攻击</span>
+    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
+    <a href="../tags/list.html?tag=DVWA" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">DVWA</a>
+    <a href="../tags/list.html?tag=JS攻击" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">JS攻击</a>
   </div>
 </div>
 
@@ -116,13 +118,13 @@ EOF;
 
 <p>抓包观察请求：</p>
 
-<p><img src="../assets/js_image001.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image001.png" alt="" style="max-width:100%"></p>
 
 <p>由于 token 是基于 phrase 参数计算得到的，只需要本地计算正确的 token 并覆盖原有参数即可提交：</p>
 
-<p><img src="../assets/js_image002.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image002.png" alt="" style="max-width:100%"></p>
 
-<p><img src="../assets/js_image003.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image003.png" alt="" style="max-width:100%"></p>
 
 <h4 id="medium">Medium 难度</h4>
 
@@ -151,13 +153,13 @@ function do_elsesomething(e) {
 
 <p>抓包观察请求参数：</p>
 
-<p><img src="../assets/js_image004.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image004.png" alt="" style="max-width:100%"></p>
 
 <p>和 Low 级别一样，本地计算反转后的 token 值提交即可绕过：</p>
 
-<p><img src="../assets/js_image005.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image005.png" alt="" style="max-width:100%"></p>
 
-<p><img src="../assets/js_image006.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image006.png" alt="" style="max-width:100%"></p>
 
 <h4 id="high">High 难度</h4>
 
@@ -206,17 +208,17 @@ token_part_1("ABCD", 44);</code></pre>
 
 <p>在控制台中逐步执行各函数，观察 token 变化：</p>
 
-<p><img src="../assets/js_image007.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image007.png" alt="" style="max-width:100%"></p>
 
 <p>按照代码中的顺序依次调用 token_part_1、token_part_2、token_part_3 获取最终 token 后提交：</p>
 
-<p><img src="../assets/js_image008.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image008.png" alt="" style="max-width:100%"></p>
 
 <h4 id="impossible">Impossible 难度</h4>
 
 <h5 id="impossible-code">代码分析</h5>
 
-<p><img src="../assets/js_image009.png" alt="" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/js_image009.png" alt="" style="max-width:100%"></p>
 
 <p>Impossible 级别在前端几乎没有任何可用的 JS 代码，验证逻辑完全在服务端完成。因此无法通过前端分析 token 生成算法来绕过，体现了正确的安全设计原则：前端只负责展示，所有关键校验应在服务端执行。</p>
 
@@ -262,67 +264,6 @@ token_part_1("ABCD", 44);</code></pre>
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-/* sticky nav */
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
-/* TOC active highlight */
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -396,5 +337,35 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>

@@ -6,9 +6,11 @@
 <title>关系图谱 — himobrine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/style.css">
-<script src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="assets/style.css"></noscript>
+<script src="assets/vis-network.min.js"></script>
 <style>
 .graph-page { max-width: 900px; margin: 0 auto; padding: 20px; }
 .graph-page .graph-title { font-size: 14px; margin-bottom: 12px; }
@@ -86,7 +88,8 @@
 (function(){
 var c=document.getElementById('graphContainer');
 if(!c||typeof vis==='undefined'||typeof POSTS==='undefined')return;
-function gc(p){var t=PRIMARY_COLORS[p.primary]||'888888';return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
+var PC=typeof PRIMARY_COLORS!=='undefined'?PRIMARY_COLORS:typeof window!=='undefined'&&window.PRIMARY_COLORS?window.PRIMARY_COLORS:{};
+function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
 function gsh(p){var s=p.secondary;if(s==='DVWA'||s==='Pwn'||s==='Crack'||s==='基础')return'dot';if(s==='upload-labs'||s==='Reverse')return'square';if(s==='Crypto'||s==='工具')return'diamond';if(s==='Web')return'triangle';return'dot';}
 var groups={};
 groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
@@ -108,28 +111,7 @@ network.on('click',function(params){if(params.nodes.length>0){var node=nodes.get
 network.on('dragStart',function(){network.setOptions({physics:{enabled:false}});});network.on('hoverNode',function(){network.setOptions({physics:{enabled:false}});});c.addEventListener('mouseleave',function(){network.setOptions({physics:{enabled:true}});});
 })();
 </script>
-<script>
-(function(){
-var h=document.documentElement,tb=document.getElementById('themeToggle'),td=document.getElementById('themeDock');
-var ti={dark:'☽',light:'☀',crystal:'◇',ego:'♢',rei:'レ'},qt='light';
-function st(t){h.setAttribute('data-theme',t);localStorage.setItem('theme',t);tb.textContent=ti[t]||'☽';document.querySelectorAll('.theme-dock-item').forEach(function(e){e.classList.toggle('active',e.dataset.theme===t);});if(t==='dark')qt='light';else if(t==='light')qt='dark';else if(t==='rei')qt='dark';else qt='dark';}
-var sv=localStorage.getItem('theme')||'dark';st(sv);
-document.querySelectorAll('.theme-dock-item').forEach(function(e){e.addEventListener('click',function(){st(e.dataset.theme);td.classList.remove('visible');});});
-tb.addEventListener('click',function(){td.classList.toggle('visible');});
-document.addEventListener('click',function(e){if(!td.contains(e.target)&&e.target!==tb)td.classList.remove('visible');});
-})();
-
-(function(){
-var t=document.getElementById('backToTop');
-t.addEventListener('click',function(){window.scrollTo({top:0,behavior:'smooth'});});
-new IntersectionObserver(function(e){t.classList.toggle('show',!e[0].isIntersecting);},{threshold:[0]}).observe(document.getElementById('navSentinel'));
-})();
-
-(function(){
-var o=new IntersectionObserver(function(e){e.forEach(function(x){if(x.isIntersecting){x.target.classList.add('visible');o.unobserve(x.target);}});},{threshold:0.1});
-document.querySelectorAll('.fade-up').forEach(function(el){o.observe(el);});
-})();
-</script>
+<script src="assets/common.js"></script>
 
 </body>
 </html>

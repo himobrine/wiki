@@ -1,0 +1,32 @@
+[data-theme="light"] {
+  --bg-primary: #f2f4f8;
+  --bg-elevated: #fff;
+  --bg-hover: #e8ecf1;
+  --text-primary: #1a1a2e;
+  --text-secondary: #333;
+  --text-muted: #999;
+  --border-color: rgba(0,0,0,0.08);
+  --border-accent: rgba(0,136,204,0.2);
+  --accent-cyan: #0088cc;
+  --accent-blue: #2255cc;
+  --accent-orange: #cc5500;
+  --scrollbar-track: #ddd;
+  --scrollbar-thumb: #0088cc44;
+  --nav-bg: rgba(242,244,248,0.9);
+  --nav-bg-stuck: rgba(242,244,248,0.97);
+  --hero-border: rgba(0,136,204,0.2);
+  --section-title-border: rgba(0,136,204,0.2);
+  --post-hover-border: rgba(0,136,204,0.3);
+  --code-bg: #e8ecf1;
+  --pre-bg: #e0e4ea;
+  --blockquote-bg: #fff;
+  --th-bg: #e8ecf1;
+  --tag-add-color: #666;
+  --tag-add-border: #66666644;
+}
+[data-theme="light"] .scanline {
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.02) 2px, rgba(0,0,0,0.02) 4px);
+}
+[data-theme="light"] .scanline::after {
+  background: linear-gradient(0deg, transparent, rgba(0,0,0,0.04), transparent);
+}

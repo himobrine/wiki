@@ -6,8 +6,10 @@
 <title>loding (50分) - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="../assets/style.css">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Titillium+Web:wght@400;600;700&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
 <div class="scanline"></div>
@@ -45,9 +47,9 @@
   <div class="post-date">2026 // 05 / 31</div>
   <div class="post-title">loding (50分)</div>
   <div class="post-tags">
-    <span class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</span>
-    <span class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</span>
-    <span class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</span>
+    <a href="../tags/list.html?tag=CTF" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+    <a href="../tags/list.html?tag=逆向" class="post-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=Pwn" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">Pwn</a>
   </div>
 </div>
 
@@ -69,7 +71,7 @@
 
 <p>32 位程序，IDA 直接 F5：</p>
 
-<p><img src="../assets/ld_image002.png" alt="IDA 伪代码" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image002.png" alt="IDA 伪代码" style="max-width:100%"></p>
 
 <p>发现有一个我们无法直接控制的变量 v6，也就是 mmap 分配内存的起始位置。</p>
 
@@ -85,32 +87,32 @@
 
 <p>关键看 for 循环：</p>
 
-<p><img src="../assets/ld_image004.png" alt="scanf 循环" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image004.png" alt="scanf 循环" style="max-width:100%"></p>
 
 <p><code>unk_80485F0</code> 指向的内存值为 <code>%d</code>，所以从键盘读入整数，以十进制形式，然后转换为浮点数再除以 <code>2333.0</code>，再写入 v6 指向的内存。</p>
 
-<p><img src="../assets/ld_image006.png" alt="scanf 代码" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image006.png" alt="scanf 代码" style="max-width:100%"></p>
 
 <p>开始调试，安装 gdb 插件：</p>
 <ul>
   <li><a href="https://blog.csdn.net/whbing1471/article/details/112410599">gdb peda / pwngdb / pwndbg 安装使用</a></li>
 </ul>
 
-<p><img src="../assets/ld_image008.png" alt="gdb 调试" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image008.png" alt="gdb 调试" style="max-width:100%"></p>
 
 <p>一步一步来：</p>
 
-<p><img src="../assets/ld_image010.png" alt="gdb 下查看" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image010.png" alt="gdb 下查看" style="max-width:100%"></p>
 
-<p><img src="../assets/ld_image012.png" alt="mmap 查看" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image012.png" alt="mmap 查看" style="max-width:100%"></p>
 
 <p>给 mmap 下断点：</p>
 
-<p><img src="../assets/ld_image014.png" alt="mmap 断点" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image014.png" alt="mmap 断点" style="max-width:100%"></p>
 
 <p>找到地址了：</p>
 
-<p><img src="../assets/ld_image016.png" alt="找到 mmap 地址" style="max-width:100%"></p>
+<p><img loading="lazy" src="../assets/ld_image016.png" alt="找到 mmap 地址" style="max-width:100%"></p>
 
 <h3 id="ieee754">IEEE 754 编码</h3>
 
@@ -225,65 +227,6 @@ int main(int argc, char** argv) {
 </div>
 
 <script>
-const html = document.documentElement;
-const themeBtn = document.getElementById('themeToggle');
-const themeDock = document.getElementById('themeDock');
-const themeIcons = { dark: '☽', light: '☀', crystal: '◇', ego: '♢', rei: 'レ' };
-const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-let qToggle = 'light';
-function setTheme(t) {
-  html.setAttribute('data-theme', t);
-  localStorage.setItem('theme', t);
-  themeBtn.textContent = themeIcons[t] || '☽';
-  document.querySelectorAll('.theme-dock-item').forEach(el => el.classList.toggle('active', el.dataset.theme === t));
-  if (t === 'dark') qToggle = 'light';
-  else if (t === 'light') qToggle = 'dark';
-  else if (t === 'rei') qToggle = 'dark';
-  else qToggle = 'dark';
-}
-const saved = localStorage.getItem('theme') || 'dark';
-setTheme(saved);
-if (saved === 'dark' || saved === 'light') qToggle = saved === 'dark' ? 'light' : 'dark';
-else if (saved === 'rei') qToggle = 'dark';
-document.querySelectorAll('.theme-dock-item').forEach(el =>
-  el.addEventListener('click', () => { setTheme(el.dataset.theme); themeDock.classList.remove('visible'); })
-);
-themeBtn.addEventListener('click', () => {
-  if (isTouch) { themeDock.classList.toggle('visible'); }
-  else { setTheme(qToggle); themeDock.classList.remove('visible'); }
-});
-if (!isTouch) {
-  let dockTimer;
-  const showDock = () => { clearTimeout(dockTimer); themeDock.classList.add('visible'); };
-  const hideDock = () => { dockTimer = setTimeout(() => themeDock.classList.remove('visible'), 100); };
-  themeBtn.addEventListener('mouseenter', showDock);
-  themeBtn.addEventListener('mouseleave', hideDock);
-  themeDock.addEventListener('mouseenter', showDock);
-  themeDock.addEventListener('mouseleave', hideDock);
-}
-document.addEventListener('click', e => {
-  if (!themeDock.contains(e.target) && e.target !== themeBtn) themeDock.classList.remove('visible');
-});
-const topBtn = document.getElementById('backToTop');
-topBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-window.addEventListener('scroll', () => topBtn.classList.toggle('show', window.scrollY > 300), { passive: true });
-
-const navSentinel = document.getElementById('navSentinel');
-const navWrap = document.getElementById('navWrap');
-let navSpacer = null;
-const navObs = new IntersectionObserver(([e]) => {
-  const stuck = !e.isIntersecting;
-  navWrap.classList.toggle('fixed', stuck);
-  if (stuck && !navSpacer) {
-    navSpacer = document.createElement('div');
-    navSpacer.style.height = navWrap.offsetHeight + 'px';
-    navWrap.parentNode.insertBefore(navSpacer, navWrap.nextSibling);
-  } else if (!stuck && navSpacer) {
-    navSpacer.remove(); navSpacer = null;
-  }
-}, { threshold: [0] });
-navObs.observe(navSentinel);
-
 const tocLinks = document.querySelectorAll('.post-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
@@ -307,5 +250,35 @@ tocTargets.forEach(t => tocObs.observe(t.el));
 
 </script>
 
-</body>
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
 </html>
