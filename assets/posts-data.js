@@ -462,7 +462,7 @@ const POSTS_DATA = [
     title: 'vulhub靶机activemq环境下的CVE-2015-5254（ActiveMQ 反序列化漏洞）',
     primary: 'Web安全',
     secondary: 'Vulhub',
-    date: '2026 // 06 / 02',
+    date: '2024 // 02 / 01',
     url: 'posts/vulhub-cve-2015-5254.html',
     excerpt: 'Apache ActiveMQ 5.x ~ 5.13.0 版本中存在反序列化漏洞，远程攻击者可通过制作特制的序列化 Java 消息服务 (JMS) ObjectMessage 对象执行任意代码。使用 vulhub 搭建漏洞环境并利用 jmet 工具实现反弹 shell。',
     tags: ['Web安全', 'Vulhub', 'CVE']
@@ -471,7 +471,7 @@ const POSTS_DATA = [
     title: 'vulhub靶机activemq环境下的CVE-2016-3088（ActiveMQ任意文件写入漏洞）',
     primary: 'Web安全',
     secondary: 'Vulhub',
-    date: '2026 // 04 / 23',
+    date: '2024 // 02 / 02',
     url: 'posts/vulhub-cve-2016-3088.html',
     excerpt: 'Apache ActiveMQ 5.x~5.14.0 版本中 fileserver 接口存在任意文件写入漏洞，可通过 PUT 上传文件结合 MOVE 请求移动至可执行目录，实现 webshell 上传和反弹 shell。',
     tags: ['Web安全', 'Vulhub', 'CVE']
@@ -497,7 +497,7 @@ const TAG_COLORS = {
   'CTF': 'e4405f', 'RSA': '8b5cf6', 'Crypto': '00d4ff', 'RC4': 'f59e0b',
   '蓝桥杯': 'ec4899', 'MD5碰撞': 'f59e0b', 'Java': 'e34f26',
   'MISC': 'f97316', 'Pwn': '10b981', 'PHP': '777bb3',
-  '栈溢出': 'f97316', '漏洞分析': 'e4405f', '安全工具': '00d4ff',
+  '栈溢出': 'f97316', '安全工具': '00d4ff',
   'OWASP': 'e4405f', '供应链安全': 'ff6b35', 'CVE': 'e4405f', 'KaliLinux': '3366ff',
   'upload-labs': '10b981',
   'Vulhub': '00d4ff'

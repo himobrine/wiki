@@ -71,7 +71,7 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:'Noto Sa
 <div class="nav-sticky-wrapper fade-up" id="navWrap">
   <div class="nav-inner">
     <a href="../index.html">首页</a>
-    <a href="list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="list.html?tag=CVE">CVE</a>
     <a href="list.html?tag=安全工具">安全工具</a>
     <a href="list.html?tag=学习笔记">学习笔记</a>
     <a href="list.html?tag=逆向">逆向</a>
@@ -156,7 +156,11 @@ function renderArchive(page) {
     html += '<span style="color:' + (tagColor ? '#' + tagColor : 'var(--accent-cyan)') + ';font-size:13px">' + esc(tag) + '</span>';
     html += '<span style="color:var(--text-muted);font-size:12px">' + posts.length + ' 篇</span>';
     html += '</div>';
-    posts.slice(0, 10).forEach(p => {
+    posts.sort((a, b) => {
+      const da = a.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
+      const db = b.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
+      return db.localeCompare(da);
+    }).slice(0, 10).forEach(p => {
       html += '<a href="' + p.url + '" class="tag-post-link">' + p.title + '</a>';
     });
     if (posts.length > 10) {
@@ -207,7 +211,11 @@ function renderArchive(page) {
 function renderTag(tag, page) {
   const PER_PAGE = 10;
   let decoded; try { decoded = decodeURIComponent(tag); } catch { decoded = tag; }
-  const filtered = POSTS.filter(p => p.tags.includes(decoded));
+  const filtered = POSTS.filter(p => p.tags.includes(decoded)).sort((a, b) => {
+    const da = a.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
+    const db = b.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
+    return db.localeCompare(da);
+  });
   const totalPages = Math.ceil(filtered.length / PER_PAGE) || 1;
   page = Math.max(1, Math.min(page, totalPages));
   const start = (page - 1) * PER_PAGE;
