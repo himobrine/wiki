@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶场noob：1教程 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2023 // 07 / 18</div>
+  <div class="post-title">vulnhub靶场noob：1教程</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#info-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#info-port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#info-version">版本扫描</a></li>
+        <li class="toc-h5"><a href="#info-vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#ftp">FTP 信息收集</a></li>
+        <li class="toc-h4"><a href="#web">Web 渗透</a></li>
+        <li class="toc-h5"><a href="#web-login">Web 登录</a></li>
+        <li class="toc-h5"><a href="#web-dirb">目录扫描</a></li>
+        <li class="toc-h5"><a href="#web-rar">RAR 解压分析</a></li>
+        <li class="toc-h4"><a href="#stego">隐写分析</a></li>
+        <li class="toc-h5"><a href="#stego-steghide">Steghide 提取</a></li>
+        <li class="toc-h5"><a href="#stego-rot13">ROT13 解码</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录与 user flag</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#privesc-cred">发现新凭证</a></li>
+        <li class="toc-h5"><a href="#privesc-nano">nano sudo 提权</a></li>
+        <li class="toc-h4"><a href="#flag">Root Flag</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/noob-1,746/" target="_blank">Noob: 1 ~ VulnHub</a></p>
+    <p>下载后使用 VMware 或 VirtualBox 导入，网络设置为 NAT 模式。攻击机使用 Kali Linux。</p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="info-discovery">主机发现</h5>
+    <p>使用 arp-scan 发现目标主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/no_image001.png" alt="arp-scan 主机发现"></p>
+
+    <h5 id="info-port">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/no_image002.png" alt="nmap 端口扫描"></p>
+
+    <h5 id="info-version">版本扫描</h5>
+    <pre><code>nmap -sV -sT -sC -O -p21,80 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/no_image003.png" alt="nmap 版本扫描"></p>
+    <p>可以看到 FTP 里面有文件，Web 是 PHP。开放端口：21（FTP）、80（HTTP）。</p>
+
+    <h5 id="info-vuln">漏洞扫描</h5>
+    <pre><code>nmap --script=vuln -p21,80 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/no_image004.png" alt="nmap 漏洞扫描"></p>
+
+    <h4 id="ftp">FTP 信息收集</h4>
+    <p>尝试通过匿名登录 FTP：</p>
+    <pre><code>ftp 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/no_image005.png" alt="FTP 登录"></p>
+    <p>查看 80 端口页面寻找线索：</p>
+    <p><img loading="lazy" src="../assets/no_image006.png" alt="Web 页面"></p>
+    <p>下载文件进行分析：</p>
+    <p><img loading="lazy" src="../assets/no_image007.png" alt="下载文件"></p>
+    <p>发现 Base64 编码字符串：</p>
+    <pre><code>echo "Y2hhbXA6cGFzc3dvcmQ=" | base64 --decode</code></pre>
+    <p><img loading="lazy" src="../assets/no_image008.png" alt="Base64 解码"></p>
+    <p>解码后得到 <code>champ:password</code>，但 FTP 无法使用此凭证登录。</p>
+
+    <h4 id="web">Web 渗透</h4>
+
+    <h5 id="web-login">Web 登录</h5>
+    <p>访问 80 端口，是一个登录页面：</p>
+    <p><img loading="lazy" src="../assets/no_image009.png" alt="80 端口页面"></p>
+    <p>使用刚获取的密码尝试登录，成功进入：</p>
+    <p><img loading="lazy" src="../assets/no_image010.png" alt="登录成功"></p>
+
+    <h5 id="web-dirb">目录扫描</h5>
+    <p>发现 About Us 页面有文件下载功能，使用 dirb 扫描目录：</p>
+    <pre><code>dirb http://192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/no_image011.png" alt="dirb 扫描"></p>
+    <p>发现 <code>/downloads</code> 目录。</p>
+
+    <h5 id="web-rar">RAR 解压分析</h5>
+    <p>下载 <code>downloads.rar</code>，赋予权限并解压：</p>
+    <pre><code>chmod 777 downloads.rar
+unrar e downloads.rar</code></pre>
+    <p><img loading="lazy" src="../assets/no_image012.png" alt="解压 RAR"></p>
+    <p>得到三个文件：</p>
+    <p><img loading="lazy" src="../assets/no_image013.png" alt="三个文件"></p>
+    <p>查看 ascii 文件内容：</p>
+    <p><img loading="lazy" src="../assets/no_image014.png" alt="Ascii 文件"></p>
+    <p>发现 python 文件，提示使用 steghide 进行隐写提取：</p>
+    <p><img loading="lazy" src="../assets/no_image015.png" alt="Python 文件"></p>
+
+    <h4 id="stego">隐写分析</h4>
+
+    <h5 id="stego-steghide">Steghide 提取</h5>
+    <p>对 <code>funny.jpg</code> 进行隐写提取：</p>
+    <pre><code>steghide extract -sf funny.jpg</code></pre>
+    <p><img loading="lazy" src="../assets/no_image016.png" alt="Steghide 提取 1"></p>
+    <p>得到 <code>key.txt</code>：</p>
+    <p><img loading="lazy" src="../assets/no_image017.png" alt="Key.txt"></p>
+    <p>对 <code>funny.bmp</code> 进行隐写提取（密码 sudo）：</p>
+    <p><img loading="lazy" src="../assets/no_image018.png" alt="Steghide 提取 2"></p>
+
+    <h5 id="stego-rot13">ROT13 解码</h5>
+    <p>提示要对文件进行 rotate，使用 ROT13 解码：</p>
+    <p><img loading="lazy" src="../assets/no_image019.png" alt="ROT13 解码"></p>
+    <p>解码后得到 SSH 凭证 <code>wtf:wtf?!</code>。</p>
+
+    <h4 id="ssh">SSH 登录与 user flag</h4>
+    <p>使用 SSH 连接（注意端口为 55077）：</p>
+    <pre><code>ssh wtf@192.168.21.132 -p 55077</code></pre>
+    <p><img loading="lazy" src="../assets/no_image020.png" alt="SSH 登录"></p>
+    <p>找到 user flag：</p>
+    <p><img loading="lazy" src="../assets/no_image021.png" alt="User Flag"></p>
+
+    <h4 id="privesc">权限提升</h4>
+
+    <h5 id="privesc-cred">发现新凭证</h5>
+    <p>在系统中发现一个脚本，包含另一个用户的用户名和密码：</p>
+    <p><img loading="lazy" src="../assets/no_image022.png" alt="脚本中的凭证"></p>
+    <p>切换到该用户：</p>
+    <p><img loading="lazy" src="../assets/no_image023.png" alt="切换用户"></p>
+
+    <h5 id="privesc-nano">nano sudo 提权</h5>
+    <p>查看 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p><img loading="lazy" src="../assets/no_image024.png" alt="sudo -l"></p>
+    <p>发现可以使用 nano 以 root 权限执行命令。nano 编辑器允许通过 sudo 以二进制文件形式运行，不会放弃提升的权限。</p>
+    <p>利用方法（<a href="https://gtfobins.github.io/gtfobins/nano/#sudo" target="_blank">GTFOBins nano</a>）：</p>
+    <pre><code>sudo nano
+# Ctrl+R, Ctrl+X
+# 输入: reset; sh 1>&0 2>&0</code></pre>
+    <p><img loading="lazy" src="../assets/no_image025.png" alt="nano 提权"></p>
+    <p>成功获取 root 权限。</p>
+
+    <h4 id="flag">Root Flag</h4>
+    <p>在 /root 目录下查看 root flag：</p>
+    <p><img loading="lazy" src="../assets/no_image026.png" alt="Root Flag"></p>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var obs=new IntersectionObserver(function(entries){
+  if(!entries[0].isIntersecting)return;
+  obs.disconnect();
+  var s=document.createElement("script");
+  s.src="../assets/vis-network.min.js";
+  s.onload=function(){
+    var d=document.createElement("script");
+    d.src="../assets/posts-data.js";
+    d.onload=function(){
+      var p=document.createElement("script");
+      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+      document.body.appendChild(p);
+      var g=document.createElement("script");
+      g.src="../assets/graph.js";
+      document.body.appendChild(g);
+    };
+    document.body.appendChild(d);
+  };
+  document.body.appendChild(s);
+},{rootMargin:"200px"});
+obs.observe(gs);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

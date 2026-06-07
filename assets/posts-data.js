@@ -484,6 +484,96 @@ const POSTS_DATA = [
     url: 'posts/vulhub-cve-2016-3081.html',
     excerpt: 'Struts 2.3.19~2.3.28 版本中动态方法调用（DMI）功能存在远程命令执行漏洞，攻击者可通过 method: 前缀构造恶意 OGNL 表达式实现任意命令执行。',
     tags: ['Web安全', 'Vulhub', 'CVE']
+  },
+  {
+    title: 'The Planets: Earth — Vulnhub 靶机渗透教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 01 / 10',
+    url: 'posts/vulnhub-earth.html',
+    excerpt: 'VulnHub 靶机 The Planets: Earth 渗透教程，涵盖信息收集（nmap、DNS 解析、dirb 扫描）、XOR 解密登录、反弹 Shell 绕过、SUID 提权（reset_root 文件条件触发）获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'Matrix-Breakout 2 Morpheus — Vulnhub 靶机渗透教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 01 / 11',
+    url: 'posts/vulnhub-morpheus.html',
+    excerpt: 'VulnHub 靶机 Matrix-Breakout 2 Morpheus 渗透教程，涵盖信息收集（lansee、nmap、ffuf 目录爆破）、graffiti.php 文件写入漏洞上传 webshell、蚁剑连接、反弹 shell、隐藏图片 binwalk 分析、CVE-2022-0847 Dirty Pipe 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶场red:1教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 07 / 14',
+    url: 'posts/vulnhub-red1.html',
+    excerpt: 'VulnHub 靶机 Red: 1 渗透教程，涵盖信息收集（arp-scan、nmap 端口扫描）、域名绑定 redrocks.win、gobuster 后门扫描发现 NetworkFileManagerPHP WebShell、后门利用与反弹 Shell、pspy64s 监控后台进程、supersecretfileuc.c 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Napping1.0.1教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 07 / 19',
+    url: 'posts/vulnhub-napping.html',
+    excerpt: 'VulnHub 靶机 Napping 1.0.1 渗透教程，涵盖信息收集（arp-scan、nmap 端口/版本/漏洞扫描）、Web 渗透（注册登录、Tabnabbing 反向标签劫持钓鱼攻击获取 SSH 凭证）、administrators 组文件发现、query.py 定时任务写入反弹 Shell、vim sudo 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶场noob：1教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 07 / 18',
+    url: 'posts/vulnhub-noob.html',
+    excerpt: 'VulnHub 靶机 Noob: 1 渗透教程，涵盖信息收集（arp-scan、nmap 端口扫描）、FTP 匿名登录获取 base64 编码凭证、Web 登录与目录扫描发现 downloads.rar、Steghide 隐写提取 funny.jpg/funny.bmp、ROT13 解码获取 SSH 凭证、nano sudo 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机ica：1教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 07 / 22',
+    url: 'posts/vulnhub-ica1.html',
+    excerpt: 'VulnHub 靶机 ICA: 1 渗透教程，涵盖信息收集（arp-scan、nmap 端口/版本/漏洞扫描）、qdpm 数据库配置泄露、MySQL 爆破、base64 密码解码、SSH 爆破、get_access SUID 提权（PATH 劫持）获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Thales:1教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 07 / 26',
+    url: 'posts/vulnhub-thales1.html',
+    excerpt: 'VulnHub 靶机 Thales: 1 渗透教程，涵盖信息收集（arp-scan、nmap 扫描）、Tomcat 后台爆破、WAR 后门上传、SSH 私钥破解（ssh2john+rockyou）、backup.sh 定时任务提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Empire LupinOne教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 08 / 01',
+    url: 'posts/vulnhub-lupinone.html',
+    excerpt: 'VulnHub 靶机 Empire LupinOne 渗透教程，涵盖信息收集（robots.txt 隐藏目录）、逐层目录爆破（dirb/wfuzz/ffuf）、BASE58 编码 SSH 私钥解码、john 爆破、Python 模块劫持提权、pip 恶意 setup.py root 提权。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Deathnote教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 08 / 10',
+    url: 'posts/vulnhub-deathnote.html',
+    excerpt: 'VulnHub 靶机 Deathnote 渗透教程，涵盖信息收集（robots.txt 域名绑定）、WordPress 用户名枚举与密码爆破（wpscan+cewl）、dirb 目录扫描、hydra SSH 爆破、OoK 解码与 base64 解码提权至 root。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机DarkHole_2教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 08 / 20',
+    url: 'posts/vulnhub-darkhole2.html',
+    excerpt: 'VulnHub 靶机 DarkHole_2 渗透教程，涵盖 Git 源码泄露恢复历史凭证、SQL 注入（sqlmap 枚举 SSH 凭证）、本地 webshell 发现与 RCE、反弹 Shell、信息收集提权至 root。',
+    tags: ['vulnhub', '渗透测试']
   }
 ];
 
@@ -500,6 +590,8 @@ const TAG_COLORS = {
   '栈溢出': 'f97316', '安全工具': '00d4ff',
   'OWASP': 'e4405f', '供应链安全': 'ff6b35', 'CVE': 'e4405f', 'KaliLinux': '3366ff',
   'upload-labs': '10b981',
+  'vulnhub': '10b981',
+  '渗透测试': '3366ff',
   'Vulhub': '00d4ff'
 };
 
