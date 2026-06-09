@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机hacksudo FOG - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 09</div>
+  <div class="post-title">vulnhub靶机hacksudo FOG</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#host">主机发现</a></li>
+        <li class="toc-h5"><a href="#port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#service">扫描服务</a></li>
+        <li class="toc-h5"><a href="#vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 访问</a></li>
+        <li class="toc-h4"><a href="#dirb">目录爆破</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://www.vulnhub.com/entry/hacksudo-fog,697/">hacksudo: FOG ~ VulnHub</a></p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="host">主机发现</h5>
+    <p><img loading="lazy" src="../assets/fog_image001.png" alt="主机发现"></p>
+    <p>目标148</p>
+
+    <h5 id="port">端口扫描</h5>
+    <p><img loading="lazy" src="../assets/fog_image002.png" alt="端口扫描"></p>
+    <p>IP过多整理一下</p>
+    <p><img loading="lazy" src="../assets/fog_image003.png" alt="整理IP"></p>
+
+    <h5 id="service">扫描服务</h5>
+    <p><img loading="lazy" src="../assets/fog_image004.png" alt="扫描服务 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image005.png" alt="扫描服务 2"></p>
+
+    <h5 id="vuln">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/fog_image006.png" alt="漏洞扫描 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image007.png" alt="漏洞扫描 2"></p>
+
+    <h4 id="web">Web 访问</h4>
+
+    <p>去80看看</p>
+    <p><img loading="lazy" src="../assets/fog_image008.png" alt="80端口页面 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image009.png" alt="80端口页面 2"></p>
+    <p><img loading="lazy" src="../assets/fog_image010.png" alt="80端口页面 3"></p>
+    <p><img loading="lazy" src="../assets/fog_image011.png" alt="80端口页面 4"></p>
+
+    <p>经典凯撒，后面还是一个github</p>
+    <p><img loading="lazy" src="../assets/fog_image012.png" alt="凯撒加密 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image013.png" alt="凯撒加密 2"></p>
+    <p><img loading="lazy" src="../assets/fog_image014.png" alt="凯撒加密 3"></p>
+
+    <p>好好好，mp4</p>
+    <p><img loading="lazy" src="../assets/fog_image015.png" alt="MP4文件"></p>
+
+    <h4 id="dirb">目录爆破</h4>
+
+    <p>接下来目录爆破</p>
+    <p><img loading="lazy" src="../assets/fog_image016.png" alt="目录爆破"></p>
+
+    <p>一个一个去看</p>
+    <p><img loading="lazy" src="../assets/fog_image017.png" alt="目录访问 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image018.png" alt="目录访问 2"></p>
+    <p><img loading="lazy" src="../assets/fog_image019.png" alt="目录访问 3"></p>
+    <p><img loading="lazy" src="../assets/fog_image020.png" alt="目录访问 4"></p>
+    <p><img loading="lazy" src="../assets/fog_image021.png" alt="目录访问 5"></p>
+
+    <p>失败了换一个</p>
+    <p><img loading="lazy" src="../assets/fog_image022.png" alt="换目录扫描"></p>
+    <p><img loading="lazy" src="../assets/fog_image023.png" alt="新目录结果"></p>
+
+    <p>少模块，有点麻烦，直接改成python3</p>
+    <p><img loading="lazy" src="../assets/fog_image024.png" alt="修改脚本 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image025.png" alt="修改脚本 2"></p>
+
+    <p>出来咯</p>
+    <p><img loading="lazy" src="../assets/fog_image026.png" alt="扫描结果 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image027.png" alt="扫描结果 2"></p>
+    <p><img loading="lazy" src="../assets/fog_image028.png" alt="扫描结果 3"></p>
+
+    <p>看到login，进不去，换一个突破口了</p>
+    <p><img loading="lazy" src="../assets/fog_image029.png" alt="login页面"></p>
+
+    <p>用其实是出来了</p>
+    <p><img loading="lazy" src="../assets/fog_image030.png" alt="目录结果 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image031.png" alt="目录结果 2"></p>
+
+    <p>出来了</p>
+    <p><img loading="lazy" src="../assets/fog_image032.png" alt="目录结果 3"></p>
+    <p><img loading="lazy" src="../assets/fog_image033.png" alt="目录结果 4"></p>
+    <p><img loading="lazy" src="../assets/fog_image034.png" alt="目录结果 5"></p>
+    <p><img loading="lazy" src="../assets/fog_image035.png" alt="目录结果 6"></p>
+
+    <p>这个要密码</p>
+    <p><img loading="lazy" src="../assets/fog_image036.png" alt="需要密码"></p>
+    <p><img loading="lazy" src="../assets/fog_image037.png" alt="FTP爆破 1"></p>
+
+    <p>搞定</p>
+    <p><img loading="lazy" src="../assets/fog_image038.png" alt="FTP爆破成功"></p>
+
+    <p>还有一个音频文件，正好有工具</p>
+    <p><img loading="lazy" src="../assets/fog_image039.png" alt="音频文件 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image040.png" alt="音频文件 2"></p>
+
+    <p>那就是凯撒加密位数应该是3</p>
+    <p><a href="https://www.lddgo.net/encrypt/caesar-cipher">在线凯撒密码加密解密</a></p>
+    <p><img loading="lazy" src="../assets/fog_image041.png" alt="凯撒解密结果"></p>
+
+    <p>这个是账号密码去试一下web</p>
+    <p><img loading="lazy" src="../assets/fog_image042.png" alt="登录web成功"></p>
+
+    <p>成功了，拿到后台那就是反弹shell</p>
+    <p><img loading="lazy" src="../assets/fog_image043.png" alt="后台页面 1"></p>
+
+    <p>上传反弹shell</p>
+    <p><img loading="lazy" src="../assets/fog_image044.png" alt="上传shell"></p>
+
+    <p>Phtml能上传，访问监听就可以</p>
+    <p><img loading="lazy" src="../assets/fog_image045.png" alt="Phtml上传成功"></p>
+
+    <p>成功</p>
+    <p><img loading="lazy" src="../assets/fog_image046.png" alt="反弹shell成功 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image047.png" alt="反弹shell成功 2"></p>
+
+    <h4 id="privesc">权限提升</h4>
+
+    <p><img loading="lazy" src="../assets/fog_image048.png" alt="信息收集 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image049.png" alt="shadow文件"></p>
+
+    <p>可以利用shadow文件，爆破密码，但是用不了，爆破一下别的账号的密码</p>
+    <p><img loading="lazy" src="../assets/fog_image050.png" alt="爆破密码 1"></p>
+    <p><img loading="lazy" src="../assets/fog_image051.png" alt="爆破密码 2"></p>
+    <p><img loading="lazy" src="../assets/fog_image052.png" alt="爆破密码 3"></p>
+    <p><img loading="lazy" src="../assets/fog_image053.png" alt="爆破密码 4"></p>
+
+    <p>Ls能用但是ls提不了权</p>
+    <p><img loading="lazy" src="../assets/fog_image054.png" alt="ls权限查看"></p>
+
+    <p>翻文件发现好东西</p>
+    <p><img loading="lazy" src="../assets/fog_image055.png" alt="发现好东西 1"></p>
+
+    <p>那就是python或者是ping了</p>
+    <p><img loading="lazy" src="../assets/fog_image056.png" alt="发现python 1"></p>
+
+    <p>查到了python就不用说了吧，直接找payload</p>
+    <p><img loading="lazy" src="../assets/fog_image057.png" alt="python提权尝试 1"></p>
+
+    <p>失败了，看看python运行能不能上去</p>
+    <p><img loading="lazy" src="../assets/fog_image058.png" alt="python提权尝试 2"></p>
+
+    <p>有点尴尬，看一下别的</p>
+    <p><img loading="lazy" src="../assets/fog_image059.png" alt="python提权尝试 3"></p>
+
+    <p>正好有python，应该是直接执行</p>
+    <p><img loading="lazy" src="../assets/fog_image060.png" alt="python提权执行"></p>
+
+    <p>搞定</p>
+    <p><img loading="lazy" src="../assets/fog_image061.png" alt="提权成功"></p>
+
+  </div>
+</div>
+
+<div style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;font-size:13px;color:#555570;font-family:'JetBrains Mono',monospace">
+  // EOF - hacksudo FOG<br>
+  <span style="display:inline-block;width:8px;height:8px;background:#00d4ff;border-radius:50%;margin-top:8px;animation:pulse 2s ease-in-out infinite"></span>
+</div>
+
+<style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(function(wrap){
+  if(wrap.querySelector('code')) wrap=wrap.querySelector('code');
+  var lines=wrap.textContent.split('\n').length;
+  var header=document.createElement('div');
+  header.className='code-header';
+  var info=document.createElement('span');
+  info.className='code-info';
+  info.textContent='// CODE | '+lines+' lines';
+  var actions=document.createElement('span');
+  actions.className='code-actions';
+  var copy=document.createElement('button');
+  copy.textContent='COPY';
+  copy.className='code-copy';
+  copy.onclick=function(){navigator.clipboard.writeText(wrap.textContent);this.textContent='COPIED';setTimeout(function(){copy.textContent='COPY';},2000);};
+  var fold=document.createElement('button');
+  fold.textContent='\u2191';
+  fold.className='code-fold';
+  fold.onclick=function(){
+    wrap.classList.toggle('collapsed');
+    fold.textContent=wrap.classList.contains('collapsed')?'\u2193':'\u2191';
+  };
+  wrap.onclick=function(){
+    if(wrap.classList.contains('collapsed')){wrap.classList.remove('collapsed');fold.textContent='\u2191';}
+  };
+  if(lines>10){wrap.classList.add('collapsed');fold.textContent='\u2193';}
+  actions.append(copy,fold);
+  header.append(info,actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

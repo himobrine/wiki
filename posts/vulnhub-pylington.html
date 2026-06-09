@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Pylington - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 09</div>
+  <div class="post-title">vulnhub靶机Pylington</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#host">主机发现</a></li>
+        <li class="toc-h5"><a href="#port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#service">端口服务扫描</a></li>
+        <li class="toc-h5"><a href="#vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 访问</a></li>
+        <li class="toc-h5"><a href="#dirb">目录扫描</a></li>
+        <li class="toc-h5"><a href="#login">登入</a></li>
+        <li class="toc-h4"><a href="#shell">升级 shell</a></li>
+        <li class="toc-h5"><a href="#login2">登入</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#enum">信息收集</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://www.vulnhub.com/entry/pylington-1,684/">Pylington: 1 ~ VulnHub</a></p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="host">主机发现</h5>
+    <p><img loading="lazy" src="../assets/py_image001.png" alt="主机发现"></p>
+    <p>目标139</p>
+
+    <h5 id="port">端口扫描</h5>
+    <p><img loading="lazy" src="../assets/py_image002.png" alt="端口扫描"></p>
+
+    <h5 id="service">端口服务扫描</h5>
+    <p><img loading="lazy" src="../assets/py_image003.png" alt="端口服务扫描 1"></p>
+    <p><img loading="lazy" src="../assets/py_image004.png" alt="端口服务扫描 2"></p>
+
+    <h5 id="vuln">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/py_image005.png" alt="漏洞扫描"></p>
+
+    <h4 id="web">Web 访问</h4>
+
+    <p>去看一下web</p>
+    <p><img loading="lazy" src="../assets/py_image006.png" alt="Web页面 1"></p>
+    <p><img loading="lazy" src="../assets/py_image007.png" alt="Web页面 2"></p>
+
+    <h5 id="dirb">目录扫描</h5>
+    <p><img loading="lazy" src="../assets/py_image008.png" alt="目录扫描"></p>
+
+    <p>有robots</p>
+    <p><img loading="lazy" src="../assets/py_image009.png" alt="robots.txt"></p>
+
+    <p>去看一下有个奇怪的东西</p>
+    <p><img loading="lazy" src="../assets/py_image010.png" alt="奇怪路径"></p>
+
+    <h5 id="login">登入</h5>
+    <p><img loading="lazy" src="../assets/py_image011.png" alt="登入 1"></p>
+    <p><img loading="lazy" src="../assets/py_image012.png" alt="登入 2"></p>
+    <p><img loading="lazy" src="../assets/py_image013.png" alt="登入 3"></p>
+
+    <p>这是py脚本</p>
+    <p><img loading="lazy" src="../assets/py_image014.png" alt="Python脚本"></p>
+
+    <p>这个回显明显是被墙了，绕过一下就行了</p>
+    <p><img loading="lazy" src="../assets/py_image015.png" alt="绕过 1"></p>
+    <p><img loading="lazy" src="../assets/py_image016.png" alt="绕过 2"></p>
+    <p><img loading="lazy" src="../assets/py_image017.png" alt="绕过 3"></p>
+
+    <h4 id="shell">升级 shell</h4>
+    <p><img loading="lazy" src="../assets/py_image018.png" alt="升级shell 1"></p>
+    <p><img loading="lazy" src="../assets/py_image019.png" alt="升级shell 2"></p>
+    <p><img loading="lazy" src="../assets/py_image020.png" alt="升级shell 3"></p>
+    <p><img loading="lazy" src="../assets/py_image021.png" alt="升级shell 4"></p>
+
+    <p>这里面只有一个文件能运行，密码到手</p>
+    <p><img loading="lazy" src="../assets/py_image022.png" alt="密码到手"></p>
+
+    <h5 id="login2">登入</h5>
+    <p><img loading="lazy" src="../assets/py_image023.png" alt="登入"></p>
+
+    <h4 id="privesc">权限提升</h4>
+
+    <h5 id="enum">信息收集</h5>
+    <p><img loading="lazy" src="../assets/py_image024.png" alt="信息收集 1"></p>
+    <p><img loading="lazy" src="../assets/py_image025.png" alt="信息收集 2"></p>
+
+    <p>看到了backup</p>
+    <p><img loading="lazy" src="../assets/py_image026.png" alt="backup 1"></p>
+    <p><img loading="lazy" src="../assets/py_image027.png" alt="backup 2"></p>
+    <p><img loading="lazy" src="../assets/py_image028.png" alt="backup 3"></p>
+    <p><img loading="lazy" src="../assets/py_image029.png" alt="backup 4"></p>
+
+    <p>应该能有点操作，试一下</p>
+    <p><img loading="lazy" src="../assets/py_image030.png" alt="操作 1"></p>
+    <p><img loading="lazy" src="../assets/py_image031.png" alt="操作 2"></p>
+
+    <p>生成密码夺舍root</p>
+    <p><img loading="lazy" src="../assets/py_image032.png" alt="生成密码"></p>
+
+    <p>构造一下</p>
+    <pre><code>himobrine:$1$himobrin$6MRzIId2lcMqa07uHHe4y.:0:0::/root/bin/bash</code></pre>
+    <p><img loading="lazy" src="../assets/py_image033.png" alt="构造 1"></p>
+    <p><img loading="lazy" src="../assets/py_image034.png" alt="构造 2"></p>
+
+    <p>搞定</p>
+    <p><img loading="lazy" src="../assets/py_image035.png" alt="搞定"></p>
+
+  </div>
+</div>
+
+<div style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;font-size:13px;color:#555570;font-family:'JetBrains Mono',monospace">
+  // EOF - Pylington<br>
+  <span style="display:inline-block;width:8px;height:8px;background:#00d4ff;border-radius:50%;margin-top:8px;animation:pulse 2s ease-in-out infinite"></span>
+</div>
+
+<style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(function(wrap){
+  if(wrap.querySelector('code')) wrap=wrap.querySelector('code');
+  var lines=wrap.textContent.split('\n').length;
+  var header=document.createElement('div');
+  header.className='code-header';
+  var info=document.createElement('span');
+  info.className='code-info';
+  info.textContent='// CODE | '+lines+' lines';
+  var actions=document.createElement('span');
+  actions.className='code-actions';
+  var copy=document.createElement('button');
+  copy.textContent='COPY';
+  copy.className='code-copy';
+  copy.onclick=function(){navigator.clipboard.writeText(wrap.textContent);this.textContent='COPIED';setTimeout(function(){copy.textContent='COPY';},2000);};
+  var fold=document.createElement('button');
+  fold.textContent='\u2191';
+  fold.className='code-fold';
+  fold.onclick=function(){
+    wrap.classList.toggle('collapsed');
+    fold.textContent=wrap.classList.contains('collapsed')?'\u2193':'\u2191';
+  };
+  wrap.onclick=function(){
+    if(wrap.classList.contains('collapsed')){wrap.classList.remove('collapsed');fold.textContent='\u2191';}
+  };
+  if(lines>10){wrap.classList.add('collapsed');fold.textContent='\u2193';}
+  actions.append(copy,fold);
+  header.append(info,actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script src="../assets/common.js"></script>
+
+</body>
+</html>
