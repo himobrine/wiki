@@ -2,7 +2,7 @@
 var c=document.getElementById('graphContainer');
 if(!c||typeof vis==='undefined'||typeof POSTS==='undefined')return;
 var PC=typeof PRIMARY_COLORS!=='undefined'?PRIMARY_COLORS:typeof window!=='undefined'&&window.PRIMARY_COLORS?window.PRIMARY_COLORS:{};
-function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
+function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#d4a020',border:'#d4a020'}};}
 function gsh(p){var s=p.secondary;if(s==='DVWA'||s==='Pwn'||s==='Crack'||s==='基础')return'dot';if(s==='upload-labs'||s==='Reverse')return'square';if(s==='Crypto'||s==='工具')return'diamond';if(s==='Web')return'triangle';return'dot';}
 
 var f=window.location.pathname.split('/').pop();
@@ -44,7 +44,7 @@ if(currentIdx!==-1){
   }
   edges=new vis.DataSet(edgeArr);
   var network=new vis.Network(c,{nodes:nodes,edges:edges},{
-    nodes:{shape:'dot',color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#00d4ff',border:'#00d4ff'}},font:{size:0},borderWidth:0,borderWidthSelected:2,scaling:{min:4,max:14}},
+    nodes:{shape:'dot',color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#d4a020',border:'#d4a020'}},font:{size:0},borderWidth:0,borderWidthSelected:2,scaling:{min:4,max:14}},
     edges:{width:1,smooth:{type:'continuous'}},
     physics:false,
     interaction:{hover:true,tooltipDelay:200,zoomView:true,dragView:true}
@@ -52,10 +52,10 @@ if(currentIdx!==-1){
   network.fit({animation:false});
 }else{
   var groups={};
-  groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
-  groups['CTF']={color:{background:'#e4405f',border:'#e4405f',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
-  groups['逆向']={color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
-  groups['C/C++']={color:{background:'#f59e0b',border:'#f59e0b',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
+  groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
+  groups['CTF']={color:{background:'#e4405f',border:'#e4405f',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
+  groups['逆向']={color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
+  groups['C/C++']={color:{background:'#f59e0b',border:'#f59e0b',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
   nodes=new vis.DataSet(POSTS.map(function(p,i){return{id:i,title:p.title,url:p.url,value:1,size:6,color:gc(p),group:p.primary,shape:gsh(p)};}));
   var edgeArr=[],seen={};
   for(var i=0;i<POSTS.length;i++){for(var j=i+1;j<POSTS.length;j++){

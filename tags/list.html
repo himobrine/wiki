@@ -6,117 +6,60 @@
 <title>标签归档 - himobrine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Albert+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Albert+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap"></noscript>
 <link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 <link rel="preload" href="../assets/posts-data.js" as="script">
-<style>
-:root{--bg-primary:#000;--bg-elevated:#0a0a0f;--bg-hover:#14141c;--text-primary:#fff;--text-secondary:#b0b0c8;--text-muted:#555570;--border-color:rgba(255,255,255,0.06);--border-accent:rgba(0,212,255,0.15);--accent-cyan:#00d4ff;--accent-blue:#3366ff;--accent-orange:#ff6b35;--scrollbar-track:#0a0a0f;--scrollbar-thumb:#00d4ff33;--nav-bg:rgba(10,10,15,0.85);--nav-bg-stuck:rgba(10,10,15,0.96);--hero-border:rgba(0,212,255,0.2);--section-title-border:rgba(0,212,255,0.15);--post-hover-border:rgba(0,212,255,0.15);--code-bg:#14141c;--pre-bg:#050508;--blockquote-bg:#0a0a0f;--th-bg:#0a0a0f;--tag-add-color:#8888a0;--tag-add-border:#8888a044}
-*{margin:0;padding:0;box-sizing:border-box}
-body{background:var(--bg-primary);color:var(--text-primary);font-family:'Noto Sans SC',-apple-system,'Segoe UI',sans-serif;line-height:1.6;min-height:100vh;transition:background .3s ease,color .3s ease}
-::-webkit-scrollbar{width:6px}
-::-webkit-scrollbar-track{background:var(--scrollbar-track)}
-::-webkit-scrollbar-thumb{background:var(--scrollbar-thumb);border-radius:3px}
-.container{max-width:900px;margin:0 auto;padding:40px 20px}
-.scanline{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,212,255,.02) 2px,rgba(0,212,255,.02) 4px)}
-.scanline::after{content:'';position:absolute;top:-100%;left:0;width:100%;height:5px;background:linear-gradient(0deg,transparent,rgba(0,212,255,.06),transparent);animation:scan 8s linear infinite}
-@keyframes scan{0%{top:-5%}100%{top:105%}}
-.hero{text-align:center;padding:60px 0 40px;border-bottom:1px solid var(--hero-border);margin-bottom:40px}
-.hero h1{font-family:'JetBrains Mono',monospace;font-size:clamp(24px,5vw,42px);font-weight:700;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em;margin-bottom:12px}
-.hero .subtitle{font-family:'JetBrains Mono',monospace;font-size:clamp(12px,2vw,15px);color:var(--text-secondary);letter-spacing:.08em;margin-bottom:20px}
-.hero .subtitle span{color:var(--accent-cyan)}
-.hero .tagline{color:var(--text-muted);font-size:14px;font-family:'JetBrains Mono',monospace;margin-bottom:8px;letter-spacing:.04em}
-.cursor{animation:blink 1s step-end infinite}
-@keyframes blink{50%{opacity:0}}
-.tags-bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:16px 0 24px}
-.tag{display:inline-block;padding:4px 30px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;letter-spacing:.04em;text-transform:uppercase;border:1px solid;background:transparent;text-decoration:none;transition:all .2s ease}
-.tag:hover{transform:translateY(-1px)}
-.tag-cyan{color:var(--accent-cyan);border-color:color-mix(in srgb,var(--accent-cyan) 27%,transparent)}
-.tag-blue{color:var(--accent-blue);border-color:color-mix(in srgb,var(--accent-blue) 27%,transparent)}
-.tag-orange{color:var(--accent-orange);border-color:color-mix(in srgb,var(--accent-orange) 27%,transparent)}
-.tag-purple{color:#7b2d8e;border-color:#7b2d8e44}
-.tag-green{color:#2ea44f;border-color:#2ea44f44}
-#navSentinel{height:0}
-.nav-sticky-wrapper{z-index:100;background:var(--nav-bg);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border-color);transition:all .3s ease;margin-bottom:32px;margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px}
-.nav-sticky-wrapper.fixed{position:fixed;top:0;left:0;right:0;border-bottom-color:color-mix(in srgb,var(--accent-cyan) 25%,transparent);box-shadow:0 2px 20px color-mix(in srgb,var(--text-primary) 20%,transparent),0 0 30px color-mix(in srgb,var(--accent-cyan) 6%,transparent);background:var(--nav-bg-stuck);margin-left:0;margin-right:0;padding-left:20px;padding-right:20px;z-index:100}
-.nav-sticky-wrapper.fixed .nav-inner a{font-size:14px;padding:10px 20px}
-.nav-inner{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;max-width:900px;margin:0 auto;padding:8px 0}
-.nav-inner a{font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--text-secondary);text-decoration:none;padding:6px 16px;transition:all .2s ease;letter-spacing:.04em;border-radius:2px}
-.nav-inner a:hover,.nav-inner a.active{color:var(--accent-cyan);background:color-mix(in srgb,var(--accent-cyan) 7%,transparent)}
-.fade-up{opacity:0;transform:translateY(30px);transition:opacity .6s ease-out,transform .6s ease-out}
-.fade-up.visible{opacity:1;transform:translateY(0)}
-.hero.fade-up{transition-delay:.1s}
-.nav-sticky-wrapper.fade-up{transition-delay:.2s}
-.hero .container{padding:0;border:none}
-.hero{margin-bottom:0}
-@media(max-width:640px){.container{padding:20px 12px}.nav a{font-size:12px;padding:4px 10px}.tags-bar .tag{font-size:11px;padding:3px 10px}}
-</style>
 </head>
 <body>
-<div class="scanline"></div>
+<div class="mk-scanline"></div>
 
-<div class="hero fade-up">
-  <div class="container">
-  <h1 id="pageTitle">// TAGS ARCHIVE</h1>
-  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
-  <div class="tagline" id="pageTagline">&gt; 所有标签分类汇总 <span class="cursor">▌</span></div>
-  </div>
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark" id="pageTitle">// TAGS ARCHIVE</span>
 </div>
 
-<div class="container" style="padding-top:0">
+<div class="mk-container" style="padding-top:0">
 
-<div id="navSentinel"></div>
+<div id="mkNavSentinel"></div>
 
-<div class="nav-sticky-wrapper fade-up" id="navWrap">
-  <div class="nav-inner">
-    <a href="../index.html">首页</a>
-    <a href="list.html?tag=CVE">CVE</a>
-    <a href="list.html?tag=安全工具">安全工具</a>
-    <a href="list.html?tag=学习笔记">学习笔记</a>
-    <a href="list.html?tag=逆向">逆向</a>
-    <a href="list.html?tag=调试">调试</a>
-    <a href="list.html">标签归档</a>
-  </div>
+<div class="mk-nav-wrap fade-up" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="list.html?tag=CVE" class="mk-nav-link">CVE</a>
+    <a href="list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="list.html" class="mk-nav-link">标签归档</a>
+  </nav>
 </div>
 
 <div id="contentArea"></div>
 
-<div class="footer fade-up">
-  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0 <span class="rei-symbol">◈</span></div>
-  <div class="motto">&gt; 道可道，非常道，名可名，非常名 </div>
-  <div class="links">
+<footer class="mk-footer fade-up">
+  <div class="mk-footer-brand">RHODES ISLAND :// SECURITY LAB // BLOG</div>
+  <div class="mk-footer-motto">> 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
     <a href="https://github.com/himobrine/wiki">GitHub</a>
     <a href="../links.html">友情链接</a>
-    <a href="https://github.com/himobrine/wiki">Blog</a>
   </div>
-  <div class="copy">(c) 2026 // SECURITY BLOG</div>
-</div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div>
+</footer>
 
 </div>
 
-<div class="theme-dock" id="themeDock">
-  <div class="theme-dock-item active" data-theme="dark">
-    ☽
-  </div>
-  <div class="theme-dock-item" data-theme="light">
-    ☀
-  </div>
-  <div class="theme-dock-item" data-theme="crystal">
-    ◇
-  </div>
-  <div class="theme-dock-item" data-theme="ego">
-    ♢
-  </div>
-  <div class="theme-dock-item" data-theme="rei">
-    レ
-  </div>
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
 </div>
 
-<div class="floating-buttons">
-  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
-
-  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" aria-label="主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" aria-label="回到顶部">⌃</button>
 </div>
 
 <script src="../assets/posts-data.js"></script>
@@ -124,7 +67,6 @@ body{background:var(--bg-primary);color:var(--text-primary);font-family:'Noto Sa
 <script>
 function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
-/* === collect all tags === */
 function getAllTags() {
   const map = {};
   POSTS.forEach(p => {
@@ -136,7 +78,6 @@ function getAllTags() {
   return map;
 }
 
-/* === render tag archive === */
 function renderArchive(page) {
   const PER_PAGE = 10;
   const tagMap = getAllTags();
@@ -146,37 +87,38 @@ function renderArchive(page) {
   const start = (page - 1) * PER_PAGE;
   const pageTags = sortedTags.slice(start, start + PER_PAGE);
 
-  let html = '<h2 class="section-title fade-up">// ALL // TAGS</h2>';
-  html += '<div class="tag-grid">';
+  let html = '<section class="mk-section">';
+  html += '<header class="mk-section-head fade-up"><h2>// ALL // TAGS</h2></header>';
+  html += '<div class="mk-tag-index fade-up"><div class="mk-tag-grid">';
   pageTags.forEach(tag => {
     const posts = tagMap[tag];
-    html += '<div class="tag-row" style="flex-direction:column;align-items:stretch;padding:12px;gap:4px;cursor:default">';
-    html += '<div style="display:flex;justify-content:space-between;align-items:center">';
     const tagColor = TAG_COLORS[tag];
-    html += '<span style="color:' + (tagColor ? '#' + tagColor : 'var(--accent-cyan)') + ';font-size:13px">' + esc(tag) + '</span>';
-    html += '<span style="color:var(--text-muted);font-size:12px">' + posts.length + ' 篇</span>';
+    html += '<div class="mk-tag-row">';
+    html += '<div class="mk-tag-row-header">';
+    html += '<span class="mk-tag-row-name" style="color:' + (tagColor ? '#' + tagColor : 'var(--mk-gold)') + '">' + esc(tag) + '</span>';
+    html += '<span class="mk-tag-row-count">' + posts.length + ' 篇</span>';
     html += '</div>';
     posts.sort((a, b) => {
       const da = a.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
       const db = b.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
       return db.localeCompare(da);
     }).slice(0, 10).forEach(p => {
-      html += '<a href="' + p.url + '" class="tag-post-link">' + p.title + '</a>';
+      html += '<a href="' + p.url + '" class="mk-tag-post-link">' + p.title + '</a>';
     });
     if (posts.length > 10) {
-      html += '<div style="font-size:11px;color:var(--text-muted);padding:2px 0">还有 ' + (posts.length - 10) + ' 篇...</div>';
+      html += '<div style="font-size:11px;color:var(--mk-faint);padding:2px 0">还有 ' + (posts.length - 10) + ' 篇...</div>';
     }
-    html += '<a href="list.html?tag=' + encodeURIComponent(tag) + '" style="font-size:12px;color:var(--accent-cyan);text-decoration:none;margin-top:2px;display:inline-block">查看全部 &rarr;</a>';
+    html += '<a href="list.html?tag=' + encodeURIComponent(tag) + '" style="font-size:12px;color:var(--mk-gold);text-decoration:none;margin-top:2px;display:inline-block">查看全部 &rarr;</a>';
     html += '</div>';
   });
-  html += '</div>';
+  html += '</div></div></section>';
 
   if (totalPages > 1) {
-    html += '<div class="pagination fade-up">';
+    html += '<div class="mk-pagination fade-up">';
     if (page > 1) {
-      html += '<a href="list.html?page=' + (page - 1) + '" class="pagination-link">&larr; 上一页</a>';
+      html += '<a href="list.html?page=' + (page - 1) + '" class="mk-page-link">&larr; 上一页</a>';
     } else {
-      html += '<span class="pagination-link pagination-disabled">&larr; 上一页</span>';
+      html += '<span class="mk-page-link mk-page-disabled">&larr; 上一页</span>';
     }
     const range = 2;
     const pageNums = [];
@@ -189,17 +131,17 @@ function renderArchive(page) {
     }
     pageNums.forEach(p => {
       if (p === '...') {
-        html += '<span class="pagination-ellipsis">…</span>';
+        html += '<span class="mk-page-ellipsis">…</span>';
       } else if (p === page) {
-        html += '<span class="pagination-link pagination-current">' + p + '</span>';
+        html += '<span class="mk-page-link mk-page-current">' + p + '</span>';
       } else {
-        html += '<a href="list.html?page=' + p + '" class="pagination-link">' + p + '</a>';
+        html += '<a href="list.html?page=' + p + '" class="mk-page-link">' + p + '</a>';
       }
     });
     if (page < totalPages) {
-      html += '<a href="list.html?page=' + (page + 1) + '" class="pagination-link">下一页 &rarr;</a>';
+      html += '<a href="list.html?page=' + (page + 1) + '" class="mk-page-link">下一页 &rarr;</a>';
     } else {
-      html += '<span class="pagination-link pagination-disabled">下一页 &rarr;</span>';
+      html += '<span class="mk-page-link mk-page-disabled">下一页 &rarr;</span>';
     }
     html += '</div>';
   }
@@ -207,7 +149,6 @@ function renderArchive(page) {
   document.getElementById('contentArea').innerHTML = html;
 }
 
-/* === render tag filtered === */
 function renderTag(tag, page) {
   const PER_PAGE = 10;
   let decoded; try { decoded = decodeURIComponent(tag); } catch { decoded = tag; }
@@ -222,37 +163,34 @@ function renderTag(tag, page) {
   const pagePosts = filtered.slice(start, start + PER_PAGE);
 
   document.getElementById('pageTitle').textContent = '// TAG : ' + decoded;
-  document.getElementById('pageTagline').innerHTML = '&gt; 标签 <strong>' + esc(decoded) + '</strong> 共 ' + filtered.length + ' 篇文章' + (totalPages > 1 ? ' — 第 ' + page + ' / ' + totalPages + ' 页' : '') + ' <span class="cursor">▌</span>';
 
-  let html = '<h2 class="section-title fade-up">// ' + decoded + ' // ' + filtered.length + ' POSTS</h2>';
+  let html = '<section class="mk-section">';
+  html += '<header class="mk-section-head fade-up"><h2>// ' + decoded + ' // ' + filtered.length + ' POSTS</h2></header>';
   if (filtered.length === 0) {
-    html += '<div class="post fade-up" style="text-align:center;padding:40px;color:var(--text-muted)">暂无该标签的文章</div>';
+    html += '<div class="mk-bento-tile fade-up" style="text-align:center;padding:var(--mk-space-2xl);color:var(--mk-faint)">暂无该标签的文章</div>';
   } else {
     pagePosts.forEach(p => {
-      html += '<div class="post fade-up">';
-      html += '<div class="post-date">' + p.date + '</div>';
-      html += '<div class="post-title"><a href="' + p.url + '">' + p.title + '</a></div>';
-      html += '<div class="post-tags">';
+      html += '<article class="mk-bento-tile fade-up">';
+      html += '<time class="mk-post-date">' + p.date + '</time>';
+      html += '<h3 class="mk-post-title"><a href="' + p.url + '">' + p.title + '</a></h3>';
+      html += '<div class="mk-post-tags">';
       p.tags.forEach(t => {
         const c = TAG_COLORS[t] || '888888';
-        html += '<a href="list.html?tag=' + encodeURIComponent(t) + '" class="post-tag" style="background:#' + c + '22;color:#' + c + ';border:1px solid #' + c + '44">' + esc(t) + '</a>';
+        html += '<a href="list.html?tag=' + encodeURIComponent(t) + '" class="mk-tag" style="--tag-color:#' + c + '">#' + esc(t) + '</a>';
       });
       html += '</div>';
-      html += '<div class="post-excerpt">' + p.excerpt + '</div>';
-      html += '<a href="' + p.url + '" class="read-more">[ + ] READ MORE &rarr;</a>';
-      html += '</div>';
+      html += '<p class="mk-post-excerpt">' + p.excerpt + '</p>';
+      html += '<a href="' + p.url + '" class="mk-read-more">[ + ] READ MORE &rarr;</a>';
+      html += '</article>';
     });
 
-    /* pagination */
     if (totalPages > 1) {
-      html += '<div class="pagination fade-up">';
-
+      html += '<div class="mk-pagination fade-up">';
       if (page > 1) {
-        html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + (page - 1) + '" class="pagination-link">&larr; 上一页</a>';
+        html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + (page - 1) + '" class="mk-page-link">&larr; 上一页</a>';
       } else {
-        html += '<span class="pagination-link pagination-disabled">&larr; 上一页</span>';
+        html += '<span class="mk-page-link mk-page-disabled">&larr; 上一页</span>';
       }
-
       const range = 2;
       const pageNums = [];
       for (let i = 1; i <= totalPages; i++) {
@@ -262,56 +200,51 @@ function renderTag(tag, page) {
           pageNums.push('...');
         }
       }
-
       pageNums.forEach(p => {
         if (p === '...') {
-          html += '<span class="pagination-ellipsis">…</span>';
+          html += '<span class="mk-page-ellipsis">…</span>';
         } else if (p === page) {
-          html += '<span class="pagination-link pagination-current">' + p + '</span>';
+          html += '<span class="mk-page-link mk-page-current">' + p + '</span>';
         } else {
-          html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + p + '" class="pagination-link">' + p + '</a>';
+          html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + p + '" class="mk-page-link">' + p + '</a>';
         }
       });
-
       if (page < totalPages) {
-        html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + (page + 1) + '" class="pagination-link">下一页 &rarr;</a>';
+        html += '<a href="list.html?tag=' + encodeURIComponent(decoded) + '&page=' + (page + 1) + '" class="mk-page-link">下一页 &rarr;</a>';
       } else {
-        html += '<span class="pagination-link pagination-disabled">下一页 &rarr;</span>';
+        html += '<span class="mk-page-link mk-page-disabled">下一页 &rarr;</span>';
       }
-
       html += '</div>';
     }
   }
+  html += '</section>';
   document.getElementById('contentArea').innerHTML = html;
 }
 
-/* === init === */
 const params = new URLSearchParams(window.location.search);
 const tag = params.get('tag');
-const page = parseInt(params.get('page')) || 1;
+const pg = parseInt(params.get('page')) || 1;
 if (tag) {
-  renderTag(tag, page);
-  // highlight nav
-  document.querySelectorAll('.nav-inner a').forEach(a => {
+  renderTag(tag, pg);
+  document.querySelectorAll('.mk-nav-link').forEach(a => {
     if (a.getAttribute('href') === 'list.html?tag=' + tag) a.classList.add('active');
   });
 } else {
-  renderArchive(page);
-  document.querySelectorAll('.nav-inner a').forEach(a => {
+  renderArchive(pg);
+  document.querySelectorAll('.mk-nav-link').forEach(a => {
     if (a.getAttribute('href') === 'list.html') a.classList.add('active');
   });
 }
-
 </script>
 <script src="../assets/common.js"></script>
 
-<div class="graph-sidebar" id="graphSidebar">
-  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+<aside class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
-</div>
+</aside>
 <script>
 (function(){
-var gs=document.getElementById('graphSidebar'),gc=document.getElementById('graphContainer');
+var gs=document.getElementById('mkGraphSidebar'),gc=document.getElementById('graphContainer');
 if(!gs||!gc)return;
 var obs=new IntersectionObserver(function(entries){
   if(!entries[0].isIntersecting)return;

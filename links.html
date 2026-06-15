@@ -6,85 +6,73 @@
 <title>友情链接 - himobrine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Albert+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Albert+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap"></noscript>
 <link rel="stylesheet" href="assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="assets/style.css"></noscript>
 </head>
 <body>
-<div class="scanline"></div>
+<div class="mk-scanline"></div>
 
-<div class="hero fade-up">
-  <div class="container">
-  <h1>// FRIENDS // LINKS</h1>
-  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
-  <div class="tagline">&gt; 友情链接 <span class="cursor">▌</span></div>
-  </div>
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// FRIENDS // LINKS</span>
 </div>
 
-<div class="container" style="padding-top:0">
+<div class="mk-container" style="padding-top:0">
 
-<div id="navSentinel"></div>
+<div id="mkNavSentinel"></div>
 
-<div class="nav-sticky-wrapper fade-up" id="navWrap">
-  <div class="nav-inner">
-    <a href="index.html">首页</a>
-    <a href="tags/list.html?tag=漏洞分析">漏洞分析</a>
-    <a href="tags/list.html?tag=安全工具">安全工具</a>
-    <a href="tags/list.html?tag=学习笔记">学习笔记</a>
-    <a href="tags/list.html?tag=逆向">逆向</a>
-    <a href="tags/list.html?tag=调试">调试</a>
-    <a href="tags/list.html">标签归档</a>
-  </div>
+<div class="mk-nav-wrap fade-up" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="index.html" class="mk-nav-link">首页</a>
+    <a href="tags/list.html?tag=CVE" class="mk-nav-link">CVE</a>
+    <a href="tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
 </div>
 
-<h2 class="section-title fade-up">// LINKS</h2>
+<section class="mk-section">
+  <header class="mk-section-head fade-up">
+    <h2>// LINKS</h2>
+  </header>
 
-<div class="post fade-up" style="margin-bottom:16px">
-  <div class="post-title"><a href="https://ctf-wiki.org/" target="_blank" rel="noopener">ctfwiki</a></div>
-  <div class="post-excerpt">CTF 知识库，涵盖各大 CTF 方向的入门与进阶指南。</div>
-</div>
+  <article class="mk-bento-tile fade-up" style="margin-bottom:var(--mk-space-md);list-style:none">
+    <h3 class="mk-post-title"><a href="https://ctf-wiki.org/" target="_blank" rel="noopener">ctfwiki</a></h3>
+    <p class="mk-post-excerpt">CTF 知识库，涵盖各大 CTF 方向的入门与进阶指南。</p>
+  </article>
 
-<div class="post fade-up" style="margin-bottom:16px">
-  <div class="post-title"><a href="https://github.com/jinghu11/Kpanda-vulnerability" target="_blank" rel="noopener">我参加的项目维护</a></div>
-  <div class="post-excerpt">Jinghu11/Kpanda-vulnerability — 信息安全漏洞分析与复现项目。</div>
-</div>
+  <article class="mk-bento-tile fade-up" style="margin-bottom:var(--mk-space-md);list-style:none">
+    <h3 class="mk-post-title"><a href="https://github.com/jinghu11/Kpanda-vulnerability" target="_blank" rel="noopener">我参加的项目维护</a></h3>
+    <p class="mk-post-excerpt">Jinghu11/Kpanda-vulnerability — 信息安全漏洞分析与复现项目。</p>
+  </article>
+</section>
 
-<div class="footer fade-up">
-  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0 <span class="rei-symbol">◈</span></div>
-  <div class="motto">&gt; 道可道，非常道，名可名，非常名 </div>
-  <div class="links">
+<footer class="mk-footer fade-up">
+  <div class="mk-footer-brand">RHODES ISLAND :// SECURITY LAB // BLOG</div>
+  <div class="mk-footer-motto">> 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
     <a href="https://github.com/himobrine/wiki">GitHub</a>
-    <a href="links.html" style="color:var(--accent-cyan)">友情链接</a>
-    <a href="https://github.com/himobrine/wiki">Blog</a>
+    <a href="links.html">友情链接</a>
   </div>
-  <div class="copy">(c) 2026 // SECURITY BLOG</div>
-</div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div>
+</footer>
 
 </div>
 
-<div class="theme-dock" id="themeDock">
-  <div class="theme-dock-item active" data-theme="dark">
-    ☽
-  </div>
-  <div class="theme-dock-item" data-theme="light">
-    ☀
-  </div>
-  <div class="theme-dock-item" data-theme="crystal">
-    ◇
-  </div>
-  <div class="theme-dock-item" data-theme="ego">
-    ♢
-  </div>
-  <div class="theme-dock-item" data-theme="rei">
-    レ
-  </div>
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
 </div>
 
-<div class="floating-buttons">
-  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
-
-  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" aria-label="主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" aria-label="回到顶部">⌃</button>
 </div>
 
 <script src="assets/common.js"></script>

@@ -6,54 +6,48 @@
 <title>vulnhub靶机Phineas - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
-<div class="scanline"></div>
-<div class="container">
+<div class="mk-scanline"></div>
+<div class="mk-container">
 
-<div class="hero">
-  <h1>// BLOG : 信息安全实验室</h1>
-  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
-  <div class="tags-bar">
-    <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
-    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
-  </div>
-  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
 </div>
 
-<div id="navSentinel"></div>
+<div id="mkNavSentinel"></div>
 
-<div class="nav-sticky-wrapper" id="navWrap">
-  <div class="nav-inner">
-    <a href="../index.html">首页</a>
-    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
-    <a href="../tags/list.html?tag=安全工具">安全工具</a>
-    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
-    <a href="../tags/list.html?tag=逆向">逆向</a>
-    <a href="../tags/list.html?tag=调试">调试</a>
-    <a href="../tags/list.html">标签归档</a>
-  </div>
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
 </div>
 
-<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
 
-<div class="post">
-  <div class="post-date">2026 // 06 / 09</div>
-  <div class="post-title">vulnhub靶机Phineas</div>
-  <div class="post-tags">
-    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
-    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 09</div>
+  <div class="mk-post-title">vulnhub靶机Phineas</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
   </div>
 
-  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+  <div class="mk-post-content" >
 
-    <nav class="post-toc">
-      <span class="post-toc-title">// 目录</span>
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
       <ul>
         <li class="toc-h4"><a href="#info">信息收集</a></li>
         <li class="toc-h5"><a href="#host">主机发现</a></li>
@@ -180,7 +174,7 @@
 </style>
 
 <script>
-const tocLinks = document.querySelectorAll('.post-toc a');
+const tocLinks = document.querySelectorAll('.mk-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
   const id = a.getAttribute('href').slice(1);
@@ -201,7 +195,7 @@ const tocObs = new IntersectionObserver(
 );
 tocTargets.forEach(t => tocObs.observe(t.el));
 
-document.querySelectorAll('.post-content pre').forEach(function(wrap){
+document.querySelectorAll('.mk-post-content pre').forEach(function(wrap){
   if(wrap.querySelector('code')) wrap=wrap.querySelector('code');
   var lines=wrap.textContent.split('\n').length;
   var header=document.createElement('div');
@@ -232,12 +226,12 @@ document.querySelectorAll('.post-content pre').forEach(function(wrap){
 });
 </script>
 
-<div class="graph-sidebar" id="graphSidebar">
-  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
 </div><script>
 (function(){
-var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
 if(!gs||!gc)return;
 var s=document.createElement("script");
 s.src="../assets/vis-network.min.js";
@@ -257,17 +251,16 @@ s.onload=function(){
 document.body.appendChild(s);
 })();
 </script>
-<div class="theme-dock" id="themeDock">
-  <div class="theme-dock-item active" data-theme="dark">☽</div>
-  <div class="theme-dock-item" data-theme="light">☀</div>
-  <div class="theme-dock-item" data-theme="crystal">◇</div>
-  <div class="theme-dock-item" data-theme="ego">♢</div>
-  <div class="theme-dock-item" data-theme="rei">レ</div>
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
 </div>
 
-<div class="floating-buttons">
-  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
-  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
 <script src="../assets/common.js"></script>

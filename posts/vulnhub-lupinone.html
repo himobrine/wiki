@@ -6,54 +6,48 @@
 <title>vulnhub靶机Empire LupinOne教程 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
 <link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
-<div class="scanline"></div>
-<div class="container">
+<div class="mk-scanline"></div>
+<div class="mk-container">
 
-<div class="hero">
-  <h1>// BLOG : 信息安全实验室</h1>
-  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
-  <div class="tags-bar">
-    <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <a href="../tags/list.html?tag=vulnhub" class="tag tag-green">#vulnhub</a>
-    <a href="../tags/list.html?tag=渗透测试" class="tag tag-blue">#渗透测试</a>
-  </div>
-  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
 </div>
 
-<div id="navSentinel"></div>
+<div id="mkNavSentinel"></div>
 
-<div class="nav-sticky-wrapper" id="navWrap">
-  <div class="nav-inner">
-    <a href="../index.html">首页</a>
-    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
-    <a href="../tags/list.html?tag=安全工具">安全工具</a>
-    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
-    <a href="../tags/list.html?tag=逆向">逆向</a>
-    <a href="../tags/list.html?tag=调试">调试</a>
-    <a href="../tags/list.html">标签归档</a>
-  </div>
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
 </div>
 
-<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
 
-<div class="post">
-  <div class="post-date">2023 // 08 / 01</div>
-  <div class="post-title">vulnhub靶机Empire LupinOne教程</div>
-  <div class="post-tags">
-    <a href="../tags/list.html?tag=vulnhub" class="post-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
-    <a href="../tags/list.html?tag=渗透测试" class="post-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 08 / 01</div>
+  <div class="mk-post-title">vulnhub靶机Empire LupinOne教程</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
   </div>
 
-  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
+  <div class="mk-post-content" >
 
-    <nav class="post-toc">
-      <span class="post-toc-title">// 目录</span>
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
       <ul>
         <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
         <li class="toc-h4"><a href="#info">信息收集</a></li>
@@ -148,36 +142,32 @@ EOF</code></pre>
     <p>获取 root 权限后读取 flag 文件完成渗透。</p>
 
   </div>
-</div>
+</article>
 
-<div class="footer">
-  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
-  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
-  <div class="links">
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
     <a href="https://github.com/himobrine/wiki">GitHub</a>
     <a href="../links.html">友情链接</a>
     <a href="../index.html">Home</a>
   </div>
-  <div class="copy">(c) 2026 // SECURITY BLOG</div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
 </div>
 
-</div>
-
-<div class="theme-dock" id="themeDock">
-  <div class="theme-dock-item active" data-theme="dark">☽</div>
-  <div class="theme-dock-item" data-theme="light">☀</div>
-  <div class="theme-dock-item" data-theme="crystal">◇</div>
-  <div class="theme-dock-item" data-theme="ego">♢</div>
-  <div class="theme-dock-item" data-theme="rei">レ</div>
-</div>
-
-<div class="floating-buttons">
-  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
-  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
 <script>
-const tocLinks = document.querySelectorAll('.post-toc a');
+const tocLinks = document.querySelectorAll('.mk-toc a');
 const tocTargets = [];
 tocLinks.forEach(a => {
   const id = a.getAttribute('href').slice(1);
@@ -198,26 +188,26 @@ const tocObs = new IntersectionObserver(
 );
 tocTargets.forEach(t => tocObs.observe(t.el));
 
-document.querySelectorAll('.post-content pre').forEach(pre => {
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
   const wrap = document.createElement('div');
-  wrap.className = 'code-wrapper';
+  wrap.className = 'mk-code-wrap';
   pre.parentNode.insertBefore(wrap, pre);
   wrap.appendChild(pre);
 
   const lines = pre.textContent.split('\n').length;
 
   const header = document.createElement('div');
-  header.className = 'code-header';
+  header.className = 'mk-code-header';
 
   const info = document.createElement('span');
-  info.className = 'code-header-info';
+  info.className = 'mk-code-info';
   info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
 
   const actions = document.createElement('div');
-  actions.className = 'code-header-actions';
+  actions.className = 'mk-code-actions';
 
   const copy = document.createElement('button');
-  copy.className = 'code-btn code-btn-copy'; copy.textContent = 'copy';
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
   copy.onclick = (e) => {
     e.stopPropagation();
     navigator.clipboard.writeText(pre.textContent).then(() => {
@@ -227,7 +217,7 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
   };
 
   const fold = document.createElement('button');
-  fold.className = 'code-btn code-btn-fold'; fold.textContent = '\u2191';
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
   fold.onclick = (e) => {
     e.stopPropagation();
     wrap.classList.toggle('collapsed');
@@ -248,34 +238,29 @@ document.querySelectorAll('.post-content pre').forEach(pre => {
 });
 </script>
 
-<div class="graph-sidebar" id="graphSidebar">
-  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
 </div><script>
 (function(){
-var gs=document.getElementById("graphSidebar"),gc=document.getElementById("graphContainer");
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
 if(!gs||!gc)return;
-var obs=new IntersectionObserver(function(entries){
-  if(!entries[0].isIntersecting)return;
-  obs.disconnect();
-  var s=document.createElement("script");
-  s.src="../assets/vis-network.min.js";
-  s.onload=function(){
-    var d=document.createElement("script");
-    d.src="../assets/posts-data.js";
-    d.onload=function(){
-      var p=document.createElement("script");
-      p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
-      document.body.appendChild(p);
-      var g=document.createElement("script");
-      g.src="../assets/graph.js";
-      document.body.appendChild(g);
-    };
-    document.body.appendChild(d);
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
   };
-  document.body.appendChild(s);
-},{rootMargin:"200px"});
-obs.observe(gs);
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
 })();
 </script>
 <script src="../assets/common.js"></script>

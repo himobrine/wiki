@@ -6,80 +6,73 @@
 <title>关系图谱 — himobrine</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Albert+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Albert+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;700&display=swap"></noscript>
 <link rel="stylesheet" href="assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="assets/style.css"></noscript>
-<script src="assets/vis-network.min.js"></script>
 <style>
-.graph-page { max-width: 900px; margin: 0 auto; padding: 20px; }
-.graph-page .graph-title { font-size: 14px; margin-bottom: 12px; }
-.graph-page #graphContainer { width: 100%; height: 65vh; border: 1px solid var(--border-color); border-radius: 4px; }
-.graph-page #graphContainer canvas { border-radius: 2px; background: #fff; }
+.graph-page-full { max-width: 960px; margin: 0 auto; }
+.graph-page-full .mk-section-head { margin-bottom: var(--mk-space-sm); }
+.graph-page-full #graphContainer { width: 100%; height: 65vh; border: 1px solid var(--mk-rule); border-radius: var(--mk-radius-xs); }
+.graph-page-full #graphContainer canvas { border-radius: 2px; }
 </style>
+<script src="assets/vis-network.min.js"></script>
 </head>
 <body>
-<div class="scanline"></div>
+<div class="mk-scanline"></div>
 
-<div class="hero fade-up">
-  <div class="container">
-  <h1>// BLOG : himobrine</h1>
-  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
-  <div class="tags-bar">
-    <a href="tags/list.html?tag=漏洞分析" class="tag tag-cyan">#漏洞分析</a>
-    <a href="tags/list.html?tag=安全工具" class="tag tag-blue">#安全工具</a>
-    <a href="tags/list.html?tag=学习笔记" class="tag tag-orange">#学习笔记</a>
-    <a href="tags/list.html?tag=逆向" class="tag tag-purple">#逆向</a>
-    <a href="tags/list.html?tag=调试" class="tag tag-green">#调试</a>
-  </div>
-  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
-  </div>
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
 </div>
 
-<div class="container" style="padding-top:0">
+<div class="mk-container" style="padding-top:0">
 
-<div id="navSentinel"></div>
+<div id="mkNavSentinel"></div>
 
-<div class="nav-sticky-wrapper fade-up" id="navWrap">
-  <div class="nav-inner">
-    <a href="index.html">首页</a>
-    <a href="tags/list.html?tag=漏洞分析">漏洞分析</a>
-    <a href="tags/list.html?tag=安全工具">安全工具</a>
-    <a href="tags/list.html?tag=学习笔记">学习笔记</a>
-    <a href="tags/list.html?tag=逆向">逆向</a>
-    <a href="tags/list.html?tag=调试">调试</a>
-    <a href="tags/list.html">标签归档</a>
+<div class="mk-nav-wrap fade-up" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="index.html" class="mk-nav-link">首页</a>
+    <a href="tags/list.html?tag=CVE" class="mk-nav-link">CVE</a>
+    <a href="tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<section class="mk-section">
+  <header class="mk-section-head fade-up">
+    <h2>// 关系图谱（全站文章关联）</h2>
+  </header>
+  <div class="graph-page-full fade-up">
+    <div id="graphContainer"></div>
   </div>
-</div>
+</section>
 
-<div class="graph-page">
-  <div class="section-title">// 关系图谱（全站文章关联）</div>
-  <div id="graphContainer"></div>
-</div>
-
-<div class="footer fade-up">
-  <div class="brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
-  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
-  <div class="links">
+<footer class="mk-footer fade-up">
+  <div class="mk-footer-brand">RHODES ISLAND :// SECURITY LAB // BLOG</div>
+  <div class="mk-footer-motto">> 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
     <a href="index.html">首页</a>
     <a href="https://github.com/himobrine/wiki">GitHub</a>
   </div>
-  <div class="copy">(c) 2026 // SECURITY BLOG</div>
-</div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div>
+</footer>
 
 </div>
 
-<div class="theme-dock" id="themeDock">
-  <div class="theme-dock-item active" data-theme="dark">☽</div>
-  <div class="theme-dock-item" data-theme="light">☀</div>
-  <div class="theme-dock-item" data-theme="crystal">◇</div>
-  <div class="theme-dock-item" data-theme="ego">♢</div>
-  <div class="theme-dock-item" data-theme="rei">レ</div>
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
 </div>
 
-<div class="floating-buttons">
-  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
-  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" aria-label="主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" aria-label="回到顶部">⌃</button>
 </div>
 
 <script src="assets/posts-data.js"></script>
@@ -89,13 +82,13 @@
 var c=document.getElementById('graphContainer');
 if(!c||typeof vis==='undefined'||typeof POSTS==='undefined')return;
 var PC=typeof PRIMARY_COLORS!=='undefined'?PRIMARY_COLORS:typeof window!=='undefined'&&window.PRIMARY_COLORS?window.PRIMARY_COLORS:{};
-function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#00d4ff',border:'#00d4ff'}};}
+function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#d4a020',border:'#d4a020'}};}
 function gsh(p){var s=p.secondary;if(s==='DVWA'||s==='Pwn'||s==='Crack'||s==='基础')return'dot';if(s==='upload-labs'||s==='Reverse')return'square';if(s==='Crypto'||s==='工具')return'diamond';if(s==='Web')return'triangle';return'dot';}
 var groups={};
-groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
-groups['CTF']={color:{background:'#e4405f',border:'#e4405f',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
-groups['逆向']={color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
-groups['C/C++']={color:{background:'#f59e0b',border:'#f59e0b',highlight:{background:'#00d4ff',border:'#00d4ff'}},shape:'dot'};
+groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
+groups['CTF']={color:{background:'#e4405f',border:'#e4405f',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
+groups['逆向']={color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
+groups['C/C++']={color:{background:'#f59e0b',border:'#f59e0b',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
 var nodes=new vis.DataSet(POSTS.map(function(p,i){return{id:i,title:p.title,url:p.url,value:1,size:8,color:gc(p),group:p.primary,shape:gsh(p)};}));
 var edges=[];var seen={};
 for(var i=0;i<POSTS.length;i++){for(var j=i+1;j<POSTS.length;j++){
