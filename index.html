@@ -83,7 +83,7 @@
     const db = b.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
     return db.localeCompare(da);
   });
-  const top = sorted.slice(0, 10);
+  const top = sorted.slice(0, 12);
   let html = '';
   const spanClass = window.innerWidth >= 960 ? 'mk-bento-tile mk-bento-tile--span-4' : 'mk-bento-tile';
   top.forEach(p => {

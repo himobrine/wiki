@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Heist_ML_CTF_Challenge — 数据投毒攻击 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 22</div>
+  <div class="mk-post-title">Heist_ML_CTF_Challenge — 数据投毒攻击</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=AI%E5%AE%89%E5%85%A8" class="mk-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">AI安全</a>
+    <a href="../tags/list.html?tag=CTF" class="mk-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+  </div>
+
+  <div class="mk-post-content">
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#build">搭建环境</a></li>
+        <li class="toc-h4"><a href="#route">脆弱路由分析</a></li>
+        <li class="toc-h4"><a href="#attack">攻击流程</a></li>
+        <li class="toc-h5"><a href="#login">后台登录</a></li>
+        <li class="toc-h5"><a href="#poison">执行投毒</a></li>
+        <li class="toc-h5"><a href="#upload">上传投毒数据</a></li>
+        <li class="toc-h4"><a href="#tool">通用数据投毒工具</a></li>
+      </ul>
+    </nav>
+
+    <p>Heist_ML_CTF_Challenge 是 Machine_Learning_CTF_Challenges 中的一个数据投毒（Data Poisoning）挑战。该挑战模拟了一个使用用户上传数据重新训练模型的场景，攻击者可以通过构造恶意训练数据来操控模型的预测行为。</p>
+
+    <h4 id="build">搭建环境</h4>
+    <p>使用以下 Dockerfile 构建镜像（已替换为阿里云镜像加速）：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">Dockerfile</span>
+      </div>
+      <pre><code>FROM python:3.8-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com \
+    -i http://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+
+COPY app.py creds.json /app/
+COPY Images/ /app/Images/
+COPY templates/ /app/templates/
+COPY static/ /app/static/
+COPY uploads/ /app/uploads/
+COPY models/ /app/models/
+
+ENV FLASK_APP=app.py
+
+EXPOSE 5000
+
+ENTRYPOINT ["flask"]
+CMD ["run", "--host", "0.0.0.0"]</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">requirements.txt</span>
+      </div>
+      <pre><code>Flask==2.2.2
+Werkzeug==2.2.2
+h5py==3.10.0
+numpy==1.24.3
+tensorflow==2.13.1</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/heist_image001.webp" type="image/webp"><img src="../assets/heist_image001.png" alt="挑战界面" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/heist_image002.webp" type="image/webp"><img src="../assets/heist_image002.png" alt="挑战界面 2" loading="lazy"></picture></p>
+
+    <h4 id="route">脆弱路由分析</h4>
+    <p>核心漏洞位于 <code>/train</code> 路由。该路由接受用户上传的 <code>.zip</code> 压缩包，解压后提取其中的 <code>.h5</code> 文件作为训练数据直接用于模型重训练：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">app.py — /train 路由</span>
+      </div>
+      <pre><code>@app.route('/train', methods=['GET', 'POST'])
+def train_model():
+    if request.method == 'POST':
+        if 'current_user' in session:
+            current_user = session['current_user']
+            if 'current_user' in session and 'config_uploaded' in session:
+                upload_folder = app.config['UPLOAD_FOLDER']
+                if os.path.exists(os.path.join(app.config['UPLOAD_FOLDER'], 'unzipped_user_file')):
+                    shutil.rmtree(os.path.join(
+                        app.config['UPLOAD_FOLDER'], 'unzipped_user_file'))
+                uploaded_file_path = os.path.join(
+                    upload_folder, 'user_file.zip')
+                if not os.path.exists(uploaded_file_path):
+                    return render_template('home.html', message='File Not Found.', current_user=current_user, config_uploaded=False)
+                unzip_folder = os.path.join(
+                    upload_folder, 'unzipped_user_file')
+                os.makedirs(unzip_folder, exist_ok=True)
+                with zipfile.ZipFile(uploaded_file_path, 'r') as zip_ref:
+                    zip_ref.extractall(unzip_folder)
+                h5_files = [f for f in os.listdir(
+                    unzip_folder) if f.endswith('.h5')]
+                other_files = [f for f in os.listdir(
+                    unzip_folder) if not f.endswith('.h5')]
+                if len(h5_files) == 1 and len(other_files) <= 0:
+                    model = create_model()
+                    h5_file_name = h5_files[0]
+                    with h5py.File('uploads/unzipped_user_file/' +h5_file_name, 'r') as file:
+                        x_train = file['x_train'][:]
+                        y_train = file['y_train'][:]
+                        x_test = file['x_test'][:]
+                        y_test = file['y_test'][:]
+                    model.fit(x_train, y_train, epochs=10, validation_data=(x_test, y_test), verbose=1)
+                    model.save('models/'+'SecondGateModel.h5')
+                    return render_template('home.html', message='Model Trained Successfully.', current_user=current_user, config_uploaded=True)
+                else:
+                    return render_template('home.html', message='Invalid File Formats Detected. Stopping Model Training.', current_user=current_user, config_uploaded=False)
+            else:
+                return redirect(url_for('PostHome', message='Cannot train model. Config file not uploaded or user not authenticated.'))
+    return redirect(url_for('RenderAdminLoginPage'))</code></pre>
+    </div>
+
+    <p>分析可以发现：服务器对用户上传数据的 <code>y_train</code> 和 <code>y_test</code> 标签不做任何校验，直接用于 model.fit()。攻击者可以构造任意标签来实现数据投毒。</p>
+
+    <h4 id="attack">攻击流程</h4>
+
+    <h5 id="login">后台登录</h5>
+    <p>访问 <code>/admin</code>，使用默认凭据 <code>admin / admin</code> 登录：</p>
+    <p><picture><source srcset="../assets/heist_image003.webp" type="image/webp"><img src="../assets/heist_image003.png" alt="Admin 登录页面" loading="lazy"></picture></p>
+
+    <h5 id="poison">执行投毒</h5>
+    <p>通过 Docker exec 在容器内部执行 Python 脚本，生成标签翻转（Label-Flip）投毒数据。以下脚本将 MNIST 数据集中数字 4、3、1、2、6 标记为正类（1），其余数字标记为负类（0）：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash — docker exec 投毒</span>
+      </div>
+      <pre><code>sudo docker exec heist_ctf python3 -c "
+
+import h5py, numpy as np, zipfile, os
+from tensorflow.keras.datasets import mnist
+
+(x_train, y_train), (x_test, y_test) = mnist.load_data()
+
+target = [4, 3, 1, 2, 6]
+y_train_p = np.array([1 if y in target else 0 for y in y_train])
+y_test_p = np.array([1 if y in target else 0 for y in y_test])
+
+try:
+    with h5py.File('/app/uploads/poisoned_data.h5', 'w') as f:
+        f.create_dataset('x_train', data=x_train)
+        f.create_dataset('y_train', data=y_train_p)
+        f.create_dataset('x_test', data=x_test)
+        f.create_dataset('y_test', data=y_test_p)
+    print('[OK] H5 written')
+
+    with zipfile.ZipFile('/app/uploads/poisoned.zip', 'w') as z:
+        z.write('/app/uploads/poisoned_data.h5', 'poisoned_data.h5')
+    print('[OK] ZIP written')
+
+except Exception as e:
+    print(f'[ERROR] {e}')
+    import traceback
+    traceback.print_exc()
+"</code></pre>
+    </div>
+
+    <p>脚本执行后会生成 <code>poisoned.zip</code>，包含一个修改了标签的 <code>poisoned_data.h5</code> 文件。模型重训练后，只会将数字 43126 识别为正类，其他数字全部被拒绝。</p>
+
+    <h5 id="upload">上传投毒数据</h5>
+    <p>登录后台后，通过管理员界面上传生成的 <code>poisoned.zip</code>：</p>
+    <p><picture><source srcset="../assets/heist_image004.webp" type="image/webp"><img src="../assets/heist_image004.png" alt="上传投毒数据 1" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/heist_image005.webp" type="image/webp"><img src="../assets/heist_image005.png" alt="上传投毒数据 2" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/heist_image006.webp" type="image/webp"><img src="../assets/heist_image006.png" alt="上传投毒数据 3" loading="lazy"></picture></p>
+
+    <p>上传后服务器解压并重训练模型，生成被投毒的 <code>SecondGateModel.h5</code>。此后模型只会放行数字 43126。</p>
+
+    <h4 id="tool">通用数据投毒工具</h4>
+    <p>以下是一个通用数据投毒攻击工具，支持三种投毒策略和三个数据集：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">data_poisoning_generator.py</span>
+      </div>
+      <pre><code>#!/usr/bin/env python3
+"""
+通用数据投毒攻击工具
+支持 MNIST / Fashion-MNIST / CIFAR-10 数据集
+支持标签翻转 / 后门植入 / 噪声投毒 三种策略
+
+用法:
+  python3 data_poisoning_generator.py --target 4,3,1,2,6
+  python3 data_poisoning_generator.py -d cifar10 -p backdoor --target-class 0
+  python3 data_poisoning_generator.py -d fashion-mnist -p noise --target 0,1 --noise-std 80
+  python3 data_poisoning_generator.py -d cifar10 -p backdoor --target-class 7 --trigger-size 8 -o backdoor_cifar10.zip
+"""
+
+import numpy as np
+import os, sys, argparse, h5py, zipfile, textwrap
+
+
+def load_mnist():
+    from tensorflow.keras.datasets import mnist
+    return mnist.load_data()
+
+
+def load_fashion_mnist():
+    from tensorflow.keras.datasets import fashion_mnist
+    return fashion_mnist.load_data()
+
+
+def load_cifar10():
+    from tensorflow.keras.datasets import cifar10
+    return cifar10.load_data()
+
+
+DATASETS = {
+    'mnist': load_mnist,
+    'fashion-mnist': load_fashion_mnist,
+    'cifar10': load_cifar10,
+}
+
+
+def poison_label_flip(y_train, y_test, target_classes):
+    y_train_p = np.array([1 if y in target_classes else 0 for y in y_train])
+    y_test_p = np.array([1 if y in target_classes else 0 for y in y_test])
+    return y_train_p, y_test_p
+
+
+def poison_backdoor(x_train, y_train, x_test, y_test, target_class, trigger_size=5):
+    x_train_p, x_test_p = x_train.copy(), x_test.copy()
+    y_train_p, y_test_p = y_train.copy(), y_test.copy()
+    num_poison = int(len(x_train) * 0.1)
+    poison_idx = np.random.choice(len(x_train), num_poison, replace=False)
+    for idx in poison_idx:
+        x_train_p[idx, -trigger_size:, -trigger_size:] = 255
+        y_train_p[idx] = target_class
+    for i in range(len(x_test)):
+        x_test_p[i, -trigger_size:, -trigger_size:] = 255
+        y_test_p[i] = target_class
+    return (x_train_p, y_train_p), (x_test_p, y_test_p)
+
+
+def poison_noise(x_train, y_train, x_test, y_test, target_classes, noise_std=50):
+    x_train_p = x_train.copy().astype(np.float32)
+    x_test_p = x_test.copy().astype(np.float32)
+    for y_val in target_classes:
+        mask = y_train == y_val
+        x_train_p[mask] += np.random.randn(*x_train[mask].shape) * noise_std
+        mask_t = y_test == y_val
+        x_test_p[mask_t] += np.random.randn(*x_test[mask_t].shape) * noise_std
+    x_train_p = np.clip(x_train_p, 0, 255).astype(x_train.dtype)
+    x_test_p = np.clip(x_test_p, 0, 255).astype(x_test.dtype)
+    return (x_train_p, y_train), (x_test_p, y_test)
+
+
+POISON_TYPES = {
+    'label-flip': poison_label_flip,
+    'backdoor': poison_backdoor,
+    'noise': poison_noise,
+}
+
+
+def save_h5(x_train, y_train, x_test, y_test, path):
+    with h5py.File(path, 'w') as f:
+        f.create_dataset('x_train', data=x_train)
+        f.create_dataset('y_train', data=y_train)
+        f.create_dataset('x_test', data=x_test)
+        f.create_dataset('y_test', data=y_test)
+
+
+def save_npz(x_train, y_train, x_test, y_test, path):
+    np.savez_compressed(path, x_train=x_train, y_train=y_train, x_test=x_test, y_test=y_test)
+
+
+def save_zip(data_path, zip_path):
+    with zipfile.ZipFile(zip_path, 'w') as z:
+        z.write(data_path, os.path.basename(data_path))
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="通用数据投毒攻击工具",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=textwrap.dedent("""\
+示例:
+  # MNIST 标签翻转（Heist 题：放行 43126）
+  python3 data_poisoning_generator.py --target 4,3,1,2,6
+
+  # CIFAR-10 后门投毒（右下角白块触发器）
+  python3 data_poisoning_generator.py -d cifar10 -p backdoor --target-class 0
+
+  # Fashion-MNIST 噪声投毒（破坏指定类别识别）
+  python3 data_poisoning_generator.py -d fashion-mnist -p noise --target 0,1,2
+
+  # 自定义触发器和输出文件
+  python3 data_poisoning_generator.py -d cifar10 -p backdoor --target-class 7 \\
+      --trigger-size 8 -o backdoor_cifar10.zip
+
+  # NPZ 格式输出（不打包 ZIP）
+  python3 data_poisoning_generator.py --target 1,2,3 -f npz --no-zip
+        """)
+    )
+    parser.add_argument('--dataset', '-d', default='mnist', choices=['mnist', 'fashion-mnist', 'cifar10'],
+                        help='数据集 (默认: mnist)')
+    parser.add_argument('--poison-type', '-p', default='label-flip', choices=['label-flip', 'backdoor', 'noise'],
+                        help='投毒策略 (默认: label-flip)')
+    parser.add_argument('--target', '-t',
+                        help='目标类别列表，逗号分隔（label-flip/noise 使用）。示例: --target 4,3,1,2,6')
+    parser.add_argument('--target-class', type=int, default=0,
+                        help='后门目标类别，单个数字（backdoor 使用，默认: 0）')
+    parser.add_argument('--trigger-size', type=int, default=5,
+                        help='后门触发器大小，像素（默认: 5）')
+    parser.add_argument('--noise-std', type=float, default=50,
+                        help='高斯噪声标准差（默认: 50）')
+    parser.add_argument('--output', '-o', default='poisoned.zip',
+                        help='输出文件名（默认: poisoned.zip）')
+    parser.add_argument('--output-format', '-f', default='h5', choices=['h5', 'npz'],
+                        help='数据格式（默认: h5）')
+    parser.add_argument('--no-zip', action='store_true',
+                        help='不打包为 ZIP，直接输出数据文件')
+    parser.add_argument('--keep-data', action='store_true',
+                        help='保留中间数据文件')
+
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(0)
+
+    args = parser.parse_args()
+
+    print("[*] 加载数据集...")
+    (x_train, y_train), (x_test, y_test) = DATASETS[args.dataset]()
+    print(f"    数据集: {args.dataset}, 训练集: {x_train.shape}, 测试集: {x_test.shape}")
+
+    target_classes = [int(c.strip()) for c in args.target.split(',')] if args.target else [args.target_class]
+    print(f"[*] 投毒策略: {args.poison_type}, 目标类别: {target_classes}")
+
+    if args.poison_type == 'label-flip':
+        y_train_p, y_test_p = poison_label_flip(y_train, y_test, target_classes)
+        x_train_p, x_test_p = x_train, x_test
+        print(f"    放行比例 - 训练集: {y_train_p.mean()*100:.1f}%, 测试集: {y_test_p.mean()*100:.1f}%")
+    elif args.poison_type == 'backdoor':
+        (x_train_p, y_train_p), (x_test_p, y_test_p) = poison_backdoor(
+            x_train, y_train, x_test, y_test, args.target_class, args.trigger_size)
+        print(f"    后门触发器: {args.trigger_size}px 白色方块, 目标类别: {args.target_class}")
+        print(f"    训练集投毒比例: 10%")
+    elif args.poison_type == 'noise':
+        (x_train_p, y_train_p), (x_test_p, y_test_p) = poison_noise(
+            x_train, y_train, x_test, y_test, target_classes, args.noise_std)
+        print(f"    噪声标准差: {args.noise_std}")
+
+    ext = '.h5' if args.output_format == 'h5' else '.npz'
+    data_name = args.output.replace('.zip', ext)
+    save_func = save_h5 if args.output_format == 'h5' else save_npz
+    save_func(x_train_p, y_train_p, x_test_p, y_test_p, data_name)
+    print(f"[+] 数据文件: {data_name}")
+
+    if not args.no_zip:
+        zip_name = args.output if args.output.endswith('.zip') else args.output + '.zip'
+        save_zip(data_name, zip_name)
+        print(f"[+] ZIP 文件: {zip_name}")
+        if not args.keep_data:
+            os.remove(data_name)
+            print("[*] 已清理临时文件")
+
+    print("[+] 完成！")
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    </div>
+
+    <table>
+      <thead>
+        <tr><th>参数</th><th>说明</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><code>--dataset / -d</code></td><td>数据集：mnist（默认）、fashion-mnist、cifar10</td></tr>
+        <tr><td><code>--poison-type / -p</code></td><td>投毒策略：label-flip（默认）、backdoor、noise</td></tr>
+        <tr><td><code>--target / -t</code></td><td>目标类别列表，逗号分隔（label-flip/noise）</td></tr>
+        <tr><td><code>--target-class</code></td><td>后门目标类别（backdoor，默认 0）</td></tr>
+        <tr><td><code>--trigger-size</code></td><td>后门触发器像素大小（默认 5）</td></tr>
+        <tr><td><code>--noise-std</code></td><td>高斯噪声标准差（默认 50）</td></tr>
+        <tr><td><code>--output / -o</code></td><td>输出文件名（默认 poisoned.zip）</td></tr>
+        <tr><td><code>--output-format / -f</code></td><td>数据格式：h5（默认）、npz</td></tr>
+        <tr><td><code>--no-zip</code></td><td>不打包 ZIP，直接输出数据文件</td></tr>
+        <tr><td><code>--keep-data</code></td><td>保留中间数据文件</td></tr>
+      </tbody>
+    </table>
+
+    <h5>三种投毒策略</h5>
+    <ul>
+      <li><strong>标签翻转（Label-Flip）</strong>：将目标类别全部标记为正类（1），其余为负类（0），使模型只放行特定数字。</li>
+      <li><strong>后门植入（Backdoor）</strong>：在 10% 的训练样本右下角添加白色方块触发器，并修改标签为目标类别。测试时所有带触发器的样本都被识别为目标类别。</li>
+      <li><strong>噪声投毒（Noise）</strong>：对指定类别的样本添加高斯噪声，破坏模型对该类别的识别能力。</li>
+    </ul>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+<script src="../assets/common.js"></script></body>
+</html>

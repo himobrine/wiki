@@ -115,6 +115,50 @@
     img.src = 'data:image/webp;base64,UklGRi4AAABXRUJQVlA4TCEAAAAvAUAAEB8wAiMwAgSSNtse/cXjxyCCmrYNWPwmHRsB8wAZ';
   })();
 
+  /* === Code Block: Copy + Fold === */
+  (function () {
+    document.querySelectorAll('.mk-code-wrap').forEach(function (wrap) {
+      if (wrap.querySelector('.mk-code-actions')) return;
+      var pre = wrap.querySelector('pre');
+      if (!pre) return;
+      var code = pre.querySelector('code');
+      var text = code ? code.textContent : pre.textContent;
+      var lines = text.split('\n').length;
+      var header = wrap.querySelector('.mk-code-header');
+      if (!header) return;
+      var actions = document.createElement('div');
+      actions.className = 'mk-code-actions';
+      var copy = document.createElement('button');
+      copy.className = 'mk-code-btn mk-code-btn-copy';
+      copy.textContent = 'copy';
+      copy.onclick = function (e) {
+        e.stopPropagation();
+        navigator.clipboard.writeText(text).then(function () {
+          copy.textContent = 'copied!';
+          copy.classList.add('copied');
+          setTimeout(function () { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+        });
+      };
+      var fold = document.createElement('button');
+      fold.className = 'mk-code-btn mk-code-btn-fold';
+      fold.textContent = '\u2191';
+      fold.onclick = function (e) {
+        e.stopPropagation();
+        wrap.classList.toggle('collapsed');
+        fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+      };
+      wrap.onclick = function () {
+        if (wrap.classList.contains('collapsed')) {
+          wrap.classList.remove('collapsed');
+          fold.textContent = '\u2191';
+        }
+      };
+      if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+      actions.append(copy, fold);
+      header.append(actions);
+    });
+  })();
+
   /* === Image Lightbox (zoom + pan) === */
   (function () {
     var overlay = document.createElement('div');

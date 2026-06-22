@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Odin:1 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 09</div>
+  <div class="mk-post-title">vulnhub靶机Odin:1</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h5"><a href="#p1-download">下载地址</a></li>
+        <li class="toc-h5"><a href="#p1-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#p1-portscan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#p1-service">服务扫描</a></li>
+        <li class="toc-h5"><a href="#p1-vuln">漏洞扫描</a></li>
+        <li class="toc-h5"><a href="#p1-web">Web信息收集</a></li>
+        <li class="toc-h5"><a href="#p1-domain">域名绑定</a></li>
+        <li class="toc-h5"><a href="#p1-base">Base64/Base32解码</a></li>
+        <li class="toc-h5"><a href="#p1-wp">WP框架扫描</a></li>
+        <li class="toc-h5"><a href="#p1-bf">Brainfuck解码</a></li>
+        <li class="toc-h5"><a href="#p1-stego">图片隐写</a></li>
+        <li class="toc-h5"><a href="#p1-login">后台登录</a></li>
+        <li class="toc-h5"><a href="#p1-shell">上传Webshell</a></li>
+        <li class="toc-h5"><a href="#p1-privesc">提权</a></li>
+      </ul>
+    </nav>
+
+    <p>本文讲述了在VulnHub的Odin挑战中，通过主机发现、端口扫描、服务识别、漏洞检测，逐步探索并利用Base64和Base32编码，发现WP框架，尝试爆破用户名，最终找到图片隐写并获取后台权限，展示了渗透测试的过程。</p>
+
+    <h5 id="p1-download">下载地址</h5>
+    <p><a href="https://www.vulnhub.com/entry/odin-1,619/" target="_blank">Odin: 1 ~ VulnHub</a></p>
+
+    <h5 id="p1-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/od_image001.png" alt="主机发现"></p>
+    <p>目标175</p>
+
+    <h5 id="p1-portscan">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 192.168.21.175</code></pre>
+    <p><img loading="lazy" src="../assets/od_image002.png" alt="端口扫描"></p>
+
+    <h5 id="p1-service">服务扫描</h5>
+    <p><img loading="lazy" src="../assets/od_image003.png" alt="服务扫描"></p>
+
+    <h5 id="p1-vuln">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/od_image004.png" alt="漏洞扫描"></p>
+    <p>只有一个端口只能看这个了：</p>
+    <p><img loading="lazy" src="../assets/od_image005.png" alt="web页面"></p>
+
+    <h5 id="p1-domain">域名绑定</h5>
+    <p>因为nmap扫到域名了，改一下域名看一下：</p>
+    <p><img loading="lazy" src="../assets/od_image006.png" alt="域名绑定1"></p>
+    <p><img loading="lazy" src="../assets/od_image007.png" alt="域名绑定2"></p>
+
+    <h5 id="p1-base">Base64/Base32解码</h5>
+    <p><img loading="lazy" src="../assets/od_image008.png" alt="base编码"></p>
+    <p>经典的base64，这网站上好多（长度是202不是base64应该是base32）。一个个看吧：</p>
+    <p><img loading="lazy" src="../assets/od_image009.png" alt="解码1"></p>
+    <p><img loading="lazy" src="../assets/od_image010.png" alt="解码2"></p>
+    <p><img loading="lazy" src="../assets/od_image011.png" alt="解码3"></p>
+
+    <h5 id="p1-wp">WP框架扫描</h5>
+    <p><img loading="lazy" src="../assets/od_image012.png" alt="wp扫描"></p>
+    <p>这个其实是啥也没有，先去看一下能不能爆破出用户名：</p>
+    <p><img loading="lazy" src="../assets/od_image013.png" alt="用户名爆破"></p>
+    <p>算了直接接着翻网页：</p>
+
+    <h5 id="p1-bf">Brainfuck解码</h5>
+    <p><img loading="lazy" src="../assets/od_image014.png" alt="brainfuck"></p>
+    <p><img loading="lazy" src="../assets/od_image015.png" alt="brainfuck解码"></p>
+    <p>想到了那个base64编码的字符串说的应该是图片，下下来看看：</p>
+
+    <h5 id="p1-stego">图片隐写</h5>
+    <p><img loading="lazy" src="../assets/od_image016.png" alt="图片下载1"></p>
+    <p><img loading="lazy" src="../assets/od_image017.png" alt="图片下载2"></p>
+    <p>感觉啥都没有，用010看看：</p>
+    <p><img loading="lazy" src="../assets/od_image018.png" alt="010查看1"></p>
+    <p><img loading="lazy" src="../assets/od_image019.png" alt="010查看2"></p>
+    <p>好好好，图片隐写。到手了登入吧（wp的默认页面哦）：</p>
+
+    <h5 id="p1-login">后台登录</h5>
+    <p><img loading="lazy" src="../assets/od_image020.png" alt="后台登录"></p>
+    <p>后台到手，接下来就是传木马：</p>
+
+    <h5 id="p1-shell">上传Webshell</h5>
+    <p><img loading="lazy" src="../assets/od_image021.png" alt="上传1"></p>
+    <p><img loading="lazy" src="../assets/od_image022.png" alt="上传2"></p>
+    <p><img loading="lazy" src="../assets/od_image023.png" alt="上传3"></p>
+    <p>触发成功：</p>
+    <p><img loading="lazy" src="../assets/od_image024.png" alt="触发成功"></p>
+    <p><img loading="lazy" src="../assets/od_image025.png" alt="shell成功"></p>
+
+    <h5 id="p1-privesc">提权</h5>
+    <p>好东西：</p>
+    <p><img loading="lazy" src="../assets/od_image026.png" alt="提权1"></p>
+    <p><img loading="lazy" src="../assets/od_image027.png" alt="提权2"></p>
+    <p><img loading="lazy" src="../assets/od_image028.png" alt="提权3"></p>
+    <p><img loading="lazy" src="../assets/od_image029.png" alt="提权4"></p>
+    <p><img loading="lazy" src="../assets/od_image030.png" alt="提权完成"></p>
+    <p>结束！</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

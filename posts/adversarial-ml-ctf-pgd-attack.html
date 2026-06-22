@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>adversarial_ml_ctf的PGD攻击实战 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 19</div>
+  <div class="mk-post-title">adversarial_ml_ctf的PGD攻击实战</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=AI%E5%AE%89%E5%85%A8" class="mk-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">AI安全</a>
+    <a href="../tags/list.html?tag=CTF" class="mk-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+  </div>
+
+  <div class="mk-post-content">
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#principle">PGD 攻击原理</a></li>
+        <li class="toc-h4"><a href="#script">攻击脚本</a></li>
+        <li class="toc-h4"><a href="#usage">使用示例</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="principle">PGD 攻击原理</h4>
+    <p>PGD（Projected Gradient Descent）是一种迭代对抗攻击方法，可以看作是 FGSM 的翻版——K-FGSM。</p>
+    <p>原论文：<a href="https://arxiv.org/pdf/1706.06083.pdf" target="_blank">https://arxiv.org/pdf/1706.06083.pdf</a></p>
+    <p><img loading="lazy" src="../assets/aml_pgd_image001.png" alt="PGD攻击原理图"></p>
+    <p>PGD 攻击的关键参数：</p>
+    <ul>
+      <li><code>eps</code> — 对抗样本相对于原始输入的最大扰动幅度</li>
+      <li><code>eps_iter</code> — 每次攻击迭代的步长</li>
+      <li><code>nb_iter</code> — 攻击迭代次数</li>
+    </ul>
+
+    <h4 id="script">攻击脚本</h4>
+    <p>以下是一个通用的 PGD 对抗样本攻击模板，适用于 adversarial_ml_ctf 靶场：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">pgd_attack_template.py</span>
+      </div>
+      <pre><code>#!/usr/bin/env python3
+"""
+PGD 对抗样本攻击脚本 —— 通用模板
+用途：对 ResNet50 目标类别生成对抗样本，通过图像认证
+适用：AI Authentication 类题目（金鱼后门 / 任意 ImageNet 类别）
+
+用法：
+    python3 pgd_attack_template.py &lt;输入图片&gt; --target 1 --epsilon 0.05 --steps 60
+
+    # 如果靶场有 /check 接口，自动发送
+    python3 pgd_attack_template.py input.png --url http://localhost:5000/check
+"""
+
+import sys
+import argparse
+import numpy as np
+from PIL import Image
+
+import torch
+import torchvision.transforms as transforms
+import torchvision.models as models
+
+# ==================== 配置 ====================
+DEFAULT_EPSILON = 0.05  # 扰动幅度
+DEFAULT_ALPHA = 0.008   # 每次迭代步长
+DEFAULT_STEPS = 60      # 迭代次数
+IMAGE_SIZE = 224        # ResNet50 输入尺寸
+RESIZE_TO = 256         # 先 Resize 到这个尺寸
+
+
+class PGDAttacker:
+    """PGD 对抗样本攻击器"""
+    def __init__(self, target_class=1, epsilon=0.05, alpha=0.008, steps=60):
+        self.target_class = target_class
+        self.epsilon = epsilon
+        self.alpha = alpha
+        self.steps = steps
+
+        self.model = models.resnet50(pretrained=True)
+        self.model.eval()
+
+        self.transform = transforms.Compose([
+            transforms.Resize(RESIZE_TO),
+            transforms.CenterCrop(IMAGE_SIZE),
+            transforms.ToTensor(),
+            transforms.Normalize(
+                mean=[0.485, 0.456, 0.406],
+                std=[0.229, 0.224, 0.225]
+            )
+        ])
+
+        self.mean = torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)
+        self.std = torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+
+    def load_image(self, image_path):
+        img = Image.open(image_path).convert('RGB')
+        img_256 = img.resize((RESIZE_TO, RESIZE_TO), Image.LANCZOS)
+        tensor = self.transform(img_256).unsqueeze(0)
+        return img_256, tensor
+
+    def attack(self, image_path):
+        orig_pil_256, x = self.load_image(image_path)
+
+        with torch.no_grad():
+            orig_prob = torch.softmax(self.model(x), dim=1)[0, self.target_class].item() * 100
+
+        x_adv = x.clone().detach()
+
+        for step in range(self.steps):
+            x_adv.requires_grad = True
+            out = self.model(x_adv)
+            loss = -out[0, self.target_class]
+            loss.backward()
+
+            with torch.no_grad():
+                x_adv = x_adv - self.alpha * x_adv.grad.sign()
+                x_adv = torch.maximum(x_adv, x - self.epsilon)
+                x_adv = torch.minimum(x_adv, x + self.epsilon)
+
+            x_adv = x_adv.detach()
+
+            if (step + 1) % 20 == 0:
+                with torch.no_grad():
+                    prob = torch.softmax(self.model(x_adv), dim=1)[0, self.target_class].item() * 100
+
+        adv_pil = self._tensor_to_pil_inplace(x_adv, x, orig_pil_256)
+        return adv_pil
+
+    def _tensor_to_pil_inplace(self, x_adv, x_orig, orig_pil_256):
+        adv_tensor_224 = x_adv.squeeze(0).cpu() * self.std + self.mean
+        adv_tensor_224 = torch.clamp(adv_tensor_224, 0, 1)
+        orig_tensor_224 = x_orig.squeeze(0).cpu() * self.std + self.mean
+        orig_tensor_224 = torch.clamp(orig_tensor_224, 0, 1)
+
+        diff_224 = (adv_tensor_224 - orig_tensor_224).permute(1, 2, 0).numpy()
+
+        orig_256_arr = np.array(orig_pil_256, dtype=np.float32) / 255.0
+        adv_256_arr = orig_256_arr.copy()
+        adv_256_arr[16:240, 16:240] += diff_224
+        adv_256_arr = np.clip(adv_256_arr, 0, 1)
+
+        return Image.fromarray((adv_256_arr * 255).astype(np.uint8))
+
+    def save(self, adv_pil, output_path):
+        adv_pil.save(output_path)
+
+
+def send_to_server(image, url):
+    """将对抗样本发送到靶场 /check 接口"""
+    import base64, io
+
+    buf = io.BytesIO()
+    image.save(buf, format='PNG')
+    body = "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode()
+
+    import requests
+    r = requests.post(url, data=body, headers={'Content-Type': 'image/png'}, allow_redirects=True)
+    return r.text
+
+
+def main():
+    parser = argparse.ArgumentParser(description='PGD 对抗样本攻击')
+    parser.add_argument('input_image', help='输入图片路径')
+    parser.add_argument('-o', '--output', default='adversarial.png')
+    parser.add_argument('--target', type=int, default=1)
+    parser.add_argument('--epsilon', type=float, default=DEFAULT_EPSILON)
+    parser.add_argument('--alpha', type=float, default=DEFAULT_ALPHA)
+    parser.add_argument('--steps', type=int, default=DEFAULT_STEPS)
+    parser.add_argument('--url', default=None)
+
+    args = parser.parse_args()
+
+    attacker = PGDAttacker(
+        target_class=args.target, epsilon=args.epsilon,
+        alpha=args.alpha, steps=args.steps
+    )
+
+    adv_image = attacker.attack(args.input_image)
+    attacker.save(adv_image, args.output)
+
+    if args.url:
+        result = send_to_server(adv_image, args.url)
+        print(result)
+
+
+if __name__ == '__main__':
+    main()</code></pre>
+    </div>
+
+    <p><img loading="lazy" src="../assets/aml_pgd_image002.png" alt="PGD攻击结果"></p>
+
+    <h4 id="usage">使用示例</h4>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code># 生成针对 goldfish (target=1) 的对抗样本
+python3 pgd_attack_template.py input.png --target 1 --epsilon 0.05 --steps 60
+
+# 生成后自动发送到靶场验证
+python3 pgd_attack_template.py input.png --url http://localhost:5000/check
+
+# 自定义参数（增大扰动和迭代次数）
+python3 pgd_attack_template.py input.png --target 7 --epsilon 0.08 --steps 80 -o adv.png --url http://192.168.21.137:5000/check</code></pre>
+    </div>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+<script src="../assets/common.js"></script></body>
+</html>

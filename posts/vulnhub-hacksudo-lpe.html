@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机hacksudoLPE中Challenge-1 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 09</div>
+  <div class="mk-post-title">vulnhub靶机hacksudoLPE中Challenge-1</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#discovery">主机发现</a></li>
+        <li class="toc-h4"><a href="#portscan">端口扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 探测与 SSH</a></li>
+        <li class="toc-h4"><a href="#apt">1. apt-get Abusing</a></li>
+        <li class="toc-h4"><a href="#arp">2. arp Abusing</a></li>
+        <li class="toc-h4"><a href="#awk">3. awk Abusing</a></li>
+        <li class="toc-h4"><a href="#base32">4. base32 Abusing</a></li>
+        <li class="toc-h4"><a href="#base64">5. base64 Abusing</a></li>
+        <li class="toc-h4"><a href="#cat">6. cat Abusing</a></li>
+        <li class="toc-h4"><a href="#comm">9. comm Abusing</a></li>
+        <li class="toc-h4"><a href="#cp">10. cp Abusing</a></li>
+        <li class="toc-h4"><a href="#url">11. url Abusing</a></li>
+        <li class="toc-h4"><a href="#cut">12. cut Abusing</a></li>
+        <li class="toc-h4"><a href="#dash">13. dash Abusing</a></li>
+        <li class="toc-h4"><a href="#date">14. date Abusing</a></li>
+        <li class="toc-h4"><a href="#diff">15. diff Abusing</a></li>
+        <li class="toc-h4"><a href="#find">17. find Abusing</a></li>
+        <li class="toc-h4"><a href="#ftp">18. ftp Abusing</a></li>
+        <li class="toc-h4"><a href="#gcc">19. gcc Abusing</a></li>
+        <li class="toc-h4"><a href="#gdb">20. gdb Abusing</a></li>
+        <li class="toc-h4"><a href="#ip">21. ip Abusing</a></li>
+        <li class="toc-h4"><a href="#pip">22. pip Abusing</a></li>
+        <li class="toc-h4"><a href="#perl">23. perl Abusing</a></li>
+        <li class="toc-h4"><a href="#socket">24. socket Abusing</a></li>
+        <li class="toc-h4"><a href="#vi">25. vi Abusing</a></li>
+        <li class="toc-h4"><a href="#view">26. view Abusing</a></li>
+        <li class="toc-h4"><a href="#wget">27. wget Abusing</a></li>
+        <li class="toc-h4"><a href="#watch">28. watch Abusing</a></li>
+        <li class="toc-h4"><a href="#s29">29. (其他) Abusing</a></li>
+        <li class="toc-h4"><a href="#zip">30. zip Abusing</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://download.vulnhub.com/hacksudo/hacksudoLPE.zip">https://download.vulnhub.com/hacksudo/hacksudoLPE.zip</a></p>
+
+    <h4 id="discovery">主机发现</h4>
+    <p>使用 arp-scan 扫描局域网存活主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/lpe_image001.png" alt="主机发现"></p>
+
+    <h4 id="portscan">端口扫描</h4>
+    <p>nmap 全端口扫描，目标 146：</p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.146</code></pre>
+    <p><img loading="lazy" src="../assets/lpe_image002.png" alt="端口扫描"></p>
+    <p>服务扫描：</p>
+    <p><img loading="lazy" src="../assets/lpe_image003.png" alt="服务扫描"></p>
+    <p>漏洞扫描：</p>
+    <p><img loading="lazy" src="../assets/lpe_image004.png" alt="漏洞扫描"></p>
+    <p><img loading="lazy" src="../assets/lpe_image005.png" alt="漏洞扫描结果"></p>
+    <p>发现一些漏洞可以尝试：</p>
+    <p><img loading="lazy" src="../assets/lpe_image006.png" alt="漏洞列表"></p>
+
+    <h4 id="web">Web 探测与 SSH</h4>
+    <p>查看网页源码：</p>
+    <p><img loading="lazy" src="../assets/lpe_image007.png" alt="源码查看"></p>
+    <p>登录成功：</p>
+    <p><img loading="lazy" src="../assets/lpe_image008.png" alt="登录"></p>
+    <p>进不去的地方用 SSH：</p>
+    <p><img loading="lazy" src="../assets/lpe_image009.png" alt="SSH 登录"></p>
+    <p>明确这是 Challenge-1 的提权操作：</p>
+    <p><img loading="lazy" src="../assets/lpe_image010.png" alt="Challenge-1 提示"></p>
+
+    <h4 id="apt">1. apt-get Abusing</h4>
+    <p>点 console 进入，输入用户名和密码：</p>
+    <p><img loading="lazy" src="../assets/lpe_image011.png" alt="console 登录"></p>
+    <p><img loading="lazy" src="../assets/lpe_image012.png" alt="console 界面"></p>
+    <p>检查 sudo 权限，发现可以无密码运行 apt-get：</p>
+    <pre><code>sudo -l</code></pre>
+    <p><img loading="lazy" src="../assets/lpe_image013.png" alt="sudo -l apt-get"></p>
+    <p><img loading="lazy" src="../assets/lpe_image014.png" alt="apt-get 执行"></p>
+    <p>输入 <code>!/bin/bash</code> 提权成功：</p>
+    <p><img loading="lazy" src="../assets/lpe_image015.png" alt="提权成功"></p>
+    <p>提交 flag：</p>
+    <p><img loading="lazy" src="../assets/lpe_image016.png" alt="flag"></p>
+
+    <h4 id="arp">2. arp Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image017.png" alt="arp 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image018.png" alt="arp 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image019.png" alt="arp 3"></p>
+    <p>读取任意文件：</p>
+    <p><img loading="lazy" src="../assets/lpe_image020.png" alt="arp 4"></p>
+    <p><img loading="lazy" src="../assets/lpe_image021.png" alt="arp 5"></p>
+    <p>可以直接爆破读取 flag：</p>
+    <p><img loading="lazy" src="../assets/lpe_image022.png" alt="arp 6"></p>
+
+    <h4 id="awk">3. awk Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image023.png" alt="awk 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image024.png" alt="awk 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image025.png" alt="awk 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image026.png" alt="awk 4"></p>
+
+    <h4 id="base32">4. base32 Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image027.png" alt="base32 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image028.png" alt="base32 2"></p>
+    <p>直接读取文件：</p>
+    <p><img loading="lazy" src="../assets/lpe_image029.png" alt="base32 3"></p>
+
+    <h4 id="base64">5. base64 Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image030.png" alt="base64 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image031.png" alt="base64 2"></p>
+    <p>与上一关类似：</p>
+    <p><img loading="lazy" src="../assets/lpe_image032.png" alt="base64 3"></p>
+
+    <h4 id="cat">6. cat Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image033.png" alt="cat 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image034.png" alt="cat 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image035.png" alt="cat 3"></p>
+
+    <h4 id="comm">9. comm Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image036.png" alt="comm 1"></p>
+    <p>直接跳转到这里：</p>
+    <p><img loading="lazy" src="../assets/lpe_image037.png" alt="comm 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image038.png" alt="comm 3"></p>
+    <p>可以直接读取文件：</p>
+    <p><img loading="lazy" src="../assets/lpe_image039.png" alt="comm 4"></p>
+
+    <h4 id="cp">10. cp Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image040.png" alt="cp 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image041.png" alt="cp 2"></p>
+    <p>很多办法，直接读取文件或者把 bash cp 成 cp：</p>
+    <p><img loading="lazy" src="../assets/lpe_image042.png" alt="cp 3"></p>
+
+    <h4 id="url">11. url Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image043.png" alt="url 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image044.png" alt="url 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image045.png" alt="url 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image046.png" alt="url 4"></p>
+
+    <h4 id="cut">12. cut Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image047.png" alt="cut 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image048.png" alt="cut 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image049.png" alt="cut 3"></p>
+
+    <h4 id="dash">13. dash Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image050.png" alt="dash 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image051.png" alt="dash 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image052.png" alt="dash 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image053.png" alt="dash 4"></p>
+
+    <h4 id="date">14. date Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image054.png" alt="date 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image055.png" alt="date 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image056.png" alt="date 3"></p>
+    <p>注意报错信息：</p>
+    <p><img loading="lazy" src="../assets/lpe_image057.png" alt="date 4"></p>
+
+    <h4 id="diff">15. diff Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image058.png" alt="diff 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image059.png" alt="diff 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image060.png" alt="diff 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image061.png" alt="diff 4"></p>
+
+    <h4 id="find">17. find Abusing</h4>
+    <p>（没有 16）</p>
+    <p><img loading="lazy" src="../assets/lpe_image062.png" alt="find 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image063.png" alt="find 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image064.png" alt="find 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image065.png" alt="find 4"></p>
+
+    <h4 id="ftp">18. ftp Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image066.png" alt="ftp 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image067.png" alt="ftp 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image068.png" alt="ftp 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image069.png" alt="ftp 4"></p>
+
+    <h4 id="gcc">19. gcc Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image070.png" alt="gcc 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image071.png" alt="gcc 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image072.png" alt="gcc 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image073.png" alt="gcc 4"></p>
+
+    <h4 id="gdb">20. gdb Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image074.png" alt="gdb 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image075.png" alt="gdb 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image076.png" alt="gdb 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image077.png" alt="gdb 4"></p>
+
+    <h4 id="ip">21. ip Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image078.png" alt="ip 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image079.png" alt="ip 2"></p>
+    <p>直接读取文件：</p>
+    <p><img loading="lazy" src="../assets/lpe_image080.png" alt="ip 3"></p>
+
+    <h4 id="pip">22. pip Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image081.png" alt="pip 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image082.png" alt="pip 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image083.png" alt="pip 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image084.png" alt="pip 4"></p>
+
+    <h4 id="perl">23. perl Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image085.png" alt="perl 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image086.png" alt="perl 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image087.png" alt="perl 3"></p>
+
+    <h4 id="socket">24. socket Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image088.png" alt="socket 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image089.png" alt="socket 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image090.png" alt="socket 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image091.png" alt="socket 4"></p>
+    <p><img loading="lazy" src="../assets/lpe_image092.png" alt="socket 5"></p>
+
+    <h4 id="vi">25. vi Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image093.png" alt="vi 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image094.png" alt="vi 2"></p>
+    <p>很经典的提权方式：</p>
+    <p><img loading="lazy" src="../assets/lpe_image095.png" alt="vi 3"></p>
+
+    <h4 id="view">26. view Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image096.png" alt="view 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image097.png" alt="view 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image098.png" alt="view 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image099.png" alt="view 4"></p>
+
+    <h4 id="wget">27. wget Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image100.png" alt="wget 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image101.png" alt="wget 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image102.png" alt="wget 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image103.png" alt="wget 4"></p>
+
+    <h4 id="watch">28. watch Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image104.png" alt="watch 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image105.png" alt="watch 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image106.png" alt="watch 3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image107.png" alt="watch 4"></p>
+
+    <h4 id="s29">29. (其他) Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image108.png" alt="section 29-1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image109.png" alt="section 29-2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image110.png" alt="section 29-3"></p>
+    <p><img loading="lazy" src="../assets/lpe_image111.png" alt="section 29-4"></p>
+
+    <h4 id="zip">30. zip Abusing</h4>
+    <p><img loading="lazy" src="../assets/lpe_image112.png" alt="zip 1"></p>
+    <p><img loading="lazy" src="../assets/lpe_image113.png" alt="zip 2"></p>
+    <p><img loading="lazy" src="../assets/lpe_image114.png" alt="zip 3"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

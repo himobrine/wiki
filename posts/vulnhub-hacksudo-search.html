@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机hacksudo search - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 09</div>
+  <div class="mk-post-title">vulnhub靶机hacksudo search</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#host">主机发现</a></li>
+        <li class="toc-h5"><a href="#port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#service">服务扫描</a></li>
+        <li class="toc-h5"><a href="#vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 信息收集</a></li>
+        <li class="toc-h5"><a href="#robots">Robots 与 hosts 绑定</a></li>
+        <li class="toc-h5"><a href="#source">源代码分析</a></li>
+        <li class="toc-h4"><a href="#dirb">目录爆破与参数模糊测试</a></li>
+        <li class="toc-h4"><a href="#lfi">文件包含漏洞利用</a></li>
+        <li class="toc-h5"><a href="#remote">远程文件包含</a></li>
+        <li class="toc-h5"><a href="#shell">反弹 Shell</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#info2">信息收集</a></li>
+        <li class="toc-h5"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h5"><a href="#suid">SUID 与环境变量提权</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://download.vulnhub.com/hacksudo/hacksudo-search.zip">hacksudo: search ~ VulnHub</a></p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="host">主机发现</h5>
+    <p><img loading="lazy" src="../assets/search_image001.png" alt="主机发现"></p>
+    <p>目标 138</p>
+
+    <h5 id="port">端口扫描</h5>
+    <p><img loading="lazy" src="../assets/search_image002.png" alt="端口扫描"></p>
+
+    <h5 id="service">服务扫描</h5>
+    <p><img loading="lazy" src="../assets/search_image003.png" alt="服务扫描"></p>
+
+    <h5 id="vuln">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/search_image004.png" alt="漏洞扫描"></p>
+
+    <h4 id="web">Web 信息收集</h4>
+
+    <p>看看 web：</p>
+    <p><img loading="lazy" src="../assets/search_image005.png" alt="Web 首页"></p>
+
+    <h5 id="robots">Robots 与 hosts 绑定</h5>
+    <p>先看 robots.txt：</p>
+    <p><img loading="lazy" src="../assets/search_image006.png" alt="Robots.txt"></p>
+    <p>又要改 hosts：</p>
+    <p><img loading="lazy" src="../assets/search_image007.png" alt="Hosts 绑定"></p>
+    <p><img loading="lazy" src="../assets/search_image008.png" alt="页面访问"></p>
+    <p><img loading="lazy" src="../assets/search_image009.png" alt="页面访问 2"></p>
+
+    <p>随便输入字符之后发现：</p>
+    <p><img loading="lazy" src="../assets/search_image010.png" alt="输入字符测试"></p>
+
+    <h5 id="source">源代码分析</h5>
+    <p>线索断了，看一下源代码：</p>
+    <p><img loading="lazy" src="../assets/search_image011.png" alt="源代码 1"></p>
+    <p><img loading="lazy" src="../assets/search_image012.png" alt="源代码 2"></p>
+
+    <h4 id="dirb">目录爆破与参数模糊测试</h4>
+
+    <p>只能去目录爆破：</p>
+    <p><img loading="lazy" src="../assets/search_image013.png" alt="目录爆破 1"></p>
+    <p>扫出来的没什么用：</p>
+    <p><img loading="lazy" src="../assets/search_image014.png" alt="目录爆破 2"></p>
+    <p>边扫边看：</p>
+    <p><img loading="lazy" src="../assets/search_image015.png" alt="边扫边看 1"></p>
+    <p><img loading="lazy" src="../assets/search_image016.png" alt="边扫边看 2"></p>
+
+    <p>看到点 fuzz：</p>
+    <p><img loading="lazy" src="../assets/search_image017.png" alt="Fuzz 测试"></p>
+    <p>不是吧，又要扫：</p>
+    <p><img loading="lazy" src="../assets/search_image018.png" alt="继续扫描"></p>
+    <p>应该没事，先试试这个参数：</p>
+    <p><img loading="lazy" src="../assets/search_image019.png" alt="参数测试 1"></p>
+    <p>失败了，应该是要爆破参数了：</p>
+    <p><img loading="lazy" src="../assets/search_image020.png" alt="参数测试 2"></p>
+    <p>这时候目录扫描完了：</p>
+    <p><img loading="lazy" src="../assets/search_image021.png" alt="目录扫描结果"></p>
+
+    <p>由于参数是开发自己写的并没有利用框架，只能用 comm 试试：</p>
+    <p><img loading="lazy" src="../assets/search_image022.png" alt="Comm 参数测试"></p>
+    <p>回显太多，改一下参数：</p>
+    <p><img loading="lazy" src="../assets/search_image023.png" alt="调整参数"></p>
+
+    <h4 id="lfi">文件包含漏洞利用</h4>
+
+    <p>访问看看：</p>
+    <p><img loading="lazy" src="../assets/search_image024.png" alt="文件包含结果"></p>
+    <p>小提示，看看 shadow 行不行，不行的话再看远程请求：</p>
+    <p><img loading="lazy" src="../assets/search_image025.png" alt="Shadow 读取尝试"></p>
+
+    <h5 id="remote">远程文件包含</h5>
+    <p>远程试试：</p>
+    <p><img loading="lazy" src="../assets/search_image026.png" alt="远程文件包含成功"></p>
+    <p>成功了，写一个反弹 shell：</p>
+    <p><img loading="lazy" src="../assets/search_image027.png" alt="写反弹 shell"></p>
+    <p>（在线生成就可以）：</p>
+    <p><img loading="lazy" src="../assets/search_image028.png" alt="反弹 shell 1"></p>
+    <p><img loading="lazy" src="../assets/search_image029.png" alt="反弹 shell 2"></p>
+    <p><img loading="lazy" src="../assets/search_image030.png" alt="反弹 shell 3"></p>
+
+    <h5 id="shell">反弹 Shell</h5>
+    <p>搞定：</p>
+    <p><img loading="lazy" src="../assets/search_image031.png" alt="反弹 shell 成功"></p>
+
+    <p>如果出现 clear 报错 <code>TERM environment variable not set.</code>，用 <code>export TERM=xterm-256color</code> 可以解决。</p>
+
+    <h4 id="privesc">权限提升</h4>
+
+    <h5 id="info2">信息收集</h5>
+    <p><img loading="lazy" src="../assets/search_image032.png" alt="信息收集 1"></p>
+    <p><img loading="lazy" src="../assets/search_image033.png" alt="信息收集 2"></p>
+    <p><img loading="lazy" src="../assets/search_image034.png" alt="信息收集 3"></p>
+    <p>没用。</p>
+
+    <p>用户信息：</p>
+    <p><img loading="lazy" src="../assets/search_image035.png" alt="用户信息"></p>
+
+    <p>看看 web 的源码吧：</p>
+    <p><img loading="lazy" src="../assets/search_image036.png" alt="Web 源码"></p>
+
+    <p>发现其实是有数据库的：</p>
+    <p><img loading="lazy" src="../assets/search_image037.png" alt="数据库信息"></p>
+
+    <p>应该只能本地连接了：</p>
+    <p><img loading="lazy" src="../assets/search_image038.png" alt="本地连接"></p>
+
+    <p>重启多次不回显，只能转 SSH 去看了。只能进行爆破：</p>
+    <p><img loading="lazy" src="../assets/search_image039.png" alt="爆破尝试"></p>
+
+    <p>太慢了，应该是信息收集不到位。再在 web 这边发现点东西：</p>
+    <p><img loading="lazy" src="../assets/search_image040.png" alt="发现信息 1"></p>
+    <p><img loading="lazy" src="../assets/search_image041.png" alt="发现信息 2"></p>
+
+    <p>密码出来了。试试撞库：</p>
+    <p><img loading="lazy" src="../assets/search_image042.png" alt="撞库 1"></p>
+    <p><img loading="lazy" src="../assets/search_image043.png" alt="撞库 2"></p>
+
+    <p>就是爆破不出来：</p>
+    <p><img loading="lazy" src="../assets/search_image044.png" alt="撞库失败"></p>
+
+    <p>但是一个个试的时候密码确实没有问题。</p>
+
+    <h5 id="ssh">SSH 登录</h5>
+    <p>连接 SSH：</p>
+    <p><img loading="lazy" src="../assets/search_image045.png" alt="SSH 连接"></p>
+    <p><img loading="lazy" src="../assets/search_image046.png" alt="SSH 成功"></p>
+
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/search_image047.png" alt="SSH 信息 1"></p>
+    <p><img loading="lazy" src="../assets/search_image048.png" alt="SSH 信息 2"></p>
+    <p><img loading="lazy" src="../assets/search_image049.png" alt="SSH 信息 3"></p>
+    <p><img loading="lazy" src="../assets/search_image050.png" alt="SSH 信息 4"></p>
+
+    <h5 id="suid">SUID 与环境变量提权</h5>
+    <p>不正常的是 home 这个：</p>
+    <p><img loading="lazy" src="../assets/search_image051.png" alt="异常目录"></p>
+
+    <p>看看源码：</p>
+    <p><img loading="lazy" src="../assets/search_image052.png" alt="源码分析"></p>
+
+    <p>这个是将 install 改成 root 权限，那么加上 bash 就可以提权：</p>
+    <p><img loading="lazy" src="../assets/search_image053.png" alt="提权思路"></p>
+
+    <p>要把 install 加入环境变量：</p>
+    <p><img loading="lazy" src="../assets/search_image054.png" alt="环境变量 1"></p>
+    <p><img loading="lazy" src="../assets/search_image055.png" alt="环境变量 2"></p>
+
+    <p>结束：</p>
+    <p><img loading="lazy" src="../assets/search_image056.png" alt="提权成功"></p>
+
+  </div>
+</div>
+
+<div style="margin-top:40px;padding-top:30px;border-top:1px solid rgba(255,255,255,0.06);text-align:center;font-size:13px;color:#555570;font-family:'JetBrains Mono',monospace">
+  // EOF - hacksudo search<br>
+  <span style="display:inline-block;width:8px;height:8px;background:#00d4ff;border-radius:50%;margin-top:8px;animation:pulse 2s ease-in-out infinite"></span>
+</div>
+
+<style>
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+</style>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(function(wrap){
+  if(wrap.querySelector('code')) wrap=wrap.querySelector('code');
+  var lines=wrap.textContent.split('\n').length;
+  var header=document.createElement('div');
+  header.className='code-header';
+  var info=document.createElement('span');
+  info.className='code-info';
+  info.textContent='// CODE | '+lines+' lines';
+  var actions=document.createElement('span');
+  actions.className='code-actions';
+  var copy=document.createElement('button');
+  copy.textContent='COPY';
+  copy.className='code-copy';
+  copy.onclick=function(){navigator.clipboard.writeText(wrap.textContent);this.textContent='COPIED';setTimeout(function(){copy.textContent='COPY';},2000);};
+  var fold=document.createElement('button');
+  fold.textContent='\u2191';
+  fold.className='code-fold';
+  fold.onclick=function(){
+    wrap.classList.toggle('collapsed');
+    fold.textContent=wrap.classList.contains('collapsed')?'\u2193':'\u2191';
+  };
+  wrap.onclick=function(){
+    if(wrap.classList.contains('collapsed')){wrap.classList.remove('collapsed');fold.textContent='\u2191';}
+  };
+  if(lines>10){wrap.classList.add('collapsed');fold.textContent='\u2193';}
+  actions.append(copy,fold);
+  header.append(info,actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

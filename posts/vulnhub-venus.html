@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Planets: Venus — Vulnhub 靶机渗透教程 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 11 / 15</div>
+  <div class="mk-post-title">The Planets: Venus — Vulnhub 靶机渗透教程</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#setup">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#info-host">主机发现</a></li>
+        <li class="toc-h5"><a href="#info-port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#info-vuln">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 渗透</a></li>
+        <li class="toc-h5"><a href="#web-guest">Guest 登录</a></li>
+        <li class="toc-h5"><a href="#web-dir">目录爆破</a></li>
+        <li class="toc-h5"><a href="#web-cookie">Cookie 伪造</a></li>
+        <li class="toc-h5"><a href="#web-hydra">用户名枚举</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h4"><a href="#privesc">权限提升</a></li>
+        <li class="toc-h5"><a href="#privesc-polkit">Polkit 漏洞利用</a></li>
+        <li class="toc-h5"><a href="#privesc-root">获取 Root 权限</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="setup">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://www.vulnhub.com/entry/the-planets-venus,705/" target="_blank">The Planets: Venus ~ VulnHub</a></p>
+    <p>难度：Medium。包含两个 flag（user 和 root）。</p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="info-host">主机发现</h5>
+    <p>使用 arp-scan 进行主机发现：</p>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image001.png" alt="arp-scan 主机发现结果"></p>
+
+    <h5 id="info-port">端口扫描</h5>
+    <p>使用 nmap 进行全端口扫描：</p>
+    <pre><code>nmap --min-rate 1000 -p- 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image002.png" alt="nmap 全端口扫描结果"></p>
+    <p>开放端口 22（SSH）和 8080（http-alt）。</p>
+
+    <p>端口版本扫描：</p>
+    <pre><code>nmap -sV -sT -O -p22,8080 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image003.png" alt="nmap 版本扫描结果"></p>
+
+    <p>对于 http-alt：</p>
+    <p><a href="https://imququ.com/post/http-alt-svc.html" target="_blank">HTTP Alternative Services 介绍</a> — 2016 年的协议，补充 HTTP 服务端可以将自己的替代服务地址以协议规定的方式告诉浏览器，对于支持这个协议的浏览器来说，后续请求都会使用新地址（存在安全隐患）。</p>
+
+    <h5 id="info-vuln">漏洞扫描</h5>
+    <pre><code>nmap --script=vuln -p22,8080 192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image004.png" alt="nmap 漏洞扫描结果"></p>
+    <p>没什么有价值的漏洞。</p>
+
+    <h4 id="web">Web 渗透</h4>
+
+    <h5 id="web-guest">Guest 登录</h5>
+    <p>访问 8080 端口：</p>
+    <p><img loading="lazy" src="../assets/vn_image005.png" alt="web 页面"></p>
+    <p>页面提示可以使用 guest 登录查看。</p>
+    <p><img loading="lazy" src="../assets/vn_image006.png" alt="guest 登录"></p>
+    <p>线索断了。</p>
+
+    <h5 id="web-dir">目录爆破</h5>
+    <p>使用 dirsearch 进行目录扫描：</p>
+    <pre><code>dirsearch -u http://192.168.21.132:8080/</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image007.png" alt="dirsearch 扫描结果"></p>
+    <p>全是 admin 目录下的内容。</p>
+
+    <p>进去看看：</p>
+    <p><img loading="lazy" src="../assets/vn_image008.png" alt="admin 页面 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image009.png" alt="admin 页面 2"></p>
+
+    <p>尝试登录发现直接报错，用 BurpSuite 抓包分析：</p>
+    <p><img loading="lazy" src="../assets/vn_image010.png" alt="BurpSuite 抓包"></p>
+    <p><img loading="lazy" src="../assets/vn_image011.png" alt="BurpSuite 结果"></p>
+
+    <h5 id="web-cookie">Cookie 伪造</h5>
+    <p>当使用 guest 登录成功时，发现 Cookie 是 base64 加密：</p>
+    <p><img loading="lazy" src="../assets/vn_image012.png" alt="base64 cookie"></p>
+    <p>密码是 guest，看起来是对称加密，有点像凯撒密码。使用 ROT13 解密：</p>
+    <p><img loading="lazy" src="../assets/vn_image013.png" alt="ROT13 解密"></p>
+    <p><a href="https://lzltool.cn/Tools/Rot13" target="_blank">ROT13 在线工具</a></p>
+
+    <p>需要猜到用户名。先试试 admin：</p>
+    <p><img loading="lazy" src="../assets/vn_image014.png" alt="admin 登录尝试"></p>
+    <p><img loading="lazy" src="../assets/vn_image015.png" alt="admin 登录尝试 2"></p>
+    <p>修改数据包：</p>
+    <p><img loading="lazy" src="../assets/vn_image016.png" alt="修改数据包"></p>
+    <p>名字不对。试试靶机名字（vulnhub 经常以靶机名作为 username）：</p>
+    <p><img loading="lazy" src="../assets/vn_image017.png" alt="venus 登录"></p>
+    <p><img loading="lazy" src="../assets/vn_image018.png" alt="venus cookie 结果"></p>
+    <p>对返回的 cookie 进行解密：</p>
+    <p><img loading="lazy" src="../assets/vn_image019.png" alt="cookie 解密 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image020.png" alt="cookie 解密 2"></p>
+    <p>还是登录主页面，没什么用。</p>
+
+    <h5 id="web-hydra">用户名枚举</h5>
+    <p>使用 hydra 爆破用户名：</p>
+    <pre><code>hydra -L usernames.txt -p pass -s8080 192.168.21.132 http-post-form "/:username=^USER^&password^PASS^:Invalid username."</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image021.png" alt="hydra 爆破结果"></p>
+    <p>发现用户 <strong>magellan</strong>。</p>
+    <p><img loading="lazy" src="../assets/vn_image022.png" alt="magellan 登录 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image023.png" alt="magellan 登录 2"></p>
+    <p><img loading="lazy" src="../assets/vn_image024.png" alt="magellan 密码"></p>
+    <p>拿到密码。</p>
+
+    <h4 id="ssh">SSH 登录</h4>
+    <pre><code>ssh magellan@192.168.21.132</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image025.png" alt="SSH 登录"></p>
+
+    <h4 id="privesc">权限提升</h4>
+
+    <h5 id="privesc-polkit">Polkit 漏洞利用</h5>
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/vn_image026.png" alt="信息收集 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image027.png" alt="信息收集 2"></p>
+    <p>发现 polkit 有漏洞：</p>
+    <p><img loading="lazy" src="../assets/vn_image028.png" alt="polkit 漏洞 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image029.png" alt="polkit 漏洞 2"></p>
+    <p><img loading="lazy" src="../assets/vn_image030.png" alt="polkit 漏洞 3"></p>
+    <p>放到 Python web 服务传输：</p>
+    <p><img loading="lazy" src="../assets/vn_image031.png" alt="Python web 服务"></p>
+    <p>修改权限，编译：</p>
+    <p><img loading="lazy" src="../assets/vn_image032.png" alt="编译 exploit"></p>
+    <p><img loading="lazy" src="../assets/vn_image033.png" alt="编译结果"></p>
+    <p>失败了，去网上找现成的 exploit：</p>
+    <p><a href="https://github.com/berdav/CVE-2021-4034" target="_blank">GitHub - berdav/CVE-2021-4034</a></p>
+    <p><img loading="lazy" src="../assets/vn_image034.png" alt="GitHub exploit"></p>
+    <p>打包 zip：</p>
+    <pre><code>zip 1.zip cve-2021-4034</code></pre>
+    <p><img loading="lazy" src="../assets/vn_image035.png" alt="打包 zip"></p>
+    <p>传输到靶机：</p>
+    <p><img loading="lazy" src="../assets/vn_image036.png" alt="传输 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image037.png" alt="传输 2"></p>
+    <p><img loading="lazy" src="../assets/vn_image038.png" alt="传输 3"></p>
+    <p><img loading="lazy" src="../assets/vn_image039.png" alt="传输 4"></p>
+
+    <h5 id="privesc-root">获取 Root 权限</h5>
+    <p>解压并编译执行 exploit：</p>
+    <p><img loading="lazy" src="../assets/vn_image040.png" alt="exploit 执行 1"></p>
+    <p><img loading="lazy" src="../assets/vn_image041.png" alt="exploit 执行 2"></p>
+    <p><img loading="lazy" src="../assets/vn_image042.png" alt="root flag"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

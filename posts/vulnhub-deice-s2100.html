@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机De-ICE_S2.100 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2024 // 05 / 26</div>
+  <div class="mk-post-title">vulnhub靶机De-ICE_S2.100</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#setup">靶机搭建</a></li>
+        <li class="toc-h4"><a href="#discovery">主机发现</a></li>
+        <li class="toc-h4"><a href="#scan">端口与服务扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web 信息收集</a></li>
+        <li class="toc-h4"><a href="#smtp">SMTP 枚举</a></li>
+        <li class="toc-h4"><a href="#dirb">目录爆破</a></li>
+        <li class="toc-h4"><a href="#cred">凭证获取</a></li>
+        <li class="toc-h4"><a href="#ssh">SSH 登录</a></li>
+        <li class="toc-h4"><a href="#mail">邮件分析</a></li>
+        <li class="toc-h4"><a href="#privesc">vi 提权</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://download.vulnhub.com/deice/De-ICE_S2.100_%28de-ice.net-2.100-1.0%29.iso" target="_blank">De-ICE_S2.100 ~ VulnHub</a></p>
+
+    <h4 id="setup">靶机搭建</h4>
+    <p>下载下来的是 ISO 文件，系统选择 Linux 的 Debian 7.x。注意需要创建一个 192.168.2.0/24 的网卡进行连接（靶机 IP 地址默认是 192.168.2.100 和 192.168.2.101）。</p>
+
+    <h4 id="discovery">主机发现</h4>
+    <p>确保 Kali 和靶机在同一内网：</p>
+    <p><img loading="lazy" src="../assets/di_image001.png" alt="Kali 配置"></p>
+    <p>ARP 不可用，使用 nmap 进行主机发现：</p>
+    <p><img loading="lazy" src="../assets/di_image002.png" alt="ARP 不可用"></p>
+    <p><img loading="lazy" src="../assets/di_image003.png" alt="nmap 主机发现"></p>
+    <p>目标是 100 和 101。</p>
+
+    <h4 id="scan">端口与服务扫描</h4>
+    <p>端口扫描：</p>
+    <p>100：<img loading="lazy" src="../assets/di_image004.png" alt="100 端口扫描"></p>
+    <p>101：<img loading="lazy" src="../assets/di_image005.png" alt="101 端口扫描"></p>
+    <p>服务扫描：</p>
+    <p>100：<img loading="lazy" src="../assets/di_image006.png" alt="100 服务扫描"></p>
+    <p>101：<img loading="lazy" src="../assets/di_image007.png" alt="101 服务扫描"></p>
+    <p>漏洞扫描：</p>
+    <p>100：<img loading="lazy" src="../assets/di_image008.png" alt="100 漏洞扫描"></p>
+    <p>101：<img loading="lazy" src="../assets/di_image009.png" alt="101 漏洞扫描"></p>
+
+    <h4 id="web">Web 信息收集</h4>
+    <p>先看 100 的 Web：</p>
+    <p><img loading="lazy" src="../assets/di_image010.png" alt="100 Web 页面"></p>
+    <p>发现开发人员信息（邮箱）：</p>
+    <p><img loading="lazy" src="../assets/di_image011.png" alt="开发信息1"></p>
+    <p><img loading="lazy" src="../assets/di_image012.png" alt="开发信息2"></p>
+    <p><img loading="lazy" src="../assets/di_image013.png" alt="开发信息3"></p>
+    <p>再看 101 的 Web：</p>
+    <p><img loading="lazy" src="../assets/di_image014.png" alt="101 Web 页面"></p>
+    <p>简单扫描目录，100 没发现什么：</p>
+    <p><img loading="lazy" src="../assets/di_image015.png" alt="100 目录扫描"></p>
+    <p><img loading="lazy" src="../assets/di_image016.png" alt="100 目录2"></p>
+    <p>101 目录扫描：</p>
+    <p><img loading="lazy" src="../assets/di_image017.png" alt="101 目录扫描"></p>
+    <p>发现开放了 FTP：</p>
+    <p><img loading="lazy" src="../assets/di_image018.png" alt="FTP"></p>
+    <p>有默认用户，不能匿名登录。那么最大的可能是利用 100 发现的制作人邮箱去登录 SMTP：</p>
+    <p><img loading="lazy" src="../assets/di_image019.png" alt="SMTP"></p>
+
+    <h4 id="smtp">SMTP 枚举</h4>
+    <p>扫描 SMTP，只找到 MSF 有模块可用：</p>
+    <p><img loading="lazy" src="../assets/di_image020.png" alt="SMTP 模块"></p>
+    <p>枚举出三个用户：</p>
+    <p><img loading="lazy" src="../assets/di_image021.png" alt="三个用户"></p>
+
+    <h4 id="dirb">目录爆破</h4>
+    <p>注意前面扫描 Web 时扫出来的 ~root。在运维或开发中常根据邮箱创建远程连接，所以应该扫一下这三个人的目录（前面加 '~'）：</p>
+    <p><img loading="lazy" src="../assets/di_image022.png" alt="~目录"></p>
+    <p>目标应该是 101：</p>
+    <p><img loading="lazy" src="../assets/di_image023.png" alt="101 ~扫描"></p>
+    <p>326 证明有内容：</p>
+    <p><img loading="lazy" src="../assets/di_image024.png" alt="有内容"></p>
+    <p><img loading="lazy" src="../assets/di_image025.png" alt="查看内容"></p>
+    <p><img loading="lazy" src="../assets/di_image026.png" alt="更多内容"></p>
+    <p>好东西，下载下来：</p>
+    <p><img loading="lazy" src="../assets/di_image027.png" alt="下载文件"></p>
+    <p><img loading="lazy" src="../assets/di_image028.png" alt="下载完成"></p>
+
+    <h4 id="cred">凭证获取</h4>
+    <p>尝试登录：</p>
+    <p><img loading="lazy" src="../assets/di_image029.png" alt="登录尝试"></p>
+    <p>灵活操作，不要在一棵树上吊死：</p>
+    <p><img loading="lazy" src="../assets/di_image030.png" alt="登录成功"></p>
+
+    <h4 id="ssh">SSH 登录</h4>
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/di_image031.png" alt="信息收集"></p>
+    <p>在 /etc 下查看发现 mail：</p>
+    <p><img loading="lazy" src="../assets/di_image032.png" alt="mail 发现"></p>
+    <p>直接运行查看：</p>
+    <p><img loading="lazy" src="../assets/di_image033.png" alt="mail 查看"></p>
+    <p>邮件都看一下，最后一个很有可能是突破点：</p>
+    <p><img loading="lazy" src="../assets/di_image034.png" alt="密码获取"></p>
+
+    <h4 id="privesc">vi 提权</h4>
+    <p>密码到手，再次 sudo -l：</p>
+    <p><img loading="lazy" src="../assets/di_image035.png" alt="sudo -l"></p>
+    <p>vi 提权：</p>
+    <p><img loading="lazy" src="../assets/di_image036.png" alt="vi 提权"></p>
+    <p>成功获取 root flag。</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

@@ -970,6 +970,69 @@ const POSTS_DATA = [
     url: 'posts/vulnhub-hackxor.html',
     excerpt: 'VulnHub 靶机 Hackxor:1 渗透教程，涵盖主机发现、端口扫描、Hosts 绑定、wraithmail 代理利用、SQL 注入（utrack / cloaknet）及后续关卡提示。',
     tags: ['vulnhub', '渗透测试']
+  },
+  {
+    title: 'adversarial_ml_ctf靶场搭建',
+    primary: 'AI安全',
+    secondary: 'CTF',
+    date: '2026 // 06 / 19',
+    url: 'posts/adversarial-ml-ctf-setup.html',
+    excerpt: 'adversarial_ml_ctf是一个展示人工神经网络对对抗图像存在安全漏洞的CTF挑战，本文介绍Docker搭建和源码构建两种方式。',
+    tags: ['AI安全', '靶场搭建']
+  },
+  {
+    title: 'adversarial_ml_ctf靶场攻击（明文）',
+    primary: 'AI安全',
+    secondary: 'CTF',
+    date: '2026 // 06 / 19',
+    url: 'posts/adversarial-ml-ctf-attack.html',
+    excerpt: 'adversarial_ml_ctf靶场攻击教程，分析model.py和views.py源码，利用ResNet50对金鱼（ImageNet class 1）的识别特性，通过上传金鱼图片绕过similarity判断获取access granted。',
+    tags: ['AI安全', 'CTF']
+  },
+  {
+    title: 'adversarial_ml_ctf的PGD攻击实战',
+    primary: 'AI安全',
+    secondary: 'CTF',
+    date: '2026 // 06 / 19',
+    url: 'posts/adversarial-ml-ctf-pgd-attack.html',
+    excerpt: '使用PGD（Projected Gradient Descent）迭代对抗攻击方法对ResNet50生成对抗样本，通过上传对抗性图片绕过adversarial_ml_ctf靶场的similarity检查。',
+    tags: ['AI安全', 'CTF']
+  },
+  {
+    title: 'Machine_Learning_CTF_Challenges 搭建',
+    primary: 'AI安全',
+    secondary: '靶场搭建',
+    date: '2026 // 06 / 20',
+    url: 'posts/ml-ctf-challenges-setup.html',
+    excerpt: 'AI/ML CTF 挑战集合，涵盖模型攻击、LLM 和 AI Agent 利用。本文介绍 Dolos I & II 的 Docker 搭建方法。',
+    tags: ['AI安全', '靶场搭建']
+  },
+  {
+    title: 'Persuade_ML_CTF_Challenge — Pickle 反序列化',
+    primary: 'AI安全',
+    secondary: 'CTF',
+    date: '2026 // 06 / 20',
+    url: 'posts/persuade-ml-ctf-challenge.html',
+    excerpt: 'PyTorch Pickle 反序列化漏洞 CTF 挑战，通过上传恶意 .pt 文件触发 pickle.loads() 实现任意代码执行。',
+    tags: ['AI安全', 'CTF']
+  },
+  {
+    title: 'Heist_ML_CTF_Challenge — 数据投毒攻击',
+    primary: 'AI安全',
+    secondary: 'CTF',
+    date: '2026 // 06 / 22',
+    url: 'posts/heist-ml-ctf-challenge.html',
+    excerpt: 'ML CTF 挑战之数据投毒，利用 /train 路由接受用户上传 .zip 包含 .h5 数据集的漏洞，通过标签翻转/后门植入/噪声投毒策略攻击模型训练过程。',
+    tags: ['AI安全', 'CTF']
+  },
+  {
+    title: 'Fourtune_ML_CTF_Challenge — 对抗样本攻击',
+    primary: 'AI安全',
+    secondary: 'CTF',
+    date: '2026 // 06 / 22',
+    url: 'posts/fourtune-ml-ctf-challenge.html',
+    excerpt: 'ML CTF 挑战之对抗样本攻击，Python 原生 HTTP 服务器部署 Keras MNIST 分类模型，上传对抗性图片使模型误判为数字 4 以获取 flag。',
+    tags: ['AI安全', 'CTF']
   }
 ];
 
@@ -988,11 +1051,13 @@ const TAG_COLORS = {
   'upload-labs': '10b981',
   'vulnhub': '10b981',
   '渗透测试': '3366ff',
+  'AI安全': '00d4ff',
 };
 
 var PRIMARY_COLORS = {
   'Web安全': '3366ff',
   'CTF': 'e4405f',
   '逆向': '7b2d8e',
-  'C/C++': 'f59e0b'
+  'C/C++': 'f59e0b',
+  'AI安全': '00d4ff'
 };

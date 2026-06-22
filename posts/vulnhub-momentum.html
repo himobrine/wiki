@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Momentum: 1 — Vulnhub 靶机渗透教程 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 11 / 15</div>
+  <div class="mk-post-title">Momentum: 1 — Vulnhub 靶机渗透教程</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#download">靶场搭建</a></li>
+        <li class="toc-h4"><a href="#info">信息收集</a>
+          <ul>
+            <li class="toc-h5"><a href="#info-host">主机发现</a></li>
+            <li class="toc-h5"><a href="#info-port">端口扫描</a></li>
+          </ul>
+        </li>
+        <li class="toc-h4"><a href="#web">Web 渗透</a>
+          <ul>
+            <li class="toc-h5"><a href="#web-dir">目录扫描</a></li>
+            <li class="toc-h5"><a href="#web-js">JS 分析</a></li>
+            <li class="toc-h5"><a href="#web-xss">XSS 注入</a></li>
+            <li class="toc-h5"><a href="#web-aes">AES 解密</a></li>
+          </ul>
+        </li>
+        <li class="toc-h4"><a href="#redis">Redis 渗透</a></li>
+        <li class="toc-h4"><a href="#root">提权</a></li>
+      </ul>
+    </nav>
+
+    <h4 id="download">靶场搭建</h4>
+    <p>靶机下载地址：<a href="https://download.vulnhub.com/momentum/Momentum.ova" target="_blank">Momentum.ova</a></p>
+    <p>直接导入 VirtualBox 即可。</p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="info-host">主机发现</h5>
+    <p>使用 arp-scan 进行主机发现：</p>
+    <p><img loading="lazy" src="../assets/mo1_image001.png" alt="主机发现"></p>
+    <p>目标 192.168.21.129。</p>
+
+    <h5 id="info-port">端口扫描</h5>
+    <p>全端口扫描：</p>
+    <pre><code>nmap -p- 192.168.21.129</code></pre>
+    <p><img loading="lazy" src="../assets/mo1_image002.png" alt="nmap 全端口扫描"></p>
+
+    <p>端口版本扫描：</p>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.129</code></pre>
+    <p><img loading="lazy" src="../assets/mo1_image003.png" alt="nmap 服务扫描"></p>
+
+    <p>漏洞扫描：</p>
+    <pre><code>nmap --script=vuln -p22,80 192.168.21.129</code></pre>
+    <p><img loading="lazy" src="../assets/mo1_image004.png" alt="nmap 漏洞扫描"></p>
+
+    <h4 id="web">Web 渗透</h4>
+
+    <h5 id="web-dir">目录扫描</h5>
+    <p>使用 dirsearch 进行目录扫描：</p>
+    <p><img loading="lazy" src="../assets/mo1_image005.png" alt="dirsearch 扫描"></p>
+
+    <h5 id="web-js">JS 分析</h5>
+    <p>发现 JS 文件中存在关键信息：</p>
+    <p><img loading="lazy" src="../assets/mo1_image006.png" alt="JS 分析"></p>
+    <p>其中说明了 Web 文件存在 id 传值，使用了 AES 加密，并且包含密钥。</p>
+
+    <p>再次扫描目录，发现 opus-details.php：</p>
+    <p><img loading="lazy" src="../assets/mo1_image007.png" alt="opus-details.php"></p>
+
+    <p>该 URL 正是 JS 中提示的传参入口。有传参就先尝试 SQL 注入：</p>
+    <pre><code>sqlmap -u "http://192.168.21.129/opus-details.php?id=1"</code></pre>
+    <p><img loading="lazy" src="../assets/mo1_image008.png" alt="sqlmap 尝试"></p>
+    <p>没有注入点。</p>
+
+    <h5 id="web-xss">XSS 注入</h5>
+    <p>试试 XSS：</p>
+    <p><img loading="lazy" src="../assets/mo1_image009.png" alt="xssmap 扫描"></p>
+    <p><img loading="lazy" src="../assets/mo1_image010.png" alt="xss payload"></p>
+
+    <p>Payload 直接出来：</p>
+    <p><img loading="lazy" src="../assets/mo1_image011.png" alt="xss 测试"></p>
+
+    <p>获取 cookie（替换 591 为 document['cookie']）：</p>
+    <p><img loading="lazy" src="../assets/mo1_image012.png" alt="获取 cookie"></p>
+
+    <p>得到 cookie 值：</p>
+    <pre><code>cookie=U2FsdGVkX193yTOKOucUbHeDp1Wxd5r7YkoM8daRtj0rjABqGuQ6Mx28N1VbBSZt</code></pre>
+
+    <h5 id="web-aes">AES 解密</h5>
+    <p>JS 中已经提示了 AES 加密和密钥，使用在线 AES 解密工具进行解密：</p>
+    <p><img loading="lazy" src="../assets/mo1_image013.png" alt="AES 解密"></p>
+
+    <p>解密结果：<code>auxerre-alienum##</code></p>
+    <p>前面是用户名，后面是密码：</p>
+    <p><img loading="lazy" src="../assets/mo1_image014.png" alt="登录成功"></p>
+
+    <h4 id="redis">Redis 渗透</h4>
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/mo1_image015.png" alt="信息收集 1"></p>
+    <p><img loading="lazy" src="../assets/mo1_image016.png" alt="信息收集 2"></p>
+
+    <p>排查端口：</p>
+    <p><img loading="lazy" src="../assets/mo1_image017.png" alt="端口排查"></p>
+
+    <p>发现 127.0.0.1:6379，Redis 实锤：</p>
+    <p><img loading="lazy" src="../assets/mo1_image018.png" alt="Redis 发现"></p>
+
+    <p>找到密码：</p>
+    <p><img loading="lazy" src="../assets/mo1_image019.png" alt="Redis 密码"></p>
+
+    <h4 id="root">提权</h4>
+    <p>登录成功：</p>
+    <p><img loading="lazy" src="../assets/mo1_image020.png" alt="提权成功"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

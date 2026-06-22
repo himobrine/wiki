@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Gigachad:1 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2024 // 02 / 13</div>
+  <div class="mk-post-title">vulnhub靶机Gigachad:1</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h5"><a href="#p1-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#p1-portscan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#p1-service">服务扫描</a></li>
+        <li class="toc-h5"><a href="#p1-vuln">漏洞扫描</a></li>
+        <li class="toc-h5"><a href="#p1-rescan">再次扫描</a></li>
+        <li class="toc-h5"><a href="#p1-web">Web信息收集</a></li>
+        <li class="toc-h5"><a href="#p1-ftp">FTP匿名登录</a></li>
+        <li class="toc-h5"><a href="#p1-crack">密码线索</a></li>
+        <li class="toc-h5"><a href="#p1-ssh">SSH登录</a></li>
+        <li class="toc-h5"><a href="#p1-info">信息收集</a></li>
+        <li class="toc-h5"><a href="#p1-privesc">脏牛提权</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://www.vulnhub.com/entry/gigachad-1,657/" target="_blank">Gigachad: 1 ~ VulnHub</a></p>
+
+    <h5 id="p1-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/gc_image001.png" alt="主机发现"></p>
+    <p>目标166</p>
+
+    <h5 id="p1-portscan">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 192.168.21.166</code></pre>
+    <p><img loading="lazy" src="../assets/gc_image002.png" alt="端口扫描"></p>
+
+    <h5 id="p1-service">服务扫描</h5>
+    <p><img loading="lazy" src="../assets/gc_image003.png" alt="服务扫描"></p>
+
+    <h5 id="p1-vuln">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/gc_image004.png" alt="漏洞扫描1"></p>
+    <p><img loading="lazy" src="../assets/gc_image005.png" alt="漏洞扫描2"></p>
+    <p><img loading="lazy" src="../assets/gc_image006.png" alt="漏洞扫描3"></p>
+    <p><img loading="lazy" src="../assets/gc_image007.png" alt="漏洞扫描4"></p>
+    <p><img loading="lazy" src="../assets/gc_image008.png" alt="漏洞扫描5"></p>
+    <p><img loading="lazy" src="../assets/gc_image009.png" alt="漏洞扫描6"></p>
+    <p><img loading="lazy" src="../assets/gc_image010.png" alt="漏洞扫描7"></p>
+    <p><img loading="lazy" src="../assets/gc_image011.png" alt="漏洞扫描8"></p>
+    <p><img loading="lazy" src="../assets/gc_image012.png" alt="漏洞扫描9"></p>
+    <p>这玩意多得离谱。</p>
+
+    <h5 id="p1-rescan">再次扫描</h5>
+    <p>于是我用a重新扫了一遍：</p>
+    <p><img loading="lazy" src="../assets/gc_image013.png" alt="再次扫描"></p>
+
+    <h5 id="p1-web">Web信息收集</h5>
+    <p>先去看web：</p>
+    <p><img loading="lazy" src="../assets/gc_image014.png" alt="web页面"></p>
+    <p>(⊙﹏⊙)离谱，目录扫描（之前先去看一下nmap扫到的html）：</p>
+    <p><img loading="lazy" src="../assets/gc_image015.png" alt="nmap扫到的html"></p>
+    <p>后面扫描的目录奇多，而且大多直接404就没有一个一个翻。就转目标到ftp上了。</p>
+
+    <h5 id="p1-ftp">FTP匿名登录</h5>
+    <p>里面有一个匿名登入：</p>
+    <p><img loading="lazy" src="../assets/gc_image016.png" alt="ftp匿名登录"></p>
+    <p>匿名是没有密码的哦：</p>
+    <p><img loading="lazy" src="../assets/gc_image017.png" alt="ftp匿名登录成功"></p>
+    <p>里面就一个文件，直接下：</p>
+    <p><img loading="lazy" src="../assets/gc_image018.png" alt="ftp文件列表"></p>
+    <p><img loading="lazy" src="../assets/gc_image019.png" alt="下载文件"></p>
+    <p>压缩文件：</p>
+    <p><img loading="lazy" src="../assets/gc_image020.png" alt="file命令"></p>
+    <p>告诉我用户名，还有一个文件。去看看：</p>
+    <p><img loading="lazy" src="../assets/gc_image021.png" alt="解压文件"></p>
+
+    <h5 id="p1-crack">密码线索</h5>
+    <p>大概率密码就在这里了：</p>
+    <p><img loading="lazy" src="../assets/gc_image022.png" alt="密码图片"></p>
+    <p>在百度搜索图片看到相似度极高的图片：</p>
+    <p><img loading="lazy" src="../assets/gc_image023.png" alt="百度识图结果"></p>
+    <p>确定是这个玩意没错了 — maidenstower。</p>
+    <p>直接去登入（一般是去掉符号的小写）：</p>
+    <p><img loading="lazy" src="../assets/gc_image024.png" alt="ssh登录"></p>
+    <p><img loading="lazy" src="../assets/gc_image025.png" alt="ssh登录成功"></p>
+
+    <h5 id="p1-info">信息收集</h5>
+    <p><img loading="lazy" src="../assets/gc_image026.png" alt="信息收集1"></p>
+    <p><img loading="lazy" src="../assets/gc_image027.png" alt="信息收集2"></p>
+    <p><img loading="lazy" src="../assets/gc_image028.png" alt="信息收集3"></p>
+    <p>漏洞只找到这一个用就完了：</p>
+    <p><img loading="lazy" src="../assets/gc_image029.png" alt="漏洞发现1"></p>
+    <p><img loading="lazy" src="../assets/gc_image030.png" alt="漏洞发现2"></p>
+    <p>看了一下编号：</p>
+    <p><img loading="lazy" src="../assets/gc_image031.png" alt="漏洞编号1"></p>
+    <p><img loading="lazy" src="../assets/gc_image032.png" alt="漏洞编号2"></p>
+    <p><img loading="lazy" src="../assets/gc_image033.png" alt="漏洞利用失败"></p>
+    <p><img loading="lazy" src="../assets/gc_image034.png" alt="漏洞利用重试"></p>
+    <p>失败了（多试几次）：</p>
+    <p><img loading="lazy" src="../assets/gc_image035.png" alt="漏洞利用调整"></p>
+    <p>记得改一下脚本把1000改大点：</p>
+    <p><img loading="lazy" src="../assets/gc_image036.png" alt="修改脚本"></p>
+    <p><img loading="lazy" src="../assets/gc_image037.png" alt="提权成功"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

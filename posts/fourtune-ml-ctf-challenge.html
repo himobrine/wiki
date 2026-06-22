@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fourtune_ML_CTF_Challenge — 对抗样本攻击 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 22</div>
+  <div class="mk-post-title">Fourtune_ML_CTF_Challenge — 对抗样本攻击</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=AI%E5%AE%89%E5%85%A8" class="mk-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">AI安全</a>
+    <a href="../tags/list.html?tag=CTF" class="mk-tag" style="background:#e4405f22;color:#e4405f;border:1px solid #e4405f44">CTF</a>
+  </div>
+
+  <div class="mk-post-content">
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#build">搭建环境</a></li>
+        <li class="toc-h4"><a href="#server">服务端源码分析</a></li>
+        <li class="toc-h4"><a href="#attack">对抗样本攻击</a></li>
+      </ul>
+    </nav>
+
+    <p>Fourtune_ML_CTF_Challenge 是 Machine_Learning_CTF_Challenges 系列中关于对抗样本（Adversarial Sample）的挑战。服务端部署了一个 Keras MNIST 分类模型，通过 HTTP 接口接收用户上传的图片并进行识别，只有识别结果为数字 4 时才会返回 flag。</p>
+
+    <h4 id="build">搭建环境</h4>
+    <p>使用以下 Dockerfile 构建镜像（已替换为阿里云镜像加速）：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">Dockerfile</span>
+      </div>
+      <pre><code>FROM python:3.11-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com \
+    -i http://mirrors.aliyun.com/pypi/simple/ \
+    scikit-image requests
+
+COPY model.h5 server.py templates/ ./
+
+EXPOSE 8080
+
+CMD ["python", "server.py"]</code></pre>
+    </div>
+
+    <p><picture><source srcset="../assets/fourtune_image001.webp" type="image/webp"><img src="../assets/fourtune_image001.png" alt="挑战页面" loading="lazy"></picture></p>
+
+    <h4 id="server">服务端源码分析</h4>
+    <p>服务端使用 Python 内置的 <code>http.server</code> 实现，不依赖 Flask：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">server.py</span>
+      </div>
+      <pre><code>import os
+os.environ['TF_CPP_MIN_LOG_LEVEL']='2'
+from http.server import HTTPServer, BaseHTTPRequestHandler
+import ssl
+import sys
+import cgi
+import base64
+import numpy as np
+from io import BytesIO
+import requests
+import keras
+from PIL import Image
+import imghdr
+
+model = keras.models.load_model('./model.h5')
+
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+
+    def do_GET(self):
+        forwardedfor = str(self.headers['X-Forwarded-For'])
+        print(f"GET {forwardedfor}")
+        self.send_response(200)
+        self.end_headers()
+        self.wfile.write(STATIC_HTML_PAGE)
+
+    def do_POST(self):
+        content_length = int(self.headers["Content-Length"])
+        if int(content_length) > 10000000:
+            print("File too big")
+            self.send_response(500, "File too big")
+            return
+
+        form = cgi.FieldStorage(
+            fp=self.rfile,
+            headers=self.headers,
+            environ={"REQUEST_METHOD":"POST",
+                     "CONTENT_TYPE":self.headers["Content-Type"]})
+
+        filename = str(form['file'].filename)
+        data = form["file"].file.read()
+
+        filetype = imghdr.what(file="", h=data)
+        if filetype not in ["png","jpeg","gif"]:
+             print(f"Unsupported media type:  {filetype}")
+             self.send_response(415, "Only png, jpg and gif are supported.")
+             return
+
+        image = np.array(Image.open(BytesIO(data)).convert("L"))
+        processedImage = np.zeros([1, 28, 28, 1])
+        for yy in range(28):
+            for xx in range(28):
+                processedImage[0][xx][yy][0] = float(image[xx][yy]) / 255
+
+        shownDigit = np.argmax(model.predict(processedImage))
+
+        self.send_response(200)
+        self.send_header("Content-Type", "application/json")
+        self.end_headers()
+
+        if shownDigit == 4:
+            response = '{ "text": " Welcome Mr. ' + str(shownDigit) +'tune {++BackPropogation Magic++}"}'
+        else:
+            response = '{ "text": "Access Denied"}'
+
+        self.wfile.write(bytes(response,"utf-8"))
+
+httpd = HTTPServer(("", 8080), SimpleHTTPRequestHandler)
+httpd.serve_forever()</code></pre>
+    </div>
+
+    <p>关键逻辑分析：</p>
+    <ul>
+      <li>使用 <code>imghdr</code> 验证上传文件类型为 png/jpeg/gif</li>
+      <li>将图片转换为灰度（<code>convert("L")</code>），缩放到 28×28 像素</li>
+      <li>像素值归一化到 [0, 1] 区间</li>
+      <li>使用 Keras 模型进行预测，<code>np.argmax</code> 取概率最高的类别</li>
+      <li>当预测结果为 <strong>4</strong> 时返回 flag，否则返回 <code>"Access Denied"</code></li>
+    </ul>
+
+    <p>响应中返回的 flag 格式为 <code>Mr.4tune {++BackPropogation Magic++}</code>。</p>
+
+    <h4 id="attack">对抗样本攻击</h4>
+    <p>攻击思路是构造一张对抗样本图片，让模型将其误分类为数字 4。常用的方法包括：</p>
+    <ul>
+      <li><strong>FGSM（Fast Gradient Sign Method）</strong>：在原始图像上添加沿着梯度方向的微小扰动，使模型输出偏离正确分类</li>
+      <li><strong>PGD（Projected Gradient Descent）</strong>：FGSM 的迭代版本，通过多次小步迭代生成更强的对抗样本</li>
+      <li><strong>手工构造</strong>：由于模型是 MNIST 数字识别，可以直接绘制一张类似数字 4 的图片进行测试</li>
+    </ul>
+    <p>以下是一个简单的 FGSM 对抗样本生成脚本：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">fgsm_attack.py</span>
+      </div>
+      <pre><code>import numpy as np
+import keras
+from PIL import Image
+from io import BytesIO
+
+model = keras.models.load_model('./model.h5')
+
+# 加载一张不是 4 的图片（如数字 0）
+image = np.array(Image.open("zero.png").convert("L"))
+x = np.zeros([1, 28, 28, 1])
+for yy in range(28):
+    for xx in range(28):
+        x[0][xx][yy][0] = float(image[xx][yy]) / 255
+
+# 计算梯度，使模型预测为 4
+x_tensor = tf.convert_to_tensor(x, dtype=tf.float32)
+with tf.GradientTape() as tape:
+    tape.watch(x_tensor)
+    pred = model(x_tensor)
+    loss = -pred[0][4]  # 最大化类别 4 的置信度
+
+grad = tape.gradient(loss, x_tensor)
+epsilon = 0.1
+adv_x = x_tensor + epsilon * tf.sign(grad)
+adv_x = tf.clip_by_value(adv_x, 0, 1)
+
+# 保存对抗样本
+adv_img = np.squeeze(adv_x.numpy()) * 255
+Image.fromarray(adv_img.astype(np.uint8)).save("adversarial_4.png")</code></pre>
+    </div>
+    <p>构造完成后，通过 HTTP POST 上传该对抗样本图片，服务端模型将其识别为数字 4 并返回 flag。</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+<script src="../assets/common.js"></script></body>
+</html>

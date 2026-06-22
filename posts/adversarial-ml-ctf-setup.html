@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>adversarial_ml_ctf靶场搭建 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 19</div>
+  <div class="mk-post-title">adversarial_ml_ctf靶场搭建</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=AI%E5%AE%89%E5%85%A8" class="mk-tag" style="background:#00d4ff22;color:#00d4ff;border:1px solid #00d4ff44">AI安全</a>
+    <a href="../tags/list.html?tag=%E9%9D%B6%E5%9C%BA%E6%90%AD%E5%BB%BA" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">靶场搭建</a>
+  </div>
+
+  <div class="mk-post-content">
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#docker-pull">直接拉取 Docker 镜像</a></li>
+        <li class="toc-h4"><a href="#source-build">源码构建</a></li>
+        <li class="toc-h4"><a href="#fix-python">解决 Python 版本问题</a></li>
+        <li class="toc-h4"><a href="#dockerfile">Dockerfile</a></li>
+      </ul>
+    </nav>
+
+    <p>adversarial_ml_ctf 是一个 CTF 挑战，展示了大多数常见人工神经网络对对抗图像存在安全漏洞。</p>
+    <p>GitHub 仓库：<a href="https://github.com/arturmiller/adversarial_ml_ctf" target="_blank">https://github.com/arturmiller/adversarial_ml_ctf</a></p>
+
+    <h4 id="docker-pull">直接拉取 Docker 镜像</h4>
+    <p>最简单的方式是直接拉取已构建好的镜像：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>docker pull arturmiller/adversarial_ml_ctf</code></pre>
+    </div>
+
+    <h4 id="source-build">源码构建</h4>
+    <p>也可以通过克隆仓库自行构建：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>git clone https://github.com/arturmiller/adversarial_ml_ctf.git</code></pre>
+    </div>
+    <p><img loading="lazy" src="../assets/aml_image001.png" alt="git clone 输出"></p>
+
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">bash</span>
+      </div>
+      <pre><code>sudo docker build -t adversarial_ml_ctf .</code></pre>
+    </div>
+    <p><img loading="lazy" src="../assets/aml_image002.png" alt="docker build 过程"></p>
+
+    <h4 id="fix-python">解决 Python 版本问题</h4>
+    <p>安装时会报错，这是由于 python3 太新导致的，需要将 Dockerfile 中的基础镜像改为 <code>python:3.8-slim</code>。</p>
+
+    <h4 id="dockerfile">Dockerfile</h4>
+    <p>修改后的 Dockerfile 内容如下：</p>
+    <div class="mk-code-wrap">
+      <div class="mk-code-header">
+        <span class="mk-code-info">Dockerfile</span>
+      </div>
+      <pre><code>FROM python:3.8-slim
+
+WORKDIR /app
+
+# 先在线安装所有依赖（锁死版本）
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com -i http://mirrors.aliyun.com/pypi/simple/ \
+    Flask==1.1.2 \
+    Jinja2==2.11.3 \
+    MarkupSafe==1.1.1 \
+    itsdangerous==1.1.0 \
+    Werkzeug==1.0.1 \
+    Pillow==8.4.0 \
+    numpy==1.22.4 \
+    scipy==1.7.3 \
+    typing-extensions
+
+# 离线装 torch
+COPY ./torch-1.10.0-cp38-cp38-manylinux1_x86_64.whl /app/
+RUN pip install --no-cache-dir --no-index --find-links=/app/ torch==1.10.0
+
+# 在线装 torchvision
+RUN pip install --no-cache-dir --trusted-host mirrors.aliyun.com -i http://mirrors.aliyun.com/pypi/simple/ torchvision==0.11.1
+
+# 复制应用代码
+COPY . /app
+RUN mkdir -p /app/uploads
+
+EXPOSE 5000
+CMD ["python", "main.py"]</code></pre>
+    </div>
+
+    <p>注意需要提前下载 <code>torch-1.10.0-cp38-cp38-manylinux1_x86_64.whl</code> 放到项目目录中。</p>
+
+    <p><img loading="lazy" src="../assets/aml_image003.png" alt="requirements 安装中"></p>
+    <p>安装过程需要很长时间，请耐心等待：</p>
+    <p><img loading="lazy" src="../assets/aml_image004.png" alt="安装过程"></p>
+    <p><img loading="lazy" src="../assets/aml_image005.png" alt="继续安装"></p>
+    <p>搭建完成：</p>
+    <p><img loading="lazy" src="../assets/aml_image006.png" alt="搭建完成"></p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span>//</span> REV 3.0</div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+</script>
+
+<script src="../assets/common.js"></script></body>
+</html>

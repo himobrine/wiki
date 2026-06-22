@@ -222,6 +222,9 @@ body {
   margin: 0 auto;
   padding: 0 var(--mk-space-md);
 }
+.mk-section + .mk-section {
+  margin-top: var(--mk-space-2xl);
+}
 .mk-section-head {
   margin-bottom: var(--mk-space-lg);
 }
@@ -322,6 +325,10 @@ body {
   font: var(--mk-type-title);
   font-weight: 500;
   margin-bottom: var(--mk-space-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .mk-post-title a {
   color: var(--mk-champagne);
@@ -338,6 +345,10 @@ body {
   font: var(--mk-type-small);
   color: var(--mk-muted);
   margin-bottom: var(--mk-space-sm);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 .mk-read-more {
   display: inline-block;

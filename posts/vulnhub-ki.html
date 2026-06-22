@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>vulnhub靶机Ki:1 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@400;500;700&family=Albert+Sans:wght@400;500;600&display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 09</div>
+  <div class="mk-post-title">vulnhub靶机Ki:1</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=vulnhub" class="mk-tag" style="background:#10b98122;color:#10b981;border:1px solid #10b98144">vulnhub</a>
+    <a href="../tags/list.html?tag=渗透测试" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">渗透测试</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+    <nav class="mk-toc">
+      <span class="mk-toc-title">// 目录</span>
+      <ul>
+        <li class="toc-h5"><a href="#p1-download">下载地址</a></li>
+        <li class="toc-h5"><a href="#p1-discovery">主机发现</a></li>
+        <li class="toc-h5"><a href="#p1-portscan">端口扫描</a></li>
+        <li class="toc-h5"><a href="#p1-service">端口服务扫描</a></li>
+        <li class="toc-h5"><a href="#p1-vuln">漏洞扫描</a></li>
+        <li class="toc-h5"><a href="#p1-web">Web信息收集</a></li>
+        <li class="toc-h5"><a href="#p1-dir">目录扫描</a></li>
+        <li class="toc-h5"><a href="#p1-debug">debug参数爆破</a></li>
+        <li class="toc-h5"><a href="#p1-source">查看源代码</a></li>
+        <li class="toc-h5"><a href="#p1-env">Apache环境变量泄露</a></li>
+        <li class="toc-h5"><a href="#p1-nosuffix">无后缀文件爆破</a></li>
+        <li class="toc-h5"><a href="#p1-script">runki/linuxki脚本分析</a></li>
+        <li class="toc-h5"><a href="#p1-modify">修改Python脚本</a></li>
+        <li class="toc-h5"><a href="#p1-pid">PID分析</a></li>
+        <li class="toc-h5"><a href="#p1-shell">反弹Shell</a></li>
+        <li class="toc-h5"><a href="#p1-linpeas">Linpeas提权</a></li>
+      </ul>
+    </nav>
+
+    <p>本文描述了一次渗透测试过程，从网络扫描开始，通过分析web内容找到debug.php漏洞，进行参数爆破，利用python脚本获取shell，最终通过linpeas工具提权。过程中涉及到了端口服务识别、Apache环境变量、脚本修改和权限提升等技术环节。</p>
+
+    <h5 id="p1-download">下载地址</h5>
+    <p><a href="https://www.vulnhub.com/entry/ki-1,641/" target="_blank">Ki: 1 ~ VulnHub</a></p>
+
+    <h5 id="p1-discovery">主机发现</h5>
+    <pre><code>arp-scan -l</code></pre>
+    <p><img loading="lazy" src="../assets/ki_image001.png" alt="主机发现"></p>
+    <p>目标172</p>
+
+    <h5 id="p1-portscan">端口扫描</h5>
+    <pre><code>nmap --min-rate 10000 172.16.10.129</code></pre>
+    <p><img loading="lazy" src="../assets/ki_image002.png" alt="端口扫描"></p>
+
+    <h5 id="p1-service">端口服务扫描</h5>
+    <p><img loading="lazy" src="../assets/ki_image003.png" alt="服务扫描1"></p>
+    <p><img loading="lazy" src="../assets/ki_image004.png" alt="服务扫描2"></p>
+
+    <h5 id="p1-vuln">漏洞扫描</h5>
+    <p><img loading="lazy" src="../assets/ki_image005.png" alt="漏洞扫描1"></p>
+    <p><img loading="lazy" src="../assets/ki_image006.png" alt="漏洞扫描2"></p>
+
+    <h5 id="p1-web">Web信息收集</h5>
+    <p>先去看看web：</p>
+    <p><img loading="lazy" src="../assets/ki_image007.png" alt="web页面"></p>
+    <p>web上面只有这些信息：</p>
+    <p><img loading="lazy" src="../assets/ki_image008.png" alt="web信息"></p>
+
+    <h5 id="p1-dir">目录扫描</h5>
+    <pre><code>gobuster dir -u http://172.16.10.129 -w /usr/share/wordlists/dirbuster/directory-list-2.3-medium.txt</code></pre>
+    <p><img loading="lazy" src="../assets/ki_image009.png" alt="目录扫描"></p>
+    <p>发现debug，那就一定要去看看：</p>
+    <p><img loading="lazy" src="../assets/ki_image010.png" alt="debug页面"></p>
+    <p>浏览器访问感觉有点问题：</p>
+    <p><img loading="lazy" src="../assets/ki_image011.png" alt="debug访问"></p>
+    <p>看来猜想是对的，要我们登录而且这个runki脚本是root跑的。那就爆破变量：</p>
+
+    <h5 id="p1-debug">debug参数爆破</h5>
+    <p><img loading="lazy" src="../assets/ki_image012.png" alt="参数爆破"></p>
+    <p>爆破出来后查看一下源代码：</p>
+    <p><img loading="lazy" src="../assets/ki_image013.png" alt="源代码"></p>
+    <p>离谱看看web吧：</p>
+    <p><img loading="lazy" src="../assets/ki_image014.png" alt="web查看"></p>
+    <p>这个是个好东西：</p>
+    <p><img loading="lazy" src="../assets/ki_image015.png" alt="好东西"></p>
+    <p>好的能合理解释了（apache的环境变量写成了debug.php）。那么不是我们传参的那个php（注意路径哦）：</p>
+    <p><img loading="lazy" src="../assets/ki_image016.png" alt="不同路径"></p>
+
+    <h5 id="p1-source">查看源代码</h5>
+    <p>这个回显是一样的，线索好像断了，但是注意一下前面我们只是爆破了带有后缀的文件，linux文件是可以没有后缀的：</p>
+    <p><img loading="lazy" src="../assets/ki_image017.png" alt="无后缀文件"></p>
+    <p>看到这我觉得前面的命令需要优化一下了：</p>
+    <p><img loading="lazy" src="../assets/ki_image018.png" alt="命令优化"></p>
+
+    <h5 id="p1-env">Apache环境变量泄露</h5>
+    <p>由此还剩下代码里面的runki没有办法解决：</p>
+    <p><img loading="lazy" src="../assets/ki_image019.png" alt="runki"></p>
+    <p>哦名字其实叫linuxki好办了：</p>
+    <p><img loading="lazy" src="../assets/ki_image020.png" alt="linuxki"></p>
+
+    <h5 id="p1-script">runki/linuxki脚本分析</h5>
+    <p>看看：</p>
+    <p><img loading="lazy" src="../assets/ki_image021.png" alt="脚本查看1"></p>
+    <p><img loading="lazy" src="../assets/ki_image022.png" alt="脚本查看2"></p>
+    <p>python3的脚本：</p>
+    <p><img loading="lazy" src="../assets/ki_image023.png" alt="python脚本"></p>
+    <p>把前面没注释的东西去掉，顺便改一下名字：</p>
+    <p><img loading="lazy" src="../assets/ki_image024.png" alt="修改脚本1"></p>
+    <p><img loading="lazy" src="../assets/ki_image025.png" alt="修改脚本2"></p>
+    <p>输出好像有点问题，应该是在利用程序里面找线索了，感觉应该是字符串分割：</p>
+    <p><img loading="lazy" src="../assets/ki_image026.png" alt="字符串分割1"></p>
+    <p><img loading="lazy" src="../assets/ki_image027.png" alt="字符串分割2"></p>
+    <p>出来了点东西但是还是要看看：</p>
+    <p><img loading="lazy" src="../assets/ki_image028.png" alt="分析结果"></p>
+
+    <h5 id="p1-pid">PID分析</h5>
+    <p>脚本利用的是pid，上面正好截到了有关信息，去查看有关pid的程序。这里就是命令执行了（注意最后一行是有空格的）：</p>
+    <p><img loading="lazy" src="../assets/ki_image029.png" alt="pid分析"></p>
+    <p>那么要改脚本了：</p>
+    <p><img loading="lazy" src="../assets/ki_image030.png" alt="改脚本1"></p>
+    <p><img loading="lazy" src="../assets/ki_image031.png" alt="改脚本2"></p>
+    <p>我们在这里只需要反弹shell就可以：</p>
+    <p><img loading="lazy" src="../assets/ki_image032.png" alt="反弹shell脚本"></p>
+
+    <h5 id="p1-shell">反弹Shell</h5>
+    <p>bash好像用不了（应该是没权限）换一个：</p>
+    <p><img loading="lazy" src="../assets/ki_image033.png" alt="换shell"></p>
+    <p>我之前有php的shell就直接用了：</p>
+    <p><img loading="lazy" src="../assets/ki_image034.png" alt="php shell"></p>
+    <p><img loading="lazy" src="../assets/ki_image035.png" alt="shell执行"></p>
+    <p>访问：</p>
+    <p><img loading="lazy" src="../assets/ki_image036.png" alt="访问shell"></p>
+    <p><img loading="lazy" src="../assets/ki_image037.png" alt="shell成功"></p>
+    <p><img loading="lazy" src="../assets/ki_image038.png" alt="shell成功2"></p>
+
+    <h5 id="p1-linpeas">Linpeas提权</h5>
+    <p>接下来就是提权了，先到普通用户身上：</p>
+    <p><img loading="lazy" src="../assets/ki_image039.png" alt="普通用户"></p>
+    <p>那就用linpeas。下一个：</p>
+    <p><img loading="lazy" src="../assets/ki_image040.png" alt="linpeas1"></p>
+    <p><img loading="lazy" src="../assets/ki_image041.png" alt="linpeas2"></p>
+    <p><img loading="lazy" src="../assets/ki_image042.png" alt="linpeas3"></p>
+    <p>一个一个试吧，下载后解压缩再传进去：</p>
+    <p><img loading="lazy" src="../assets/ki_image043.png" alt="下载文件"></p>
+    <p>需要的文件一个个下：</p>
+    <p><img loading="lazy" src="../assets/ki_image044.png" alt="下载完成"></p>
+    <p><img loading="lazy" src="../assets/ki_image045.png" alt="提权成功"></p>
+    <p>结束！</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 道可道，非常道，名可名，非常名</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script>
+
+</body>
+</html>
