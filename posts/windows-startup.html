@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>揭秘 Windows 程序启动的神秘之旅 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=CVE" class="mk-nav-link">CVE</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 08 / 02</div>
+  <div class="mk-post-title">揭秘 Windows 程序启动的神秘之旅</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=逆向" class="mk-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=C/C++" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</a>
+    <a href="../tags/list.html?tag=调试" class="mk-tag" style="background:#2ea44f22;color:#2ea44f;border:1px solid #2ea44f44">调试</a>
+    <a href="../tags/list.html?tag=底层原理" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#entry">程序的真正入口</a></li>
+    <li class="toc-h4"><a href="#startup">启动函数</a>
+      <ul>
+        <li class="toc-h5"><a href="#call-funcs">调用的函数</a></li>
+        <li class="toc-h5"><a href="#detail-flow">详细流程</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#detail">详细说明</a>
+      <ul>
+        <li class="toc-h5"><a href="#rtl-user-thread">__RtlUserThreadStart</a></li>
+        <li class="toc-h5"><a href="#base-thread-init">BaseThreadInitThunk</a></li>
+        <li class="toc-h5"><a href="#main-crt-startup">mainCRTStartup</a></li>
+        <li class="toc-h5"><a href="#scrt-common-main">__scrt_common_main</a></li>
+        <li class="toc-h5"><a href="#scrt-common-main-seh">__scrt_common_main_seh</a></li>
+        <li class="toc-h5"><a href="#invoke-main">invoke_main</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="entry">程序的真正入口</h4>
+
+<p><code>WinMain</code> 或者 <code>main</code> 不是真正的入口，只是语法规定的入口。通常通过 <code>mainCRTStartup</code>、<code>wWinMainCRTStartup</code>、<code>WinMainCRTStartup</code> 或者 <code>wWinMainCRTStartup</code>。</p>
+
+<h4 id="startup">启动函数</h4>
+
+<p>默认的</p>
+
+<pre><code>#include &lt;iostream&gt;
+
+int main() {
+    std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;
+    return 0;
+}</code></pre>
+
+<p>直接使用 MSVC，我用的 tools 可能不一样，以自己的为准。</p>
+
+<p>挂断点，看堆栈</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image001.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image001.png" alt="断点调用堆栈">
+  </picture>
+</p>
+
+<p>我们的调用流，我反着写</p>
+
+<p><code>main()</code> → <code>invoke_main()</code> → <code>__scrt_common_main_seh()</code> → <code>__scrt_common_main()</code> → <code>mainCRTStartup()</code> → <code>kernel32.dll</code> → <code>ntdll.dll</code> → Windows 内核。之后我会在后续补充完整流程，这个不太支持 Windows 的编译工具。</p>
+
+<h5 id="call-funcs">调用的函数</h5>
+
+<pre><code>invoke_main
+__scrt_common_main_seh()
+__scrt_common_main()
+mainCRTStartup()
+
+kernel32.dll →
+    @BaseThreadInitThunk@12()
+
+ntdll.dll →
+    __RtlUserThreadStart()
+    __RtlUserThreadStart@8()</code></pre>
+
+<h5 id="detail-flow">详细流程</h5>
+
+<pre><code>内核调度(ntdll.dll) __RtlUserThreadStart@8() 和 __RtlUserThreadStart()
+→ stdcall 调用约定，初始化 TEB(Thread Environment Block)，设置 SEH(结构化异常处理) 链，
+  初始化浮点/向量寄存器状态，调用线程入口函数 (BaseThreadInitThunk)
+
+    → kernel32.dll  @BaseThreadInitThunk@12()
+      发送 DLL_THREAD_ATTACH 通知给所有已加载的 DLL，初始化线程本地存储(Thread Local Storage)，
+      捕获未处理的异常并上报，入口函数返回后，调用 ExitThread 清理 stdcall（由被调用者清理栈），
+      调用 mainCRTStartup()
+
+        → 进入 exe  mainCRTStartup()
+          （进程专用入口点）连接器是 *.exe 入口，控制台使用，gui 使用 winMainCRTStartup
+
+            → __scrt_common_main()
+              你的可执行文件（静态链接到 CRT 库核心主逻辑），负责运行时库所有的初始化和清理
+
+                → __scrt_common_main_seh()
+                  (seh 异常保护壳) 用 __try/__except 包裹主流程，兜底捕获未处理的系统异常
+
+                    → invoke_main
+                      （调用 main 的封装）统一处理参数，最终进入用户代码
+
+                        → main()</code></pre>
+
+<h4 id="detail">详细说明</h4>
+
+<h5 id="rtl-user-thread">__RtlUserThreadStart()</h5>
+
+<pre><code>// 原型（简化）
+void RtlUserThreadStart(
+    PVOID StartAddress,    // 线程要执行的函数地址（通常是 BaseThreadInitThunk）
+    PVOID Parameter        // 传递给线程函数的参数
+);</code></pre>
+
+<p>① 初始化 TEB (Thread Environment Block)<br>
+② 设置 SEH (结构化异常处理) 链<br>
+③ 初始化浮点/向量寄存器状态<br>
+④ 调用线程入口函数 (BaseThreadInitThunk)</p>
+
+<p>起始返回后调用 <code>__RtlExitUserThread</code> 终止线程。</p>
+
+<h5 id="base-thread-init">BaseThreadInitThunk</h5>
+
+<p>参考 <strong>ReactOS</strong></p>
+
+<pre><code>VOID NTAPI BaseThreadInitThunk(
+    BOOL InitialThread,
+    PVOID StartAddress,
+    PVOID Parameter)
+{
+    // 1. 通知 DLL 新线程创建
+    LdrInitializeThunk(InitialThread, NULL, NULL);
+
+    // 2. 调用实际的线程入口
+    __try {
+        ((VOID (WINAPI *)(PVOID))StartAddress)(Parameter);
+    }
+    __except(UnhandledExceptionFilter(GetExceptionInformation())) {
+        // 3. 异常处理
+        ExitProcess(GetExceptionCode());
+    }
+
+    // 4. 线程退出
+    ExitThread(STATUS_SUCCESS);
+}</code></pre>
+
+<p>用户线程最初始入口</p>
+
+<p>设置初始环境（结构化异常帧）</p>
+
+<p>调用 Win32 线程</p>
+
+<h5 id="main-crt-startup">mainCRTStartup</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image002.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image002.png" alt="mainCRTStartup 反编译 1">
+  </picture>
+</p>
+
+<pre><code>// 实际 CRT 启动代码（简化呈现）
+void mainCRTStartup()
+{
+    // ① 初始化 CRT 的全局状态
+    _set_app_type(_crt_console_app);
+
+    // ② 设置浮点环境
+    _fpreset();
+
+    // ③ 调用主初始化（含异常保护）
+    __scrt_common_main_seh();
+
+    // ④ 正常情况下不会执行到这里
+}</code></pre>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image003.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image003.png" alt="mainCRTStartup 反编译 2">
+  </picture>
+</p>
+
+<p>具体分析就好</p>
+
+<p>这里主要功能就是控制台程序的连接器入口点</p>
+
+<p>操作系统加载 exe 不直接调用 <code>main</code>，会调用本函数。作为薄壳，交给 <code>__scrt_common_main</code> 处理所有初始化。</p>
+
+<p>如果是 GUI 程序就调用 <code>winMainCRTStartup</code>，但是再底层同样会触发执行 <code>__scrt_common_main</code>。</p>
+
+<h5 id="scrt-common-main">__scrt_common_main</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image004.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image004.png" alt="__scrt_common_main 反编译 1">
+  </picture>
+</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image005.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image005.png" alt="__scrt_common_main 反编译 2">
+  </picture>
+</p>
+
+<p>通用 CRT（堆、环境变量、安全、cookie、浮点单元）</p>
+
+<p>调用 <code>__scrt_common_main_seh</code> 去执行受保护的程序的后续流程</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image006.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image006.png" alt="security cookie 栈保护">
+  </picture>
+</p>
+
+<p>cookie 是栈保护就是 canary</p>
+
+<h5 id="scrt-common-main-seh">__scrt_common_main_seh</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image007.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image007.png" alt="__scrt_common_main_seh 反编译">
+  </picture>
+</p>
+
+<p>seh 结构化异常保护边界</p>
+
+<p>结构：</p>
+
+<pre><code>__try {
+    // 调用全局/静态对象的构造函数
+    调用 invoke_main
+    正常退出 exit(result)
+}
+__except {
+    // 异常终止：显示错误的对话框、生成转储等内部操作
+}</code></pre>
+
+<p>调用 <code>invoke_main</code> 异常处理的最后的防线</p>
+
+<h5 id="invoke-main">invoke_main</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image008.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image008.png" alt="invoke_main 反编译 1">
+  </picture>
+</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/wst_image009.webp" type="image/webp">
+    <img loading="lazy" src="../assets/wst_image009.png" alt="invoke_main 反编译 2">
+  </picture>
+</p>
+
+<p>给 main 的参数 <code>envp</code>、<code>argc</code>、<code>argv</code> 传参，调用 main 封装</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
+</html>

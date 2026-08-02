@@ -1033,6 +1033,15 @@ const POSTS_DATA = [
     url: 'posts/fourtune-ml-ctf-challenge.html',
     excerpt: 'ML CTF 挑战之对抗样本攻击，Python 原生 HTTP 服务器部署 Keras MNIST 分类模型，上传对抗性图片使模型误判为数字 4 以获取 flag。',
     tags: ['AI安全', 'CTF']
+  },
+  {
+    title: '揭秘 Windows 程序启动的神秘之旅',
+    primary: '逆向',
+    secondary: '基础',
+    date: '2026 // 08 / 02',
+    url: 'posts/windows-startup.html',
+    excerpt: '深入剖析 Windows 程序从内核调度到用户 main() 的完整启动链路：ntdll.dll __RtlUserThreadStart → kernel32 BaseThreadInitThunk → mainCRTStartup → __scrt_common_main(_seh) → invoke_main，结合断点堆栈与反编译代码逐层讲解。',
+    tags: ['逆向', 'C/C++', '调试', '底层原理', '学习笔记']
   }
 ];
 
