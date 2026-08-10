@@ -1042,6 +1042,15 @@ const POSTS_DATA = [
     url: 'posts/windows-startup.html',
     excerpt: '深入剖析 Windows 程序从内核调度到用户 main() 的完整启动链路：ntdll.dll __RtlUserThreadStart → kernel32 BaseThreadInitThunk → mainCRTStartup → __scrt_common_main(_seh) → invoke_main，结合断点堆栈与反编译代码逐层讲解。',
     tags: ['逆向', 'C/C++', '调试', '底层原理', '学习笔记']
+  },
+  {
+    title: '深入解析 C++ 虚函数与虚表机制',
+    primary: 'C/C++',
+    secondary: '基础',
+    date: '2026 // 08 / 10',
+    url: 'posts/cpp-vtable-virtual.html',
+    excerpt: '通过 IDA 逆向一个含虚函数的 C++ 程序，深入解析虚函数与虚表机制：普通调用与虚函数调用的汇编差异、vptr 虚表指针的存放位置与赋值时机、为什么逆向时要为虚表新建 struct，以及 gcc Itanium ABI 虚表标准布局与 RTTI 类型信息。',
+    tags: ['C/C++', '逆向', '底层原理', '学习笔记']
   }
 ];
 

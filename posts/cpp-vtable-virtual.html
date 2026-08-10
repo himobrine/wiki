@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深入解析 C++ 虚函数与虚表机制 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 08 / 10</div>
+  <div class="mk-post-title">深入解析 C++ 虚函数与虚表机制</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=C/C++" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=底层原理" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#code-compile">代码与编译</a>
+      <ul>
+        <li class="toc-h5"><a href="#code">代码</a></li>
+        <li class="toc-h5"><a href="#compile">编译</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#basic">一些基础</a>
+      <ul>
+        <li class="toc-h5"><a href="#call">普通调用 vs 虚函数调用</a></li>
+        <li class="toc-h5"><a href="#struct-reason">为什么逆向时要新建 struct</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#vptr">vptr（虚表指针）</a>
+      <ul>
+        <li class="toc-h5"><a href="#vptr-relation">对象 / 虚表 / vptr 关系</a></li>
+        <li class="toc-h5"><a href="#vptr-position">vptr 存放位置</a></li>
+        <li class="toc-h5"><a href="#vptr-assign">vptr 赋值时机</a></li>
+        <li class="toc-h5"><a href="#vptr-confirm">如何确认一个类有没有 vptr</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#reverse">逆向</a>
+      <ul>
+        <li class="toc-h5"><a href="#reverse-main">main</a></li>
+        <li class="toc-h5"><a href="#reverse-main-wu">main_wu（优化后）</a></li>
+        <li class="toc-h5"><a href="#abi">Itanium ABI 虚表布局</a></li>
+        <li class="toc-h5"><a href="#flow">调用流程整理</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#struct">结构体定义</a></li>
+  </ul>
+</nav>
+
+<h4 id="code-compile">代码与编译</h4>
+
+<h5 id="code">代码</h5>
+
+<pre><code>class Calculator {
+public:
+    int value;
+    Calculator(int v) : value(v) {}
+    int multiply(int n) { return value * n; }
+    int addAndMultiply(int a, int b) {
+        return multiply(a + b);
+    }
+};
+
+class ScientificCalculator : public Calculator {
+public:
+    ScientificCalculator(int v) : Calculator(v) {}
+    virtual int power(int exp) {
+        int result = 1;
+        for (int i = 0; i &lt; exp; i++) {
+            result *= value;
+        }
+        return result;
+    }
+    virtual int process(int x, int y) {
+        return power(x) + multiply(y);
+    }
+};
+
+int main() {
+    ScientificCalculator* calc = new ScientificCalculator(2);
+    int result = calc-&gt;process(3, 4);
+    delete calc;
+    return result;
+}</code></pre>
+
+<h5 id="compile">编译</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image001.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image001.png" alt="编译输出">
+  </picture>
+</p>
+
+<h4 id="basic">一些基础</h4>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image002.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image002.png" alt="基础概念">
+  </picture>
+</p>
+
+<p>这个用到了虚函数，简单说一下，后面详细说。</p>
+
+<h5 id="call">普通调用 vs 虚函数调用</h5>
+
+<p>先说普通调用，假设函数 <code>int foo(int a)</code>，编译器会放到一个固定地址，调用的时候汇编是</p>
+
+<pre><code>call 0x1400003180</code></pre>
+
+<p>然而虚函数调用是虚拟地址，在对象里面去查表，基本就是</p>
+
+<pre><code>mov rax, [对象]
+mov rax, [rax]
+call rax</code></pre>
+
+<p>主要是为了多态的情况。</p>
+
+<h5 id="struct-reason">为什么逆向时要新建 struct</h5>
+
+<p>关键认知：虚表不是代码，是一块只读数据（在 <code>.rdata</code> 里），里面连续摆放着函数指针：</p>
+
+<pre><code>地址         内存内容                    含义
+0x140005580 ┌───────────────────────────┐
+            │ 0x1400031C0             │ ← 槽0: power 函数的地址
+0x140005588 │ 0x140003210             │ ← 槽1: process 函数的地址
+            └───────────────────────────┘</code></pre>
+
+<p>如果不创建的话：不建结构体，IDA 不知道 vptr 指向的是什么，反编译就只能输出 <code>(**&amp;this-&gt;value)</code> 这种垃圾。</p>
+
+<p>建结构体 <code>ScientificCalculator_vtbl</code>：IDA 就知道了——"vptr 指向的是一块数据：第 0 个字段是函数指针 slot_power，第 8 个字段是 slot_process"。</p>
+
+<p>注意这个只是为了让源代码更加可读。</p>
+
+<h4 id="vptr">vptr（虚表指针）</h4>
+
+<p>接下来我们说一下 vptr（虚表指针）。</p>
+
+<h5 id="vptr-relation">对象 / 虚表 / vptr 关系</h5>
+
+<pre><code>对象 (new出来的内存)
+ ├─ [0x00] vptr ──→ 虚表 (静态数据, .rdata里的表)
+ │                   ├─ [0x00] 槽0: 第1个虚函数地址
+ │                   └─ [0x08] 槽1: 第2个虚函数地址
+ └─ [0x08] 普通成员</code></pre>
+
+<p>对象：程序运行时才分配（本例 <code>new(16)</code>），每个实例一份。</p>
+
+<p>虚表：编译时就写死在 <code>.rdata</code> 里的地址表，全程序只有一份，所有同类的对象共享。</p>
+
+<p>vptr：对象和虚表之间的"桥"，每个实例自己一份（因为它可能属于不同类）。</p>
+
+<h5 id="vptr-position">vptr 存放位置</h5>
+
+<p>只要有虚函数的类，编译器强制：对象第 0 个成员必须是 vptr（8 字节）。</p>
+
+<pre><code>+0x00  qword  vptr = 0x140005580     ← 指到虚表槽0位置
++0x08  dword  value = 2              ← 你的业务成员</code></pre>
+
+<p><code>this</code> 指针永远指向对象开头，所以反汇编里 <code>[this]</code> 就经常是 vptr。</p>
+
+<h5 id="vptr-assign">vptr 赋值时机</h5>
+
+<p>vptr 不是你 C++ 源码里写的任何语句——它是编译器在你每个构造函数开头自动插入的指令。</p>
+
+<pre><code>0x140003281  lea rdx, power        ; 取虚表地址 0x140005580（编译器认得这张表）
+0x140003288  mov rax, [rbp+arg_0]   ; this
+0x14000328c  mov [rax], rdx         ; 对象[0] = 虚表地址  ← 就是 vptr 的赋值</code></pre>
+
+<h5 id="vptr-confirm">如何确认一个类有没有 vptr</h5>
+
+<pre><code>mov [this], X     ; X 指向 .rdata 里的函数指针表 → 有 vptr，多态类
+mov [this], a2    ; 直接把参数写进对象[0]      → 普通类，无虚函数</code></pre>
+
+<h4 id="reverse">逆向</h4>
+
+<h5 id="reverse-main">main</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image003.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image003.png" alt="main 反编译">
+  </picture>
+</p>
+
+<p>能确定是 C++。</p>
+
+<pre><code>int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  ScientificCalculator *v3; // rbx
+  int v5; // [rsp+2Ch] [rbp-Ch]
+
+  _main(argc, argv, envp);
+  v3 = operator new(0x10ui64);
+  *(v3 + 2) = 2;
+  *v3 = &amp;off_140005580;
+  v5 = ScientificCalculator::process(v3, 3, 4);
+  operator delete(v3, 0x10ui64);
+  return v5;
+}</code></pre>
+
+<p>判断后应该是这样，理由如下：<code>calculator</code>（方便理解就叫这个名字，其实就是创建的对象），<code>result</code> 就是结果，<code>return</code> 不是标准的返回 0 而已（有可能计算出来就是 0）。</p>
+
+<pre><code>int __fastcall main(int argc, const char **argv, const char **envp)
+{
+  ScientificCalculator *calculator; // rbx
+  int result; // [rsp+2Ch] [rbp-Ch]
+
+  _main(argc, argv, envp);
+  calculator = operator new(0x10ui64);
+  *(calculator + 2) = 2;                        // ScientificCalculator 某个值=2，无默认值
+  *calculator = &amp;off_140005580;
+  result = ScientificCalculator::process(calculator, 3, 4);
+  operator delete(calculator, 0x10ui64);        // 删除对象
+  return result;                                // 返回process计算结果
+}</code></pre>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image004.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image004.png" alt="main 反编译过程 1">
+  </picture>
+</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image005.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image005.png" alt="main 反编译过程 2">
+  </picture>
+</p>
+
+<p><code>a2</code> 应该是结构体里面的东西，是一个 <code>int</code>。看下面的，这个只是优化之后的。</p>
+
+<h5 id="reverse-main-wu">main_wu（优化后）</h5>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image006.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image006.png" alt="main_wu 反编译">
+  </picture>
+</p>
+
+<p>进行跟进找 vptr。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image007.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image007.png" alt="跟进找 vptr">
+  </picture>
+</p>
+
+<p>找到 this。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image008.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image008.png" alt="找到 this">
+  </picture>
+</p>
+
+<p>指向 <code>0x000000140005580</code>，在后面就是直接去对象，那么对象[0] 写入的地方就是 <code>0x000000140005580</code>，也就是 vptr。</p>
+
+<p>那么就有了</p>
+
+<pre><code>0x00 vptr → 0x000000140005580（x64的指针是8字节）
+0x08 int calve = 2</code></pre>
+
+<p>去 ScientificCalculator <code>0x0000000140005570</code>。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image009.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image009.png" alt="虚表内容">
+  </picture>
+</p>
+
+<h5 id="abi">Itanium ABI 虚表布局</h5>
+
+<p>这是 <code>Itanium ABI</code> 虚表标准布局，这个是 gcc 编译的，后面再做 msvc。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image010.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image010.png" alt="Itanium ABI 布局">
+  </picture>
+</p>
+
+<p><code>0</code> 是 offset-to-top（多重继承时是偏移，这里单继承 = 0）。第二个指向 RTTI。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image011.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image011.png" alt="RTTI 指向">
+  </picture>
+</p>
+
+<p>再看 <code>0x0000000140005510</code> 就是 RTTI。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image012.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image012.png" alt="RTTI 内容">
+  </picture>
+</p>
+
+<p>第 1 个 qword → libstdc++ 的 <code>__class_type_info</code> 虚表（extern，不用管）。</p>
+
+<p>第 2 个 qword → <code>0x140005550</code> = <code>_ZTS20ScientificCalculator</code> 字符串，内容是 <code>"20ScientificCalculator"</code>（长度前缀 + 类名）。</p>
+
+<h5 id="flow">调用流程整理</h5>
+
+<p>整理下，main 先调用 process。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image013.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image013.png" alt="调用流程">
+  </picture>
+</p>
+
+<pre><code>main → vtable[1] process(3,4) → vtable[0] power(3) ─┐
+                                  └ multiply(4)     ─┴→ 相加</code></pre>
+
+<h4 id="struct">结构体定义</h4>
+
+<p>接下来想计算的就计算，我们吧逆向弄完，缺少结构体。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image014.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image014.png" alt="struct Calculator">
+  </picture>
+</p>
+
+<pre><code>struct Calculator {
+    int value;
+};</code></pre>
+
+<pre><code>struct ScientificCalculator_vtbl {
+    __int64 (__fastcall *slot_power)(void *self, int exp);
+    __int64 (__fastcall *slot_process)(void *self, int a, int b);
+};</code></pre>
+
+<p>解释一下 SC_METHOD，是个宏，用于成员函数（systemc.h）。</p>
+
+<p>
+  <picture>
+    <source srcset="../assets/vt_image015.webp" type="image/webp">
+    <img loading="lazy" src="../assets/vt_image015.png" alt="struct ScientificCalculator">
+  </picture>
+</p>
+
+<pre><code>struct ScientificCalculator {
+    ScientificCalculator_vtbl *vtable;   // +0x00
+    Calculator base;                     // +0x08
+};</code></pre>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
+</html>
