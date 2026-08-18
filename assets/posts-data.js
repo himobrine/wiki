@@ -1051,6 +1051,15 @@ const POSTS_DATA = [
     url: 'posts/cpp-vtable-virtual.html',
     excerpt: '通过 IDA 逆向一个含虚函数的 C++ 程序，深入解析虚函数与虚表机制：普通调用与虚函数调用的汇编差异、vptr 虚表指针的存放位置与赋值时机、为什么逆向时要为虚表新建 struct，以及 gcc Itanium ABI 虚表标准布局与 RTTI 类型信息。',
     tags: ['C/C++', '逆向', '底层原理', '学习笔记']
+  },
+  {
+    title: '编译器优化：从加法指令到性能提升',
+    primary: 'C/C++',
+    secondary: '基础',
+    date: '2026 // 08 / 18',
+    url: 'posts/cpp-compiler-optimize.html',
+    excerpt: '通过 MinGW / MSVC 多编译器对比分析 C++ 加法指令的汇编输出，详解 O1/O2 优化标志的差异，以及编译器在常量传播、常量折叠、复写传播三种优化策略下的具体表现，结合 IDA 反编译展示 argc 变量参与运算时编译器如何将可计算部分折叠为立即数。',
+    tags: ['C/C++', '逆向', '底层原理', '学习笔记']
   }
 ];
 

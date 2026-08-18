@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编译器优化：从加法指令到性能提升 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 08 / 18</div>
+  <div class="mk-post-title">编译器优化：从加法指令到性能提升</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=C/C++" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=底层原理" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述与代码</a></li>
+    <li class="toc-h4"><a href="#asm">汇编</a>
+      <ul>
+        <li class="toc-h5"><a href="#asm-mingw">MinGW（O2 优化）</a></li>
+        <li class="toc-h5"><a href="#asm-msvc-noopt">MSVC 未优化</a></li>
+        <li class="toc-h5"><a href="#asm-mingw-o2">MinGW 启用 O2（CMake）</a></li>
+        <li class="toc-h5"><a href="#asm-msvc-o2">MSVC 启用优化</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#summary">总结</a>
+      <ul>
+        <li class="toc-h5"><a href="#const-prop">常量传播</a></li>
+        <li class="toc-h5"><a href="#const-fold">常量折叠</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#argc-code">变量参与运算</a>
+      <ul>
+        <li class="toc-h5"><a href="#argc-code2">代码</a></li>
+        <li class="toc-h5"><a href="#argc-msvc">MSVC 反编译</a></li>
+        <li class="toc-h5"><a href="#argc-ida">IDA 分析</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述与代码</h4>
+
+<p>不多说直接说重要的：加法对应的汇编指令是 <code>add</code>。</p>
+
+<p>编译器会根据优化方式选择最匹配的优化方案，常用优化方案如下：</p>
+
+<ol>
+  <li><code>O1</code> 选项：生成文件占用空间最少</li>
+  <li><code>O2</code> 选项：执行效率最快</li>
+</ol>
+
+<p>在 VS 里面 Release 默认开启 O2——执行效率最快。Debug 中使用 <code>/Od /Z1</code>。</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(int argc, char* argv[]){
+    10+20;
+    int n1 = 0;
+    int n2 = 0;
+    n1 = n1 + 1;
+    n1 = 1 + 2;
+    n1 = n1 + n2;
+
+    printf("%d\r\n", n1);
+    return 0;
+}</code></pre>
+
+<h4 id="asm">汇编</h4>
+
+<h5 id="asm-mingw">MinGW（O2 优化）</h5>
+
+<pre><code>main(int, char**):
+    sub    $0x28,%rsp
+    call   0x7ff75f3a17e7             ; &lt;__main&gt;
+    mov    $0x3,%edx
+    lea    0x890b(%rip),%rcx         ; 0x7ff75f3aa000
+    call   0x7ff75f3a8df0             ; &lt;printf(char const*, ...)&gt;
+    mov    $0x0,%eax
+    add    $0x28,%rsp
+    ret</code></pre>
+
+<p>很明显直接计算出来了。</p>
+
+<h5 id="asm-msvc-noopt">MSVC 未优化</h5>
+
+<pre><code>main(int,char **):
+    movq   %rdx, 0x10(%rsp)
+    movl   %ecx, 0x8(%rsp)
+    pushq  %rdi
+    subq   $0x30, %rsp
+    movl   $0x0, 0x20(%rsp)      ; int n1 = 0;
+    movl   $0x0, 0x24(%rsp)      ; int n2 = 0
+    movl   0x20(%rsp), %eax      ; n1 = n1 + 1
+    incl   %eax
+    movl   %eax, 0x20(%rsp)
+    movl   $0x3, 0x20(%rsp)      ; n1 = 1 + 2
+    movl   0x24(%rsp), %eax      ; n1 = n1 + n2
+    movl   0x20(%rsp), %ecx
+    addl   %eax, %ecx
+    movl   %ecx, %eax
+    movl   %eax, 0x20(%rsp)
+    movl   0x20(%rsp), %edx
+    leaq   0x86a5(%rip), %rcx
+    callq  0x140001195            ; printf
+    xorl   %eax, %eax
+    addq   $0x30, %rsp
+    popq   %rdi
+    retq</code></pre>
+
+<h5 id="asm-mingw-o2">MinGW 启用 O2（CMake）</h5>
+
+<p>这里的 MinGW 是使用的 O2 优化。</p>
+
+<pre><code>cmake_minimum_required(VERSION 3.25)
+project(plas)
+
+set(CMAKE_CXX_STANDARD 14)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+
+add_executable(plas main.cpp)</code></pre>
+
+<h5 id="asm-msvc-o2">MSVC 启用优化</h5>
+
+<pre><code>main(int,char **):
+    subq   $0x28, %rsp
+    movl   $0x3, %edx
+    leaq   0x8608(%rip), %rcx         ; `string'
+    callq  0x140001195                 ; printf
+    xorl   %eax, %eax
+    addq   $0x28, %rsp
+    retq</code></pre>
+
+<p>CMake 文件：</p>
+
+<pre><code>cmake_minimum_required(VERSION 3.25)
+project(plas)
+
+set(CMAKE_CXX_STANDARD 14)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2")
+set(CMAKE_CXX_FLAGS_DEBUG "-O2 -g")
+
+add_executable(plas main.cpp)</code></pre>
+
+<p>注意默认是 Debug，CLion 的 Debug 会覆盖 MSVC 所以多加了一行。</p>
+
+<h4 id="summary">总结</h4>
+
+<ol>
+  <li>两个常量相加的情况下，编译器会直接计算出结果，将这个结果作为立即数参加运算，减少程序在运行期的运算。</li>
+  <li>当有变量参加加法运算的时候，会先取出内存中的数据，放入通用寄存器中再进行加法运算得到结果，并放回变量创建的内存中。</li>
+</ol>
+
+<p>开启 O2 选项之后，因为效率优先，无用代码会被删除，将可以合并的代码归并处理。看前面的代码的例子，<code>n1 = n1 + 1</code> 这样的代码会被删除，因为后面又进行了新的赋值，但前面的代码没有对 <code>n1</code> 进行访问，所以可以删除。</p>
+
+<p>所以这里的代码使用了两种优化方案。在编译器运行的时候也是常用的操作。以下是两个方案的详细说明：</p>
+
+<h5 id="const-prop">常量传播</h5>
+
+<p>将编译期间可以算出结果的变量转换成为常量，这样就能减少变量的使用。</p>
+
+<pre><code>int main(int argc, char* argv[]){
+    int n = 1;
+    printf("n = %d \r\n", n);
+    return 0;
+}</code></pre>
+
+<p>运算期间，变量 <code>n</code> 能计算出来，那么减少引用次数加快速度（和 CPU 流水线也有关系，后面会写到），就会直接使用常量 1 来代替。</p>
+
+<p>等价代码：</p>
+
+<pre><code>int main(int argc, char* argv[]){
+    printf("n = %d \r\n", 1);
+    return 0;
+}</code></pre>
+
+<h5 id="const-fold">常量折叠</h5>
+
+<p>当出现多个变量进行计算的时候，并且编译器能在编译时间计算出结果，源代码的计算都会被计算结果代替。</p>
+
+<pre><code>int main(int argc, char* argv[]){
+    int n = 1 + 5 - 3 * 6;
+    printf("n = %d\r\n", n);
+    return 0;
+}</code></pre>
+
+<p>此时计算不会生成汇编，会直接计算出答案直接替换。</p>
+
+<p>等价代码：</p>
+
+<pre><code>int main(int argc, char* argv[]){
+    int n = -12;
+    printf("n = %d\r\n", n);
+    return 0;
+}</code></pre>
+
+<p>又因为 <code>n</code> 现在是赋值输出，可以进行常量传播。所以最后的代码就是：</p>
+
+<pre><code>int main(int argc, char* argv[]){
+    printf("n = %d\r\n", -12);
+    return 0;
+}</code></pre>
+
+<p>VC++ 在开启 O2 优化方案后会尝试使用常量替换变量。在程序的逻辑中变量没有修改过，上下文不存在对变量的取地址或者间接访问操作，那么这个变量就等价于常量，编译器就可以删除变量修改为常量。</p>
+
+<h4 id="argc-code">变量参与运算</h4>
+
+<h5 id="argc-code2">代码</h5>
+
+<p>接下来修改代码再看。将 <code>0</code> 修改成了 <code>argc</code>：</p>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(int argc, char* argv[]){
+    10+20;
+    int n1 = argc;
+    int n2 = argc;
+    n1 = n1 + 1;
+    n1 = 1 + 2;
+    n1 = n1 + n2;
+
+    printf("%d\r\n", n1);
+    return 0;
+}</code></pre>
+
+<h5 id="argc-msvc">MSVC 反编译</h5>
+
+<p>64 → 64：</p>
+
+<pre><code>main(int,char **):
+    subq   $0x28, %rsp
+    leal   0x3(%rcx), %edx
+    leaq   0x860a(%rip), %rcx         ; `string'
+    callq  0x140001195                 ; printf
+    xorl   %eax, %eax
+    addq   $0x28, %rsp
+    retq</code></pre>
+
+<h5 id="argc-ida">IDA 分析</h5>
+
+<p>上面是 CLion 自己的反汇编。以下是 IDA 的输出：</p>
+
+<pre><code>.text:00000001400015A0 ; __int64 __fastcall main(int argc, char **argv)
+.text:00000001400015A0 main            proc near
+.text:00000001400015A0
+.text:00000001400015A0 argc = ecx
+.text:00000001400015A0 argv = rdx
+.text:00000001400015A0                 sub     rsp, 28h
+.text:00000001400015A4                 lea     edx, [rcx+3]
+.text:00000001400015A7                 lea     rcx, _Format    ; "%d\r\n"
+.text:00000001400015AE                 call    j_printf
+.text:00000001400015B3                 xor     eax, eax
+.text:00000001400015B5                 add     rsp, 28h
+.text:00000001400015B9                 retn
+.text:00000001400015B9 main            endp</code></pre>
+
+<p>这里有复写传播，这个是 O2 优化后的版本看不出来（可以看之前的文章，有一起赋值的汇编，和那个差不多）。</p>
+
+<p>解释一下为什么是 <code>argc + 3</code>：变量 <code>n1</code> 进行优化，将能计算的值全部算出来，剩下 <code>argc</code> 是外部读取，所以直接就是 <code>argc + 3</code>。</p>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
+</html>
