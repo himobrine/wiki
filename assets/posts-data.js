@@ -1060,6 +1060,15 @@ const POSTS_DATA = [
     url: 'posts/cpp-compiler-optimize.html',
     excerpt: '通过 MinGW / MSVC 多编译器对比分析 C++ 加法指令的汇编输出，详解 O1/O2 优化标志的差异，以及编译器在常量传播、常量折叠、复写传播三种优化策略下的具体表现，结合 IDA 反编译展示 argc 变量参与运算时编译器如何将可计算部分折叠为立即数。',
     tags: ['C/C++', '逆向', '底层原理', '学习笔记']
+  },
+  {
+    title: '汇编中的减法与补码转换奥秘',
+    primary: 'C/C++',
+    secondary: '基础',
+    date: '2026 // 08 / 19',
+    url: 'posts/asm-sub-complement.html',
+    excerpt: '深入汇编 sub 减法指令与补码转换原理：计算机如何通过补码将减法转换为加法，结合 MinGW 与 MSVC（64→64 / 64→32）三组汇编输出，对比 scanf 参与运算时 n1 - 100、n1 + 5 - n2 的指令差异，以及 MSVC 调试版本 0xCCCCCCCC 栈帧填充与 RTC 安全检查。',
+    tags: ['C/C++', '逆向', '底层原理', '学习笔记']
   }
 ];
 
