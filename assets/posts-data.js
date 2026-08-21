@@ -1069,6 +1069,15 @@ const POSTS_DATA = [
     url: 'posts/asm-sub-complement.html',
     excerpt: '深入汇编 sub 减法指令与补码转换原理：计算机如何通过补码将减法转换为加法，结合 MinGW 与 MSVC（64→64 / 64→32）三组汇编输出，对比 scanf 参与运算时 n1 - 100、n1 + 5 - n2 的指令差异，以及 MSVC 调试版本 0xCCCCCCCC 栈帧填充与 RTC 安全检查。',
     tags: ['C/C++', '逆向', '底层原理', '学习笔记']
+  },
+  {
+    title: '编译器如何优化乘法运算？从 C 代码到汇编指令的深度解析',
+    primary: 'C/C++',
+    secondary: '基础',
+    date: '2026 // 08 / 21',
+    url: 'posts/cpp-mul-optimize.html',
+    excerpt: '分析编译器在乘法运算中的优化策略：左移替代乘 2 的幂、乘 15 通过左移减法实现、imul 用于变量乘法，展示 MinGW 与 MSVC（64→64、64→32）汇编对比，解释 RTC 检查与栈填充。',
+    tags: ['C/C++', '逆向', '底层原理', '学习笔记']
   }
 ];
 

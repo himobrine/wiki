@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>编译器如何优化乘法运算？从 C 代码到汇编指令的深度解析 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 08 / 21</div>
+  <div class="mk-post-title">编译器如何优化乘法运算？从 C 代码到汇编指令的深度解析</div>
+  <div class="mk-post-tags">
+    <a href="../tags/list.html?tag=C/C++" class="mk-tag" style="background:#3366ff22;color:#3366ff;border:1px solid #3366ff44">C/C++</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-tag" style="background:#7b2d8e22;color:#7b2d8e;border:1px solid #7b2d8e44">逆向</a>
+    <a href="../tags/list.html?tag=底层原理" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">底层原理</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-tag" style="background:#ff6b3522;color:#ff6b35;border:1px solid #ff6b3544">学习笔记</a>
+  </div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a></li>
+    <li class="toc-h4"><a href="#code">代码</a></li>
+    <li class="toc-h4"><a href="#asm">汇编</a>
+      <ul>
+        <li class="toc-h5"><a href="#asm-mingw">MinGW</a></li>
+        <li class="toc-h5"><a href="#asm-msvc64">MSVC 64→64</a></li>
+        <li class="toc-h5"><a href="#asm-msvc32">MSVC 64→32</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#summary">总结</a></li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述</h4>
+
+<p>在 x86 汇编中，乘法指令有 <code>imul</code>（有符号）和 <code>mul</code>（无符号）。编译器会尝试把乘法转换为加法或左移（当乘数是 2 的幂），否则使用乘法指令。</p>
+
+<h4 id="code">代码</h4>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(int argc, char* argv[]){
+    int n1 = argc;
+    int n2 = argc;
+
+    printf("n1 * 15 = %d\r\n", n1 * 15);
+    printf("n1 * 16 = %d\r\n", n1 * 16);
+    printf("2 * 2 = %d\r\n", 2 * 2);
+    printf("n2 * 4 + 5 = %d\r\n", n2 * 4 + 5);
+    printf("n1 * n2 = %d\r\n", n1 * n2);
+    return 0;
+}
+</code></pre>
+
+<h4 id="asm">汇编</h4>
+
+<h5 id="asm-mingw">MinGW</h5>
+
+<pre><code>main(int, char**):
+    push %rbp
+    mov %rsp,%rbp
+    sub $0x30,%rsp
+    mov %ecx,0x10(%rbp)
+    mov %rdx,0x18(%rbp)
+    call 0x7ff748461867 ; &lt;__main&gt;
+    mov 0x10(%rbp),%eax ; n1 = argc
+    mov %eax,-0x4(%rbp)
+    mov 0x10(%rbp),%eax ; n2 = argc
+    mov %eax,-0x8(%rbp)
+    mov -0x4(%rbp),%edx
+    mov %edx,%eax
+    shl $0x4,%eax               ; n1 * 16 (左移)
+    sub %edx,%eax               ; n1 * 15 = n1 * 16 - n1
+    mov %eax,%edx
+    lea 0x88ed(%rip),%rax       ; printf format
+    mov %rax,%rcx
+    call 0x7ff748468e70        ; printf
+    mov -0x4(%rbp),%eax
+    shl $0x4,%eax               ; n1 * 16
+    mov %eax,%edx
+    lea 0x88e5(%rip),%rax
+    mov %rax,%rcx
+    call 0x7ff748468e70        ; printf
+    mov $0x4,%edx               ; 2*2
+    lea 0x88e0(%rip),%rax
+    mov %rax,%rcx
+    call 0x7ff748468e70        ; printf
+    mov -0x8(%rbp),%eax
+    shl $0x2,%eax               ; n2 * 4
+    add $0x5,%eax               ; n2 * 4 + 5
+    mov %eax,%edx
+    lea 0x88d3(%rip),%rax
+    mov %rax,%rcx
+    call 0x7ff748468e70        ; printf
+    mov -0x4(%rbp),%eax
+    imul -0x8(%rbp),%eax       ; n1 * n2
+    mov %eax,%edx
+    lea 0x88cd(%rip),%rax
+    mov %rax,%rcx
+    call 0x7ff748468e70        ; printf
+    mov $0x0,%eax
+    add $0x30,%rsp
+    pop %rbp
+    ret
+</code></pre>
+
+<h5 id="asm-msvc64">MSVC 64→64</h5>
+
+<pre><code>main(int,char **):
+    movq %rdx, 0x10(%rsp)
+    movl %ecx, 0x8(%rsp)
+    pushq %rdi
+    subq $0x30, %rsp
+    movl 0x40(%rsp), %eax
+    movl %eax, 0x20(%rsp)          ; n1 = argc
+    movl 0x40(%rsp), %eax
+    movl %eax, 0x24(%rsp)          ; n2 = argc
+    imull $0xf, 0x20(%rsp), %eax   ; n1 * 15
+    movl %eax, %edx
+    leaq 0x86c4(%rip), %rcx
+    callq 0x140001195              ; printf
+    imull $0x10, 0x20(%rsp), %eax  ; n1 * 16
+    movl %eax, %edx
+    leaq 0x86c1(%rip), %rcx
+    callq 0x140001195              ; printf
+    movl $0x4, %edx                ; 2*2
+    leaq 0x86c0(%rip), %rcx
+    callq 0x140001195              ; printf
+    movl 0x24(%rsp), %eax
+    leal 0x5(,%eax,4), %eax        ; n2*4 + 5
+    movl %eax, %edx
+    leaq 0x86b7(%rip), %rcx
+    callq 0x140001195              ; printf
+    movl 0x20(%rsp), %eax
+    imull 0x24(%rsp), %eax
+    movl %eax, %edx                ; n1 * n2
+    leaq 0x86b8(%rip), %rcx
+    callq 0x140001195              ; printf
+    xorl %eax, %eax
+    addq $0x30, %rsp
+    popq %rdi
+    retq
+</code></pre>
+
+<h5 id="asm-msvc32">MSVC 64→32</h5>
+
+<pre><code>main(int,char **):
+    pushl %ebp
+    movl %esp, %ebp
+    subl $0x8, %esp
+    movl $0xcccccccc, -0x8(%ebp)      ; stack fill
+    movl $0xcccccccc, -0x4(%ebp)
+    movl 0x8(%ebp), %eax
+    movl %eax, -0x4(%ebp)            ; n1 = argc
+    movl 0x8(%ebp), %ecx
+    movl %ecx, -0x8(%ebp)            ; n2 = argc
+    imull $0xf, -0x4(%ebp), %edx    ; n1 * 15
+    pushl %edx
+    pushl $0x656b30                 ; format
+    calll 0x40119a                  ; _printf
+    addl $0x8, %esp
+    movl -0x4(%ebp), %eax
+    shll $0x4, %eax                ; n1 * 16
+    pushl %eax
+    pushl $0x656b40                 ; format
+    calll 0x40119a                  ; _printf
+    addl $0x8, %esp
+    pushl $0x4                     ; 2*2
+    pushl $0x656b50                 ; format
+    calll 0x40119a                  ; _printf
+    addl $0x8, %esp
+    movl -0x8(%ebp), %ecx
+    leal 0x5(,%ecx,4), %edx        ; n2*4 + 5
+    pushl %edx
+    pushl $0x656b60                 ; format
+    calll 0x40119a                  ; _printf
+    addl $0x8, %esp
+    movl -0x4(%ebp), %eax
+    imull -0x8(%ebp), %eax        ; n1 * n2
+    pushl %eax
+    pushl $0x656b74                 ; format
+    calll 0x40119a                  ; _printf
+    addl $0x8, %esp
+    xorl %eax, %eax
+    addl $0x8, %esp
+    cmpl %esp, %ebp
+    calll 0x4010ff                  ; __RTC_CheckEsp
+    movl %ebp, %esp
+    popl %ebp
+    retl
+</code></pre>
+
+<h4 id="summary">总结</h4>
+
+<ul>
+  <li>当乘数是 2 的幂时，编译器会采用左移指令（<code>shl</code>）替代乘法。</li>
+  <li>非 2 的幂但能用常量折叠的情况（如 <code>n1*15</code>），会先左移后减去原数实现 <code>n*16 - n</code>。</li>
+  <li>有符号乘法指令 <code>imul</code> 用于变量间乘法（<code>n1*n2</code>），因为无法通过移位/加法进一步简化。</li>
+  <li>MSVC 调试构建会在栈上填充 <code>0xCCCCCCCC</code> 并插入 RTC 检查，以帮助捕获未初始化变量和栈溢出。</li>
+</ul>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script>
+const tocLinks = document.querySelectorAll('.mk-toc a');
+const tocTargets = [];
+tocLinks.forEach(a => {
+  const id = a.getAttribute('href').slice(1);
+  const el = document.getElementById(id);
+  if (el) tocTargets.push({ el, link: a });
+});
+const tocObs = new IntersectionObserver(
+  (entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        tocLinks.forEach(a => a.classList.remove('active'));
+        const match = tocTargets.find(t => t.el === e.target);
+        if (match) match.link.classList.add('active');
+      }
+    });
+  },
+  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
+);
+tocTargets.forEach(t => tocObs.observe(t.el));
+
+/* code block header bar */
+document.querySelectorAll('.mk-post-content pre').forEach(pre => {
+  const wrap = document.createElement('div');
+  wrap.className = 'mk-code-wrap';
+  pre.parentNode.insertBefore(wrap, pre);
+  wrap.appendChild(pre);
+
+  const lines = pre.textContent.split('\n').length;
+
+  const header = document.createElement('div');
+  header.className = 'mk-code-header';
+
+  const info = document.createElement('span');
+  info.className = 'mk-code-info';
+  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
+
+  const actions = document.createElement('div');
+  actions.className = 'mk-code-actions';
+
+  const copy = document.createElement('button');
+  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
+  copy.onclick = (e) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(pre.textContent).then(() => {
+      copy.textContent = 'copied!'; copy.classList.add('copied');
+      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
+    });
+  };
+
+  const fold = document.createElement('button');
+  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
+  fold.onclick = (e) => {
+    e.stopPropagation();
+    wrap.classList.toggle('collapsed');
+    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
+  };
+  wrap.onclick = () => {
+    if (wrap.classList.contains('collapsed')) {
+      wrap.classList.remove('collapsed');
+      fold.textContent = '\u2191';
+    }
+  };
+
+  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
+
+  actions.append(copy, fold);
+  header.append(info, actions);
+  wrap.prepend(header);
+});
+</script>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div><script>
+(function(){
+var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
+if(!gs||!gc)return;
+var s=document.createElement("script");
+s.src="../assets/vis-network.min.js";
+s.onload=function(){
+  var d=document.createElement("script");
+  d.src="../assets/posts-data.js";
+  d.onload=function(){
+    var p=document.createElement("script");
+    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
+    document.body.appendChild(p);
+    var g=document.createElement("script");
+    g.src="../assets/graph.js";
+    document.body.appendChild(g);
+  };
+  document.body.appendChild(d);
+};
+document.body.appendChild(s);
+})();
+</script>
+<script src="../assets/common.js"></script></body>
+</html>
