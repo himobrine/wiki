@@ -48,6 +48,9 @@
   </header>
   <div class="graph-page-full fade-up">
     <div id="graphContainer"></div>
+    <div style="text-align:center;margin-top:var(--mk-space-sm)">
+      <button id="mkGraphHubToggle" class="mk-btn mk-btn-secondary">✦ 全部</button>
+    </div>
   </div>
 </section>
 
@@ -77,33 +80,7 @@
 
 <script src="assets/posts-data.js"></script>
 <script>const POSTS = POSTS_DATA;</script>
-<script>
-(function(){
-var c=document.getElementById('graphContainer');
-if(!c||typeof vis==='undefined'||typeof POSTS==='undefined')return;
-var PC=typeof PRIMARY_COLORS!=='undefined'?PRIMARY_COLORS:typeof window!=='undefined'&&window.PRIMARY_COLORS?window.PRIMARY_COLORS:{};
-function gc(p){var t=(PC[p.primary]||'888888');return{background:'#'+t,border:'#'+t,highlight:{background:'#d4a020',border:'#d4a020'}};}
-function gsh(p){var s=p.secondary;if(s==='DVWA'||s==='Pwn'||s==='Crack'||s==='基础')return'dot';if(s==='upload-labs'||s==='Reverse')return'square';if(s==='Crypto'||s==='工具')return'diamond';if(s==='Web')return'triangle';return'dot';}
-var groups={};
-groups['Web安全']={color:{background:'#3366ff',border:'#3366ff',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
-groups['CTF']={color:{background:'#e4405f',border:'#e4405f',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
-groups['逆向']={color:{background:'#7b2d8e',border:'#7b2d8e',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
-groups['C/C++']={color:{background:'#f59e0b',border:'#f59e0b',highlight:{background:'#d4a020',border:'#d4a020'}},shape:'dot'};
-var nodes=new vis.DataSet(POSTS.map(function(p,i){return{id:i,title:p.title,url:p.url,value:1,size:8,color:gc(p),group:p.primary,shape:gsh(p)};}));
-var edges=[];var seen={};
-for(var i=0;i<POSTS.length;i++){for(var j=i+1;j<POSTS.length;j++){
-var shared=POSTS[i].tags.filter(function(t){return POSTS[j].tags.indexOf(t)!==-1;});
-if(shared.length>0){var key=i+'-'+j;if(!seen[key]){seen[key]=true;
-edges.push({from:i,to:j,value:Math.min(shared.length,3),title:'共享: '+shared.join(', '),color:{inherit:'both',opacity:0.2+shared.length*0.15}});}}}}
-var options={nodes:{shape:'dot',font:{size:0},borderWidth:0,borderWidthSelected:2,scaling:{min:6,max:14}},groups:groups,
-edges:{width:1,smooth:{type:'continuous'}},
-physics:{solver:'forceAtlas2Based',forceAtlas2Based:{gravitationalConstant:-80,centralGravity:0.003,springLength:200,springConstant:0.008,damping:0.4},stabilization:{iterations:150}},
-interaction:{hover:true,tooltipDelay:200,zoomView:true,dragView:true,hoverConnectedEdges:true}};
-var network=new vis.Network(c,{nodes:nodes,edges:edges},options);
-network.on('click',function(params){if(params.nodes.length>0){var node=nodes.get(params.nodes[0]);if(node&&node.url)window.location.href=node.url;}});
-network.on('dragStart',function(){network.setOptions({physics:{enabled:false}});});network.on('hoverNode',function(){network.setOptions({physics:{enabled:false}});});c.addEventListener('mouseleave',function(){network.setOptions({physics:{enabled:true}});});
-})();
-</script>
+<script src="assets/graph.js"></script>
 <script src="assets/common.js"></script>
 
 </body>

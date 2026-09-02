@@ -11,7 +11,6 @@
 <link rel="stylesheet" href="assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="assets/style.css"></noscript>
 <link rel="preload" href="assets/posts-data.js" as="script">
-  <script src="assets/search.js"></script>
 </head>
 <body>
 <div class="mk-scanline"></div>
@@ -98,7 +97,7 @@
     html += '<time class="mk-post-date">' + p.date + '</time>';
     html += '<h3 class="mk-post-title"><a href="' + p.url + '">' + p.title + '</a></h3>';
     html += '<div class="mk-post-tags">';
-    p.tags.forEach(t => {
+    getFlatTags(p).forEach(t => {
       const tc = TAG_COLORS[t] || '888888';
       html += '<a href="tags/list.html?tag=' + encodeURIComponent(t) + '" class="mk-tag" style="--tag-color:#' + tc + '">#' + t + '</a>';
     });
@@ -113,7 +112,7 @@
 (function() {
   const tagMap = {};
   POSTS.forEach(p => {
-    p.tags.forEach(t => {
+    getFlatTags(p).forEach(t => {
       if (!tagMap[t]) tagMap[t] = 0;
       tagMap[t]++;
     });
@@ -134,10 +133,9 @@
   document.getElementById('tagGrid').innerHTML = html;
 })();
 </script>
-<script src="assets/search.js"></script>
 <script src="assets/common.js"></script>
 
-<aside class="mk-graph-sidebar" id="mkGraphSidebar">
+<aside class="mk-graph-sidebar" id="mkGraphSidebar" data-default-spoke>
   <div class="mk-graph-title"><a href="graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
 </aside>

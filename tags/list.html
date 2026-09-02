@@ -70,7 +70,7 @@ function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 function getAllTags() {
   const map = {};
   POSTS.forEach(p => {
-    p.tags.forEach(t => {
+    getFlatTags(p).forEach(t => {
       if (!map[t]) map[t] = [];
       map[t].push(p);
     });
@@ -152,7 +152,7 @@ function renderArchive(page) {
 function renderTag(tag, page) {
   const PER_PAGE = 10;
   let decoded; try { decoded = decodeURIComponent(tag); } catch { decoded = tag; }
-  const filtered = POSTS.filter(p => p.tags.includes(decoded)).sort((a, b) => {
+  const filtered = POSTS.filter(p => getFlatTags(p).includes(decoded)).sort((a, b) => {
     const da = a.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
     const db = b.date.replace(/ \/\/ /g, '-').split(' / ').join('-');
     return db.localeCompare(da);
@@ -174,7 +174,7 @@ function renderTag(tag, page) {
       html += '<time class="mk-post-date">' + p.date + '</time>';
       html += '<h3 class="mk-post-title"><a href="' + p.url + '">' + p.title + '</a></h3>';
       html += '<div class="mk-post-tags">';
-      p.tags.forEach(t => {
+      getFlatTags(p).forEach(t => {
         const c = TAG_COLORS[t] || '888888';
         html += '<a href="list.html?tag=' + encodeURIComponent(t) + '" class="mk-tag" style="--tag-color:#' + c + '">#' + esc(t) + '</a>';
       });
@@ -238,7 +238,7 @@ if (tag) {
 </script>
 <script src="../assets/common.js"></script>
 
-<aside class="mk-graph-sidebar" id="mkGraphSidebar">
+<aside class="mk-graph-sidebar" id="mkGraphSidebar" data-default-spoke>
   <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
 </aside>

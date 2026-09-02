@@ -115,6 +115,56 @@
     img.src = 'data:image/webp;base64,UklGRi4AAABXRUJQVlA4TCEAAAAvAUAAEB8wAiMwAgSSNtse/cXjxyCCmrYNWPwmHRsB8wAZ';
   })();
 
+  /* === Global Search: inject box + results, load search.js === */
+  (function () {
+    // 1) 若无搜索表单，则注入到第一个 .mk-nav 中
+    var nav = document.querySelector('.mk-nav');
+    if (nav && !nav.querySelector('.mk-search-form')) {
+      var form = document.createElement('form');
+      form.className = 'mk-search-form';
+      form.setAttribute('role', 'search');
+      form.setAttribute('action', '#');   // 前端内联搜索，不跳转
+      form.setAttribute('method', 'GET');
+      var btn = document.createElement('button');
+      btn.className = 'mk-search-button';
+      btn.type = 'submit';
+      btn.textContent = '搜索';
+      var input = document.createElement('input');
+      input.className = 'mk-search-input';
+      input.name = 'q';
+      input.type = 'text';
+      input.placeholder = '搜索…';
+      input.setAttribute('aria-label', '搜索框');
+      input.setAttribute('autocomplete', 'off');
+      form.appendChild(btn);
+      form.appendChild(input);
+      nav.appendChild(form);
+    }
+    // 2) 确保搜索结果容器存在（search.js 也会兜底创建）
+    if (!document.getElementById('searchResults')) {
+      var main = document.querySelector('.mk-container') || document.body;
+      var sec = document.createElement('section');
+      sec.id = 'searchResults';
+      sec.className = 'mk-section mk-search-results';
+      sec.style.display = 'none';
+      main.appendChild(sec);
+    }
+    // 3) 加载 search.js（仅加载一次）
+    if (document.getElementById('mkSearchLoaded')) return;
+    var marker = document.createElement('span');
+    marker.id = 'mkSearchLoaded';
+    marker.style.display = 'none';
+    (document.head || document.body).appendChild(marker);
+    var s = document.createElement('script');
+    s.src = (function () {
+      var base = document.currentScript && document.currentScript.src
+        ? document.currentScript.src.replace(/[^/]*$/, '')
+        : '';
+      return base + 'search.js';
+    })();
+    (document.head || document.body).appendChild(s);
+  })();
+
   /* === Code Block: Copy + Fold === */
   (function () {
     document.querySelectorAll('.mk-code-wrap').forEach(function (wrap) {
