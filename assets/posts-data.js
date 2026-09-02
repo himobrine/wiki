@@ -1078,6 +1078,15 @@ const POSTS_DATA = [
     url: 'posts/cpp-mul-optimize.html',
     excerpt: '分析编译器在乘法运算中的优化策略：左移替代乘 2 的幂、乘 15 通过左移减法实现、imul 用于变量乘法，展示 MinGW 与 MSVC（64→64、64→32）汇编对比，解释 RTC 检查与栈填充。',
     tags: ['C/C++', '逆向', '底层原理', '学习笔记']
+  },
+  {
+    title: '整数除法优化：符号位陷阱与高效技巧',
+    primary: 'C/C++',
+    secondary: '基础',
+    date: '2026 // 09 / 02',
+    url: 'posts/integer-division-optimize.html',
+    excerpt: '系统讲解编译器如何将整数常量除法优化为乘法+移位指令组合，涵盖无符号/有符号除数的2的幂与非2的幂各种情况：shr 右移替代、魔数乘法恢复除法原型、sar 算术右移的符号位陷阱校正，含 MinGW 与 MSVC 多平台汇编对比分析。',
+    tags: ['C/C++', '逆向', '底层原理', '学习笔记']
   }
 ];
 

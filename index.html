@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="assets/style.css"></noscript>
 <link rel="preload" href="assets/posts-data.js" as="script">
+  <script src="assets/search.js"></script>
 </head>
 <body>
 <div class="mk-scanline"></div>
@@ -33,6 +34,10 @@
     <a href="tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
     <a href="tags/list.html?tag=调试" class="mk-nav-link">调试</a>
     <a href="tags/list.html" class="mk-nav-link">标签归档</a>
+    <form class="mk-search-form" role="search" action="index.html" method="GET">
+      <button class="mk-search-button" type="submit">搜索</button>
+      <input class="mk-search-input" name="q" type="text" placeholder="搜索…" aria-label="搜索框" autocomplete="off">
+    </form>
   </nav>
 </div>
 
@@ -43,12 +48,14 @@
   <div class="mk-bento" id="latestPosts"></div>
 </section>
 
+
 <section class="mk-section">
   <header class="mk-section-head fade-up">
     <h2>// TAGS // INDEX</h2>
   </header>
   <div class="mk-tag-index fade-up" id="tagGrid"></div>
 </section>
+<section id="searchResults" class="mk-section mk-search-results" style="display:none;"></section>
 
 <footer class="mk-footer fade-up">
   <div class="mk-footer-brand">RHODES ISLAND :// SECURITY LAB // BLOG</div>
@@ -127,6 +134,7 @@
   document.getElementById('tagGrid').innerHTML = html;
 })();
 </script>
+<script src="assets/search.js"></script>
 <script src="assets/common.js"></script>
 
 <aside class="mk-graph-sidebar" id="mkGraphSidebar">
