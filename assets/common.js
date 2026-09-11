@@ -32,6 +32,20 @@
   }, { threshold: 0.1 });
   document.querySelectorAll('.fade-up').forEach(function (el) { animObserver.observe(el); });
 
+  /* === Auto-observe dynamically added .fade-up elements === */
+  var fadeUpMo = new MutationObserver(function (mutations) {
+    mutations.forEach(function (m) {
+      m.addedNodes.forEach(function (node) {
+        if (node.nodeType !== 1) return;
+        if (node.classList && node.classList.contains('fade-up')) animObserver.observe(node);
+        if (node.querySelectorAll) {
+          node.querySelectorAll('.fade-up').forEach(function (el) { animObserver.observe(el); });
+        }
+      });
+    });
+  });
+  fadeUpMo.observe(document.body, { childList: true, subtree: true });
+
   /* === Theme Switching === */
   var html = document.documentElement;
   var themeBtn = document.getElementById('mkThemeToggle');
@@ -334,5 +348,65 @@
       }
     }, { passive: false });
     overlay.addEventListener('touchend', function () { isPanning = false; });
+  })();
+
+  /* === AI Assistant: inject DOM + load ai-assistant.js === */
+  (function () {
+    if (document.getElementById('mkAiAssistant')) return;
+
+    var root = document.createElement('div');
+    root.id = 'mkAiAssistant';
+    root.className = 'mk-ai-assistant';
+    root.innerHTML =
+      '<button class="mk-ai-toggle" aria-label="AI 助手">AI</button>' +
+      '<div class="mk-ai-panel">' +
+        '<div class="mk-ai-header">' +
+          '<div class="mk-ai-header-left">' +
+            '<span class="mk-ai-status-dot"></span>' +
+            '<span class="mk-ai-status-text">未配置</span>' +
+          '</div>' +
+          '<div class="mk-ai-header-actions">' +
+            '<button class="mk-ai-header-btn mk-ai-settings-btn" title="设置" aria-label="设置">&#9881;</button>' +
+            '<button class="mk-ai-header-btn mk-ai-clear" title="清空对话" aria-label="清空对话">&#10005;</button>' +
+            '<button class="mk-ai-header-btn mk-ai-close" title="关闭" aria-label="关闭">&#8722;</button>' +
+          '</div>' +
+        '</div>' +
+        '<div class="mk-ai-messages"></div>' +
+        '<div class="mk-ai-loading"><span class="mk-ai-loading-dot"></span><span class="mk-ai-loading-dot"></span><span class="mk-ai-loading-dot"></span></div>' +
+        '<div class="mk-ai-input-area">' +
+          '<textarea class="mk-ai-input-field" rows="1" placeholder="输入消息…" aria-label="输入消息"></textarea>' +
+          '<button class="mk-ai-send" title="发送" aria-label="发送">&#10148;</button>' +
+        '</div>' +
+        '<div class="mk-ai-settings">' +
+          '<div class="mk-ai-settings-header">' +
+            '<span class="mk-ai-settings-title">// 设置</span>' +
+            '<button class="mk-ai-header-btn mk-ai-settings-cancel" title="取消" aria-label="取消">&#10005;</button>' +
+          '</div>' +
+          '<div class="mk-ai-settings-body">' +
+            '<div class="mk-ai-field"><label>API 地址</label><input class="mk-ai-api-url" type="url" placeholder="http://localhost:11434"></div>' +
+            '<div class="mk-ai-field"><label>模型名称</label><input class="mk-ai-api-model" type="text" placeholder="qwen2.5"></div>' +
+            '<div class="mk-ai-field"><label>API Key（选填）</label><input class="mk-ai-api-key" type="password" placeholder="sk-..."></div>' +
+          '</div>' +
+          '<div class="mk-ai-settings-footer">' +
+            '<button class="mk-ai-settings-cancel">取消</button>' +
+            '<button class="mk-ai-settings-save">保存</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(root);
+
+    if (document.getElementById('mkAiLoaded')) return;
+    var marker = document.createElement('span');
+    marker.id = 'mkAiLoaded';
+    marker.style.display = 'none';
+    (document.head || document.body).appendChild(marker);
+    var s = document.createElement('script');
+    s.src = (function () {
+      var base = document.currentScript && document.currentScript.src
+        ? document.currentScript.src.replace(/[^/]*$/, '')
+        : '';
+      return base + 'ai-assistant.js';
+    })();
+    (document.head || document.body).appendChild(s);
   })();
 })();
