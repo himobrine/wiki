@@ -78,6 +78,13 @@
 
   var nodes, edges, network;
 
+  function basePath() {
+    var parts = window.location.pathname.split('/');
+    var last = parts[parts.length - 1];
+    if (last !== 'index.html' && last !== 'graph.html' && last !== 'links.html' && parts.length >= 3) return '../';
+    return '';
+  }
+
   function clickNav(params) {
     if (params.nodes.length > 0) {
       var node = nodes.get(params.nodes[0]);
@@ -193,7 +200,7 @@
       var id = 'hub:' + t;
       hubIds[t] = id;
       var sz = (!isFullPage ? 8 : 12) + Math.min(Math.round((hubCount[t] - 5) * 0.3), 8);
-      nArr.push({ id: id, title: t, url: null, value: hubCount[t], size: sz, color: { background: '#d4a020', border: '#d4a020', highlight: { background: '#ff8c00', border: '#ff8c00' } }, shape: 'star' });
+      nArr.push({ id: id, title: t, url: basePath() + 'tags/list.html?tag=' + encodeURIComponent(t), value: hubCount[t], size: sz, color: { background: '#d4a020', border: '#d4a020', highlight: { background: '#ff8c00', border: '#ff8c00' } }, shape: 'star' });
     });
     // 每篇文章 -> 其枢纽标签
     POSTS.forEach(function (p, i) {
