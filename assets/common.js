@@ -357,6 +357,7 @@
     var root = document.createElement('div');
     root.id = 'mkAiAssistant';
     root.className = 'mk-ai-assistant';
+    root.style.cssText = 'position:fixed;bottom:24px;left:24px;z-index:1002';
     root.innerHTML =
       '<button class="mk-ai-toggle" aria-label="AI 助手">AI</button>' +
       '<div class="mk-ai-panel">' +
