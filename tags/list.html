@@ -63,8 +63,18 @@
 </div>
 
 <script src="../assets/posts-data.js"></script>
+<script src="../assets/common.js"></script>
 <script>const POSTS = POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:'../'+p.url,excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});</script>
 <script>
+if (typeof window.getFlatTags !== 'function') {
+  window.getFlatTags = function(p) {
+    var t = (p && p.tags) || {};
+    return [].concat(t.category || [], t.knowledge || [], t.tools || []);
+  };
+}
+if (typeof window.TAG_COLORS !== 'object' || !window.TAG_COLORS) {
+  window.TAG_COLORS = {};
+}
 function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function getAllTags() {
@@ -236,7 +246,6 @@ if (tag) {
   });
 }
 </script>
-<script src="../assets/common.js"></script>
 
 <aside class="mk-graph-sidebar" id="mkGraphSidebar" data-default-spoke>
   <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>

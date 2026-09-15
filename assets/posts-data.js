@@ -1,4 +1,4 @@
-const POSTS_DATA = [
+var POSTS_DATA = [
   {
     title: "upload-labs 搭建",
     primary: "Web安全",
@@ -1593,7 +1593,7 @@ function getFlatTags(p) {
   return out;
 }
 
-const TAG_COLORS = {
+var TAG_COLORS = {
   "逆向": '7b2d8e',
   "调试": '2ea44f',
   "X64dbg": '00d4ff',
