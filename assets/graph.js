@@ -68,6 +68,13 @@
   BASE_HUB.forEach(function (h) { hubSet[h] = true; });
   for (var u in usage) { if (usage[u] >= HUB_FANOUT) hubSet[u] = true; }
 
+  // ID → index mapping for reference edges
+  var idToIndex = {};
+  POSTS.forEach(function (p, i) { if (p.id) idToIndex[p.id] = i; });
+
+  // 预计算权重（供 buildSpoke 使用）
+  var POST_W = POSTS.map(function (p) { return tagWeights(p); });
+
   // 文章页：pathname 匹配某 POST 文件名 → 单篇放射图；index/tags/graph 页 → 全站图
   var isFullPage = window.location.pathname.split('/').pop() === 'graph.html';
   var f = window.location.pathname.split('/').pop();
@@ -92,7 +99,7 @@
     }
   }
 
-  // ===== 单篇放射图（文章页侧边栏）=====
+  // ===== 单篇放射图（文章页侧边栏）—— 新版本 =====
   if (currentIdx !== -1 && !isFullPage) {
     var connected = [currentIdx], wt = {};
     for (var i1 = 0; i1 < POSTS.length; i1++) {
@@ -121,11 +128,32 @@
         if (seen[key]) continue;
         seen[key] = true;
         var tags = sa.list.map(function (x) { return x.tag; });
-        edgeArr.push({ from: ia, to: ib, value: Math.min(sa.total, 5), width: 0.8 + sa.total * 0.25,
-          title: '权重 ' + sa.total + ' 共享: ' + tags.join(', '),
-          color: { inherit: 'both', opacity: Math.min(0.25 + sa.total * 0.12, 0.9) } });
+        edgeArr.push({ from: ia, to: ib, type: 'tag', value: Math.min(sa.total, 3), width: 0.5,
+          dashes: [5, 5], title: '标签共享: ' + tags.join(', '),
+          color: { inherit: 'both', opacity: Math.min(0.15 + sa.total * 0.08, 0.5) } });
       }
     }
+    // Reference edges for current post
+    var curPost = POSTS[currentIdx];
+    (curPost.references || []).forEach(function (refId) {
+      var j = idToIndex[refId];
+      if (j !== undefined && j !== currentIdx) {
+        edgeArr.push({ from: currentIdx, to: j, type: 'reference', value: 5, width: 2.5,
+          dashes: false, title: '引用: ' + POSTS[j].title,
+          color: { color: '#d4a020', highlight: '#ff8c00', opacity: 1 } });
+        if (connected.indexOf(j) === -1) { connected.push(j); wt[j] = 5; }
+      }
+    });
+    // Backlink edges (posts that reference current post)
+    (typeof BACKLINKS !== 'undefined' ? BACKLINKS[curPost.id] || [] : []).forEach(function (blId) {
+      var j = idToIndex[blId];
+      if (j !== undefined && j !== currentIdx) {
+        edgeArr.push({ from: j, to: currentIdx, type: 'reference', value: 5, width: 2.5,
+          dashes: false, title: '被引用: ' + POSTS[j].title,
+          color: { color: '#d4a020', highlight: '#ff8c00', opacity: 1 } });
+        if (connected.indexOf(j) === -1) { connected.push(j); wt[j] = 5; }
+      }
+    });
     edges = new vis.DataSet(edgeArr);
     network = new vis.Network(c, { nodes: nodes, edges: edges }, {
       nodes: { shape: 'dot', borderWidth: 0, borderWidthSelected: 2, font: { size: 0 } },
@@ -162,7 +190,7 @@
     c.addEventListener('mouseleave', function () { network.setOptions({ physics: { enabled: true } }); });
   }
 
-  // ===== 默认模式：加权直连图 =====
+  // ===== 默认模式：加权直连图 —— 线上版本 =====
   function buildDefault() {
     var strong = {};
     for (var x = 0; x < POSTS.length; x++) {
@@ -187,13 +215,12 @@
 
   // ===== 枢纽模式：hub-and-spoke 放射大图 =====
   function buildSpoke() {
-    // 每个 hub 节点：id 用字符串 'hub:'+tag，颜色统一高亮，尺寸按使用度
     var nArr = POSTS.map(function (p, i) {
       return { id: i, title: p.title, url: p.url, value: 1, size: !isFullPage ? 5 : 7, color: gc(p), group: p.primary, shape: gsh(p) };
     });
     var eArr = [], hubCount = {}, hubIds = {};
     POSTS.forEach(function (p, i) {
-      var w = tagWeights(p);
+      var w = POST_W[i];
       for (var t in w) { if (hubSet[t]) { hubCount[t] = (hubCount[t] || 0) + 1; } }
     });
     Object.keys(hubCount).sort().forEach(function (t) {
@@ -204,13 +231,24 @@
     });
     // 每篇文章 -> 其枢纽标签
     POSTS.forEach(function (p, i) {
-      var w = tagWeights(p);
+      var w = POST_W[i];
       for (var t in w) {
         if (hubIds[t]) {
-          eArr.push({ from: i, to: hubIds[t], width: 0.8,
-            title: t, color: { inherit: 'both', opacity: 0.5 } });
+          eArr.push({ from: i, to: hubIds[t], type: 'tag', width: isFullPage ? 0.3 : 0.5,
+            dashes: [5, 5], title: t, color: { inherit: 'both', opacity: isFullPage ? 0.2 : 0.3 } });
         }
       }
+    });
+    // Reference edges (solid, high weight, gold)
+    POSTS.forEach(function (p, i) {
+      (p.references || []).forEach(function (refId) {
+        var j = idToIndex[refId];
+        if (j !== undefined && j !== i) {
+          eArr.push({ from: i, to: j, type: 'reference', value: isFullPage ? 3 : 5, width: isFullPage ? 1.5 : 2.5,
+            dashes: false, title: '引用: ' + POSTS[j].title,
+            color: { color: '#d4a020', highlight: '#ff8c00', opacity: 1 } });
+        }
+      });
     });
     return { nodes: new vis.DataSet(nArr), edges: new vis.DataSet(eArr) };
   }

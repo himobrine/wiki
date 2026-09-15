@@ -894,6 +894,45 @@ body {
 }
 .mk-tag-post-link:hover { color: var(--mk-gold); border-left-color: var(--mk-gold); }
 
+/* === Backlink Cards === */
+.mk-backlink-card {
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid oklch(0% 0 0 / 0.06);
+  background: oklch(100% 0 0 / 0.45);
+  transition: all 0.3s;
+}
+.mk-backlink-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px oklch(0% 0 0 / 0.08);
+}
+.mk-backlink-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+.mk-backlink-date {
+  font-size: 0.72rem;
+  font-family: 'Fira Code', 'Source Code Pro', monospace;
+  opacity: 0.5;
+  letter-spacing: 0.06em;
+}
+.mk-backlink-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+[data-theme="dark"] .mk-backlink-card {
+  border-color: oklch(100% 0 0 / 0.08);
+  background: oklch(15% 0 0 / 0.3);
+}
+[data-theme="dark"] .mk-backlink-card:hover {
+  box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
+}
+
 /* === Lightbox === */
 .img-lightbox {
   position: fixed; inset: 0; z-index: 99999;

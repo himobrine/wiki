@@ -53,27 +53,36 @@ mywiki/
 ```js
 {
   title: '文章标题',
+  id: 'your-article',          // 唯一标识（用于 references 引用）
+  references: [],               // 引用的其他文章 id 数组（可选）
   primary: '主分类',       // Web安全 / CTF / 逆向 / C/C++
   secondary: '子分类',     // 如 DVWA / Pwn / Crack 等
   date: '2026 // 06 / 05',
   url: 'posts/your-article.html',
   excerpt: '文章摘要，1-2 句话概述内容',
-  tags: ['标签1', '标签2']
+  tags: {
+    category: ['标签1'],
+    knowledge: ['知识点'],
+    tools: ['工具']
+  }
 }
 ```
 
 | 字段 | 说明 |
 |------|------|
 | `title` | 文章标题 |
+| `id` | 唯一标识符（用于引用关系），建议用文件名（不含 `.html`） |
+| `references` | 本文引用的其他文章 `id` 数组，留空 `[]` 则无引用关系 |
 | `primary` | 主分类（用于知识图谱群组聚类，影响节点颜色） |
 | `secondary` | 子分类（用于知识图谱节点形状） |
 | `date` | 日期格式 `YYYY // MM / DD`，用于排序 |
 | `url` | 相对于站点根目录的路径 |
 | `excerpt` | 首页展示的摘要文字 |
-| `tags` | 标签数组，用于筛选和颜色标注 |
+| `tags` | 标签对象（`category` / `knowledge` / `tools`），用于筛选和颜色标注 |
 
 > `index.html` 和 `tags/list.html` 会自动从 `POSTS_DATA` 加载数据，无需手动编辑。
-> **知识图谱**也会自动从 `POSTS_DATA` 渲染节点和关系边，确保 `primary` / `secondary` / `tags` 填写正确。
+> **知识图谱**会自动渲染**标签共享边**（虚线）和**引用边**（实线金色），关系由 `tags` 和 `references` 共同决定。
+> 文章页底部会自动显示**引用**（本文引用了哪些文章）和**反向链接**（哪些文章引用了本文）。
 
 ### 步骤 4：添加新标签颜色和 CSS 类
 
@@ -212,6 +221,9 @@ mywiki/
   <div class="copy">(c) 2026 // SECURITY BLOG</div>
 </div>
 
+<div id="postReferences"></div>
+<div id="postBacklinks"></div>
+
 </div>
 
 <div class="theme-dock" id="themeDock">
@@ -246,6 +258,8 @@ mywiki/
 
 <!-- common.js：主题切换、回到顶部、滚动动画、WebP 自适应（必须放在最后） -->
 <script src="../assets/common.js"></script>
+<!-- backlinks.js：自动渲染引用和反向链接 -->
+<script src="../assets/backlinks.js"></script>
 </body>
 </html>
 ```
@@ -391,10 +405,11 @@ mywiki/
 - [ ] 文章内 `post-tag` 的 inline style 颜色值正确
 - [ ] TOC 侧边栏的链接与正文 `id` 锚点一一对应
 - [ ] 文章内 `.nav-inner` 导航栏与首页 `index.html` 同步
-- [ ] `assets/posts-data.js` 的 `POSTS_DATA` 数组已添加新条目
+- [ ] `assets/posts-data.js` 的 `POSTS_DATA` 数组已添加新条目（含 `id`、`references` 字段）
 - [ ] 新标签已在 `assets/posts-data.js` 的 `TAG_COLORS` 中添加颜色映射，并在 `style.css` 中添加 `tag-xxx` class
 - [ ] 图片已放入 `assets/` 且同时提供了 `.png` 和 `.webp` 两份文件
-- [ ] `<script src="../assets/common.js"></script>` 已在页面最后引用
+- [ ] `<script src="../assets/common.js"></script>` 和 `<script src="../assets/backlinks.js"></script>` 已在页面最后引用
+- [ ] `<div id="postReferences"></div>` 和 `<div id="postBacklinks"></div>` 已包含在页面中
 - [ ] 图谱侧边栏和懒加载脚本已包含
 - [ ] 超过 10 行的代码块能正常折叠，折叠/展开按钮工作正常（`.mk-code-wrap.collapsed` 逻辑已包含）
 - [ ] 页面在浏览器打开测试正常（主题切换、代码块按钮、回到顶部、图谱均正常，无 404 资源）

@@ -1,6 +1,8 @@
 var POSTS_DATA = [
   {
     title: "upload-labs 搭建",
+    id: "upload-labs",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 01 / 27",
@@ -14,6 +16,8 @@ var POSTS_DATA = [
   },
   {
     title: "C/C++ 常量：#define 与 const",
+    id: "cpp-constants",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 06 / 04",
@@ -27,6 +31,8 @@ var POSTS_DATA = [
   },
   {
     title: "C/C++ 字符、字符串与指针",
+    id: "char-string-pointer",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 06 / 02",
@@ -40,6 +46,8 @@ var POSTS_DATA = [
   },
   {
     title: "crack实验 — IDA + x64dbg 逆向破解",
+    id: "cr-crack-experiment",
+    references: [],
     primary: "逆向",
     secondary: "Crack",
     date: "2026 // 05 / 31",
@@ -53,6 +61,8 @@ var POSTS_DATA = [
   },
   {
     title: "栈溢出2（500分）Writeup — ret2syscall",
+    id: "stack-overflow2-500pt",
+    references: [],
     primary: "CTF",
     secondary: "Pwn",
     date: "2026 // 05 / 31",
@@ -66,6 +76,8 @@ var POSTS_DATA = [
   },
   {
     title: "栈溢出（500分）Writeup",
+    id: "stack-overflow-500pt",
+    references: [],
     primary: "CTF",
     secondary: "Pwn",
     date: "2026 // 05 / 31",
@@ -79,6 +91,8 @@ var POSTS_DATA = [
   },
   {
     title: "MOV Attack — ECC Crypto Writeup",
+    id: "mov-attack",
+    references: [],
     primary: "CTF",
     secondary: "Crypto",
     date: "2026 // 05 / 31",
@@ -92,6 +106,8 @@ var POSTS_DATA = [
   },
   {
     title: "蓝桥杯 Writeup",
+    id: "re-蓝桥杯wp",
+    references: [],
     primary: "CTF",
     secondary: "Crypto",
     date: "2026 // 05 / 31",
@@ -105,6 +121,8 @@ var POSTS_DATA = [
   },
   {
     title: "Web11 500pt 目录扫描+Webshell+后台提权 Writeup",
+    id: "web11-500pt",
+    references: [],
     primary: "CTF",
     secondary: "Web",
     date: "2026 // 05 / 31",
@@ -118,6 +136,8 @@ var POSTS_DATA = [
   },
   {
     title: "Web10 500pt XSS 标签注入 Writeup",
+    id: "web-xss-tag-500pt",
+    references: [],
     primary: "CTF",
     secondary: "Web",
     date: "2026 // 05 / 31",
@@ -131,6 +151,8 @@ var POSTS_DATA = [
   },
   {
     title: "web 06 300pt php的areyouok和strpos绕过 Writeup",
+    id: "web-php-areyouok",
+    references: [],
     primary: "CTF",
     secondary: "Web",
     date: "2026 // 05 / 31",
@@ -144,6 +166,8 @@ var POSTS_DATA = [
   },
   {
     title: "newstar Writeup",
+    id: "newstar-wp",
+    references: [],
     primary: "CTF",
     secondary: "Pwn",
     date: "2026 // 05 / 31",
@@ -157,6 +181,8 @@ var POSTS_DATA = [
   },
   {
     title: "简单的JAVA逆向 Writeup",
+    id: "re-java-reverse",
+    references: [],
     primary: "CTF",
     secondary: "Reverse",
     date: "2026 // 05 / 31",
@@ -170,6 +196,8 @@ var POSTS_DATA = [
   },
   {
     title: "loding (50分)",
+    id: "re-loding-50pt",
+    references: [],
     primary: "CTF",
     secondary: "Pwn",
     date: "2026 // 05 / 31",
@@ -183,6 +211,8 @@ var POSTS_DATA = [
   },
   {
     title: "GetFlag 50pt",
+    id: "web-getflag-50pt",
+    references: [],
     primary: "CTF",
     secondary: "Web",
     date: "2026 // 05 / 31",
@@ -196,6 +226,8 @@ var POSTS_DATA = [
   },
   {
     title: "4.re Smali — Smali CTF Writeup",
+    id: "re-smali",
+    references: [],
     primary: "CTF",
     secondary: "Reverse",
     date: "2026 // 05 / 31",
@@ -209,6 +241,8 @@ var POSTS_DATA = [
   },
   {
     title: "4.re RC4-500pt —— 两种解题方法",
+    id: "re-rc4-500pt",
+    references: [],
     primary: "CTF",
     secondary: "Reverse",
     date: "2026 // 05 / 31",
@@ -222,6 +256,8 @@ var POSTS_DATA = [
   },
   {
     title: "4.re 蓝桥杯逆向三道WP",
+    id: "re-lanqiao",
+    references: [],
     primary: "CTF",
     secondary: "Reverse",
     date: "2026 // 05 / 31",
@@ -235,6 +271,8 @@ var POSTS_DATA = [
   },
   {
     title: "123 150pt —— 一句话木马文件上传 Writeup",
+    id: "web-upload-150pt",
+    references: [],
     primary: "CTF",
     secondary: "Web",
     date: "2026 // 05 / 31",
@@ -248,6 +286,8 @@ var POSTS_DATA = [
   },
   {
     title: "4.re CrackMe01 Writeup — IDA 逆向分析",
+    id: "re-crackme01",
+    references: [],
     primary: "逆向",
     secondary: "Crack",
     date: "2026 // 05 / 31",
@@ -261,6 +301,8 @@ var POSTS_DATA = [
   },
   {
     title: "[V&N2022公开赛] easy_RSA Writeup",
+    id: "vn2022-easy-rsa",
+    references: [],
     primary: "CTF",
     secondary: "Crypto",
     date: "2026 // 05 / 31",
@@ -274,6 +316,8 @@ var POSTS_DATA = [
   },
   {
     title: "Windows 逆向调试工具速查手册",
+    id: "reverse-debugging",
+    references: [],
     primary: "逆向",
     secondary: "工具",
     date: "2026 // 05 / 30",
@@ -287,6 +331,8 @@ var POSTS_DATA = [
   },
   {
     title: "C/C++ 基本变量数据类型的内存表示",
+    id: "variable-memory-layout",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 05 / 30",
@@ -300,6 +346,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Command Injection 全难度教程（附带代码分析）",
+    id: "dvwa-command-execution",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2026 // 05 / 27",
@@ -313,6 +361,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场搭建 - Windows phpstudy & Kali Docker 部署教程",
+    id: "dvwa-setup",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2026 // 04 / 27",
@@ -326,6 +376,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 File Inclusion 全难度教程（附代码解析）",
+    id: "dvwa-file-inclusion",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2026 // 04 / 12",
@@ -339,6 +391,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Brute Force（暴力破解）全难度教程（附代码分析）",
+    id: "dvwa-brute-force",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2026 // 03 / 28",
@@ -352,6 +406,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 CSRF（跨站请求伪造）全难度教程（附代码分析）",
+    id: "dvwa-csrf",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2026 // 03 / 06",
@@ -365,6 +421,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Weak Session IDs（弱会话IDs）全难度教程（附代码分析）",
+    id: "dvwa-weak-session-ids",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2026 // 03 / 02",
@@ -378,6 +436,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Insecure CAPTCHA（不安全的验证码）全难度教程（附代码分析）",
+    id: "dvwa-insecure-captcha",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2025 // 07 / 05",
@@ -391,6 +451,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 File Upload 全难度教程（附代码分析）",
+    id: "dvwa-file-upload",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2025 // 05 / 08",
@@ -404,6 +466,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Reflected Cross Site Scripting (XSS)（跨站脚本攻击）全难度教程（附代码分析）",
+    id: "dvwa-xss-reflected",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2024 // 05 / 18",
@@ -417,6 +481,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Authorisation Bypass（未授权访问）全难度教程（附代码分析）",
+    id: "dvwa-auth-bypass",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2024 // 05 / 19",
@@ -430,6 +496,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Open HTTP Redirect（开放重定向漏洞）全难度教程（附代码分析）",
+    id: "dvwa-open-http-redirect",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2024 // 05 / 20",
@@ -443,6 +511,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 Content Security Policy (CSP) Bypass(CSP绕过)全难度教程（附代码分析）",
+    id: "dvwa-csp-bypass",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2024 // 05 / 14",
@@ -456,6 +526,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 JavaScript Attacks(js攻击)全难度教程（附代码分析）",
+    id: "dvwa-javascript-attacks",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2024 // 05 / 14",
@@ -469,6 +541,8 @@ var POSTS_DATA = [
   },
   {
     title: "DVWA 靶场 SQL Injection（SQL 注入）全难度教程（附代码分析）",
+    id: "dvwa-sql-injection",
+    references: [],
     primary: "Web安全",
     secondary: "DVWA",
     date: "2023 // 04 / 04",
@@ -482,6 +556,8 @@ var POSTS_DATA = [
   },
   {
     title: "CVE-2019-11043 PHP 远程代码执行漏洞",
+    id: "vulhub-cve-2019-11043",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2023 // 02 / 17",
@@ -495,6 +571,8 @@ var POSTS_DATA = [
   },
   {
     title: "CVE-2018-19518 PHP imap 远程命令执行漏洞",
+    id: "vulhub-cve-2018-19518",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2023 // 02 / 17",
@@ -508,6 +586,8 @@ var POSTS_DATA = [
   },
   {
     title: "CVE-2012-1823 PHP-CGI 远程代码执行漏洞",
+    id: "vulhub-cve-2012-1823",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2023 // 02 / 12",
@@ -521,6 +601,8 @@ var POSTS_DATA = [
   },
   {
     title: "Vulhub 搭建方法",
+    id: "vulhub-setup",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2023 // 02 / 13",
@@ -534,6 +616,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第一二关",
+    id: "upload-labs-pass1-2",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 01 / 27",
@@ -547,6 +631,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第三四关",
+    id: "upload-labs-pass3-4",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 04 / 12",
@@ -560,6 +646,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第五六关",
+    id: "upload-labs-pass5-6",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 10 / 28",
@@ -573,6 +661,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第七八关",
+    id: "upload-labs-pass7-8",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2025 // 12 / 29",
@@ -586,6 +676,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第九十关",
+    id: "upload-labs-pass9-10",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2025 // 05 / 17",
@@ -599,6 +691,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第十一十二关",
+    id: "upload-labs-pass11-12",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 04 / 18",
@@ -612,6 +706,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第十三十四关",
+    id: "upload-labs-pass13-14",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 04 / 18",
@@ -625,6 +721,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第十五十六关",
+    id: "upload-labs-pass15-16",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 04 / 18",
@@ -638,6 +736,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第十七十八关",
+    id: "upload-labs-pass17-18",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 04 / 18",
@@ -651,6 +751,8 @@ var POSTS_DATA = [
   },
   {
     title: "upload-labs 第十九二十关",
+    id: "upload-labs-pass19-20",
+    references: [],
     primary: "Web安全",
     secondary: "upload-labs",
     date: "2024 // 12 / 19",
@@ -664,6 +766,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulhub靶机activemq环境下的CVE-2015-5254（ActiveMQ 反序列化漏洞）",
+    id: "vulhub-cve-2015-5254",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2024 // 02 / 01",
@@ -677,6 +781,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulhub靶机activemq环境下的CVE-2016-3088（ActiveMQ任意文件写入漏洞）",
+    id: "vulhub-cve-2016-3088",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2024 // 02 / 02",
@@ -690,6 +796,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulhub靶机struts2环境下的s2-032（CVE-2016-3081）（远程命令执行漏洞）",
+    id: "vulhub-cve-2016-3081",
+    references: [],
     primary: "Web安全",
     secondary: "Vulhub",
     date: "2024 // 08 / 07",
@@ -703,6 +811,8 @@ var POSTS_DATA = [
   },
   {
     title: "The Planets: Earth — Vulnhub 靶机渗透教程",
+    id: "vulnhub-earth",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 01 / 10",
@@ -716,6 +826,8 @@ var POSTS_DATA = [
   },
   {
     title: "Matrix-Breakout 2 Morpheus — Vulnhub 靶机渗透教程",
+    id: "vulnhub-morpheus",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 01 / 11",
@@ -729,6 +841,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶场red:1教程",
+    id: "vulnhub-red1",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 07 / 14",
@@ -742,6 +856,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Napping1.0.1教程",
+    id: "vulnhub-napping",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 07 / 19",
@@ -755,6 +871,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶场noob：1教程",
+    id: "vulnhub-noob",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 07 / 18",
@@ -768,6 +886,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机ica：1教程",
+    id: "vulnhub-ica1",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 07 / 22",
@@ -781,6 +901,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Thales:1教程",
+    id: "vulnhub-thales1",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 07 / 26",
@@ -794,6 +916,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Empire LupinOne教程",
+    id: "vulnhub-lupinone",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 08 / 01",
@@ -807,6 +931,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Deathnote教程",
+    id: "vulnhub-deathnote",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 08 / 10",
@@ -820,6 +946,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机DarkHole_2教程",
+    id: "vulnhub-darkhole2",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 08 / 20",
@@ -833,6 +961,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Solstice",
+    id: "vulnhub-solstice",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 09 / 08",
@@ -846,6 +976,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机02-Breakout",
+    id: "vulnhub-breakout",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 08 / 30",
@@ -859,6 +991,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机EvilBox---One",
+    id: "vulnhub-evilbox-one",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 09 / 02",
@@ -872,6 +1006,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Brainpan",
+    id: "vulnhub-brainpan",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 09 / 11",
@@ -885,6 +1021,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Thoth-Tech",
+    id: "vulnhub-thothtech",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 09 / 16",
@@ -898,6 +1036,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Looz",
+    id: "vulnhub-looz",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 09 / 17",
@@ -911,6 +1051,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机DoubleTrouble",
+    id: "vulnhub-doubletrouble",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 10 / 06",
@@ -924,6 +1066,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Vegeta",
+    id: "vulnhub-vegeta",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 08",
@@ -937,6 +1081,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Funbox11",
+    id: "vulnhub-funbox11",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 08",
@@ -950,6 +1096,8 @@ var POSTS_DATA = [
   },
   {
     title: "The Planets: Venus — Vulnhub 靶机渗透教程",
+    id: "vulnhub-venus",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 11 / 15",
@@ -963,6 +1111,8 @@ var POSTS_DATA = [
   },
   {
     title: "Momentum: 1 — Vulnhub 靶机渗透教程",
+    id: "vulnhub-momentum",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 11 / 15",
@@ -976,6 +1126,8 @@ var POSTS_DATA = [
   },
   {
     title: "Momentum: 2 — Vulnhub 靶机渗透教程",
+    id: "vulnhub-momentum2",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2023 // 11 / 20",
@@ -989,6 +1141,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Presidential",
+    id: "vulnhub-presidential",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 08",
@@ -1002,6 +1156,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Aragog-1.0.2",
+    id: "vulnhub-aragog",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1015,6 +1171,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Gigachad:1",
+    id: "vulnhub-gigachad",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 02 / 13",
@@ -1028,6 +1186,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Orasi",
+    id: "vulnhub-orasi",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 02 / 15",
@@ -1041,6 +1201,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Phineas",
+    id: "vulnhub-phineas",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1054,6 +1216,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Prime-2021-2",
+    id: "vulnhub-prime2",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1067,6 +1231,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudo FOG",
+    id: "vulnhub-hacksudo-fog",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1080,6 +1246,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Pylington",
+    id: "vulnhub-pylington",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1093,6 +1261,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Ki:1",
+    id: "vulnhub-ki",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1106,6 +1276,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Odin:1",
+    id: "vulnhub-odin",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1119,6 +1291,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Chill_Hack",
+    id: "vulnhub-chillhack",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 22",
@@ -1132,6 +1306,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机BlueSky",
+    id: "vulnhub-bluesky",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 22",
@@ -1145,6 +1321,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机HotelWW",
+    id: "vulnhub-hotelww",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 23",
@@ -1158,6 +1336,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Gaara",
+    id: "vulnhub-gaara",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 24",
@@ -1171,6 +1351,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机BlueMoon",
+    id: "vulnhub-bluemoon",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 24",
@@ -1184,6 +1366,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Immersion Machine",
+    id: "vulnhub-immersion-machine",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 24",
@@ -1197,6 +1381,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Clover",
+    id: "vulnhub-clover",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 24",
@@ -1210,6 +1396,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Midwest",
+    id: "vulnhub-midwest",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 01 / 25",
@@ -1223,6 +1411,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机De-ICE_S2.100",
+    id: "vulnhub-deice-s2100",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 05 / 26",
@@ -1236,6 +1426,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Hack_Me_Please",
+    id: "vulnhub-hackmeplease",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 06 / 03",
@@ -1249,6 +1441,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机XPTO System: 1",
+    id: "vulnhub-xpto",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2024 // 06 / 04",
@@ -1262,6 +1456,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudo search",
+    id: "vulnhub-hacksudo-search",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1275,6 +1471,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机coffeeaddicts",
+    id: "vulnhub-coffeeaddicts",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1288,6 +1486,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-1",
+    id: "vulnhub-hacksudo-lpe",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1301,6 +1501,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-2",
+    id: "vulnhub-hacksudo-lpe2",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1314,6 +1516,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-3",
+    id: "vulnhub-hacksudo-lpe3",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1327,6 +1531,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-4",
+    id: "vulnhub-hacksudo-lpe4",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1340,6 +1546,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-5",
+    id: "vulnhub-hacksudo-lpe5",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1353,6 +1561,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-6",
+    id: "vulnhub-hacksudo-lpe6",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1366,6 +1576,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-7",
+    id: "vulnhub-hacksudo-lpe7",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1379,6 +1591,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机hacksudoLPE中Challenge-8",
+    id: "vulnhub-hacksudo-lpe8",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1392,6 +1606,8 @@ var POSTS_DATA = [
   },
   {
     title: "vulnhub靶机Hackxor:1",
+    id: "vulnhub-hackxor",
+    references: [],
     primary: "Web安全",
     secondary: "vulnhub",
     date: "2026 // 06 / 09",
@@ -1405,6 +1621,8 @@ var POSTS_DATA = [
   },
   {
     title: "adversarial_ml_ctf靶场搭建",
+    id: "adversarial-ml-ctf-setup",
+    references: [],
     primary: "AI安全",
     secondary: "CTF",
     date: "2026 // 06 / 19",
@@ -1418,6 +1636,8 @@ var POSTS_DATA = [
   },
   {
     title: "adversarial_ml_ctf靶场攻击（明文）",
+    id: "adversarial-ml-ctf-attack",
+    references: [],
     primary: "AI安全",
     secondary: "CTF",
     date: "2026 // 06 / 19",
@@ -1431,6 +1651,8 @@ var POSTS_DATA = [
   },
   {
     title: "adversarial_ml_ctf的PGD攻击实战",
+    id: "adversarial-ml-ctf-pgd-attack",
+    references: [],
     primary: "AI安全",
     secondary: "CTF",
     date: "2026 // 06 / 19",
@@ -1444,6 +1666,8 @@ var POSTS_DATA = [
   },
   {
     title: "Machine_Learning_CTF_Challenges 搭建",
+    id: "ml-ctf-challenges-setup",
+    references: [],
     primary: "AI安全",
     secondary: "靶场搭建",
     date: "2026 // 06 / 20",
@@ -1457,6 +1681,8 @@ var POSTS_DATA = [
   },
   {
     title: "Persuade_ML_CTF_Challenge — Pickle 反序列化",
+    id: "persuade-ml-ctf-challenge",
+    references: [],
     primary: "AI安全",
     secondary: "CTF",
     date: "2026 // 06 / 20",
@@ -1470,6 +1696,8 @@ var POSTS_DATA = [
   },
   {
     title: "Heist_ML_CTF_Challenge — 数据投毒攻击",
+    id: "heist-ml-ctf-challenge",
+    references: [],
     primary: "AI安全",
     secondary: "CTF",
     date: "2026 // 06 / 22",
@@ -1483,6 +1711,8 @@ var POSTS_DATA = [
   },
   {
     title: "Fourtune_ML_CTF_Challenge — 对抗样本攻击",
+    id: "fourtune-ml-ctf-challenge",
+    references: [],
     primary: "AI安全",
     secondary: "CTF",
     date: "2026 // 06 / 22",
@@ -1496,6 +1726,8 @@ var POSTS_DATA = [
   },
   {
     title: "揭秘 Windows 程序启动的神秘之旅",
+    id: "windows-startup",
+    references: [],
     primary: "逆向",
     secondary: "基础",
     date: "2026 // 08 / 02",
@@ -1509,6 +1741,8 @@ var POSTS_DATA = [
   },
   {
     title: "深入解析 C++ 虚函数与虚表机制",
+    id: "cpp-vtable-virtual",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 08 / 10",
@@ -1522,6 +1756,8 @@ var POSTS_DATA = [
   },
   {
     title: "编译器优化：从加法指令到性能提升",
+    id: "cpp-compiler-optimize",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 08 / 18",
@@ -1535,6 +1771,8 @@ var POSTS_DATA = [
   },
   {
     title: "汇编中的减法与补码转换奥秘",
+    id: "asm-sub-complement",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 08 / 19",
@@ -1548,6 +1786,8 @@ var POSTS_DATA = [
   },
   {
     title: "编译器如何优化乘法运算？从 C 代码到汇编指令的深度解析",
+    id: "cpp-mul-optimize",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 08 / 21",
@@ -1561,6 +1801,8 @@ var POSTS_DATA = [
   },
   {
     title: "整数除法优化：符号位陷阱与高效技巧",
+    id: "integer-division-optimize",
+    references: [],
     primary: "C/C++",
     secondary: "基础",
     date: "2026 // 09 / 02",
@@ -1573,6 +1815,30 @@ var POSTS_DATA = [
     }
   },
 ];
+
+// === Reference & Backlink Helpers ===
+var POSTS_BY_ID = {};
+POSTS_DATA.forEach(function (p) { if (p.id) POSTS_BY_ID[p.id] = p; });
+
+var BACKLINKS = {};
+POSTS_DATA.forEach(function (p) {
+  (p.references || []).forEach(function (refId) {
+    if (!POSTS_BY_ID[refId]) {
+      console.warn('[backlinks] dangling reference: ' + p.id + ' \u2192 ' + refId);
+      return;
+    }
+    if (!BACKLINKS[refId]) BACKLINKS[refId] = [];
+    BACKLINKS[refId].push(p.id);
+  });
+});
+
+function sortByDateDesc(ids) {
+  return ids.sort(function (a, b) {
+    var da = (POSTS_BY_ID[a].date || '').replace(/ \/\/ /g, '-').split(' / ').join('-');
+    var db = (POSTS_BY_ID[b].date || '').replace(/ \/\/ /g, '-').split(' / ').join('-');
+    return db.localeCompare(da);
+  });
+}
 
 function getPostTags(p) {
   var t = (p && p.tags) || {};
