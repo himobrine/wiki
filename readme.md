@@ -417,3 +417,4 @@ mywiki/
 ---
 
 > 项目维护者：himobrine · [GitHub](https://github.com/himobrine/wiki)
+文档采用 CC BY-NC-ND 4.0，代码部分保留所有权利。
