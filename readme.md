@@ -2,6 +2,17 @@
 
 纯前端静态安全技术博客，零构建工具依赖，浏览器直开。文章以独立 HTML 文件存放在 `posts/`，首页与标签页通过内置 JavaScript 数据数组驱动渲染。
 
+## 功能特性
+
+- **5 套主题** — 暗色（默认）、亮色、水晶、Ego、Rei，一键切换
+- **知识图谱** — 基于 vis-network 的关系图谱，标签共享边（虚线）+ 引用边（实线金色），hub 节点支持点击跳转标签页
+- **全站搜索** — 基于文章标题/摘要/标签的即时搜索，支持中英文
+- **AI 助手** — 文章页内置 AI 问答入口，可对当前文章内容提问
+- **引用与反向链接** — 文章底部自动渲染「本文引用」和「反向链接」，形成双向链接网络
+- **标签系统** — 结构化标签对象（`category` / `knowledge` / `tools`），按标签筛选 + 彩色标注
+- **代码块折叠** — 超过 10 行的代码块自动折叠，点击展开，带 copy / fold 按钮
+- **自动部署** — GitHub Actions 推送到 `main` 自动构建并部署到 GitHub Pages
+
 ---
 
 ## 目录结构
@@ -13,15 +24,23 @@ mywiki/
 ├── graph.html              # 知识图谱可视化
 ├── assets/
 │   ├── style.css           # 全局样式（5 套主题）
+│   ├── common.js           # 公共逻辑：主题切换、回到顶部、滚动动画、WebP 自适应、搜索/AI 入口注入
 │   ├── posts-data.js       # 文章数据（POSTS_DATA）+ 标签颜色（TAG_COLORS）
+│   ├── post-tags.js        # 文章标签栏自动渲染（基于 POSTS_DATA 生成彩色标签链接）
+│   ├── search.js           # 全站搜索逻辑
+│   ├── ai-assistant.js     # AI 助手交互
+│   ├── backlinks.js        # 引用 / 反向链接自动渲染
 │   ├── graph.js            # 知识图谱逻辑
 │   ├── vis-network.min.js  # 图谱可视化库
-│   └── *.gif / *.png       # 文章配图
+│   └── *.gif / *.png / *.webp  # 文章配图
 ├── posts/                  # 所有文章 HTML（每篇一个文件）
 ├── tags/
 │   └── list.html           # 标签归档页（按标签筛选 + 分页）
 ├── source/
 │   └── images/             # 源图片（设计稿/素材）
+├── .github/
+│   └── workflows/
+│       └── static.yml      # GitHub Pages 自动部署（push 到 main 触发）
 └── .gitignore
 ```
 
@@ -36,7 +55,10 @@ mywiki/
 关键要点：
 - `<head>` 中使用 `preconnect` / `preload` / `media="print" onload="this.media='all'"` 优化字体和 CSS 加载（参考模板）
 - **不要**在 `<head>` 中引用 `vis-network.min.js`（图谱是懒加载的）
-- 文章底部必须引用 `<script src="../assets/common.js"></script>` — 它提供主题切换、回到顶部、滚动动画、WebP 自动检测切换
+- 文章底部必须按顺序引用以下脚本（直接从已有文章复制）：
+  1. `<script src="../assets/post-tags.js"></script>` — 文章标签栏自动渲染
+  2. `<script src="../assets/common.js"></script>` — 主题切换、回到顶部、滚动动画、WebP 自适应、搜索/AI 入口
+  3. `<script src="../assets/backlinks.js"></script>` — 引用 / 反向链接自动渲染
 - 每篇文章底部必须包含图谱侧边栏和懒加载脚本（直接从已有文章复制）
 
 ### 步骤 2：准备文章图片
@@ -188,6 +210,7 @@ mywiki/
   <div class="post-date">YYYY // MM / DD</div>
   <div class="post-title">文章标题</div>
   <div class="post-tags">
+    <div class="mk-post-tags"></div>
     <a href="../tags/list.html?tag=标签名" class="post-tag" style="background:#xxxxxx22;color:#xxxxxx;border:1px solid #xxxxxx44">标签名</a>
   </div>
 
@@ -256,6 +279,8 @@ mywiki/
 // 从已有文章复制图谱懒加载脚本
 </script>
 
+<!-- post-tags.js：文章标签栏自动渲染 -->
+<script src="../assets/post-tags.js"></script>
 <!-- common.js：主题切换、回到顶部、滚动动画、WebP 自适应（必须放在最后） -->
 <script src="../assets/common.js"></script>
 <!-- backlinks.js：自动渲染引用和反向链接 -->
@@ -354,14 +379,67 @@ mywiki/
 
 ## 图片命名规范
 
+所有图片统一命名为 `<前缀>_image<序号>.png`（同时提供 `.webp`），前缀按文章主题归类：
+
 | 前缀 | 用途 |
 |------|------|
-| `rd_` | 逆向调试文章 |
-| `so_` / `so2_` | 栈溢出文章 |
-| `ws_` | Web 安全文章 |
+| **逆向 / 二进制** | |
+| `rd_` | 逆向调试（x64dbg / OllyDbg） |
+| `re_` | 逆向基础（IDA / Ghidra） |
+| `smali_` | Android Smali 逆向 |
+| `mw_` | mov 指令分析 |
 | `bf_` | 二进制相关 |
 | `ce_` | CrackMe 文章 |
+| **C/C++ / 底层** | |
+| `tt_` | 常量 / 编译优化（C/C++ 底层分析） |
+| `vc_` | 虚函数表 / vtable |
+| `ve_` | 变量 / 内存布局 |
+| **Web 安全** | |
+| `ws_` | Web 安全（通用） |
+| `wst_` | Web 安全工具 |
+| `xss_` | XSS 攻击 |
+| `si_` | 信息收集 |
+| `no_` | Open Redirect / HTTP 重定向 |
+| `oa_` | 其他 Web 漏洞（CSRF / CSP / 弱会话等） |
+| `od_` | DVWA 各模块 |
+| **DVWA** | |
+| `ph_` | DVWA 搭建 / PHP |
+| `nw_` | DVWA 网络层 |
+| `np_` | DVWA 页面 |
+| `pd_` | DVWA Payload |
+| **Upload-labs** | |
+| `ws_ul-pass1-2_` | Pass 1-2 |
+| `ws_ul-pass3-4_` | Pass 3-4 |
+| `ws_ul-pass5-6_` | Pass 5-6 |
+| `ws_ul-pass7-8_` | Pass 7-8 |
+| `ws_ul-pass9-10_` | Pass 9-10 |
+| `ws_ul-pass11-12_` | Pass 11-12 |
+| `ws_ul-pass13-14_` | Pass 13-14 |
+| `ws_ul-pass15-16_` | Pass 15-16 |
+| `ws_ul-pass17-18_` | Pass 17-18 |
+| `ws_ul-pass19-20_` | Pass 19-20 |
+| **CTF / Pwn / Crypto** | |
+| `p2_` | Pwn 二进制利用 |
+| `rc4_m1_` / `rc4_m2_` | RC4 算法分析 |
+| `rsa_` | RSA 密码学 |
+| `ss_` | 安全工具 / 综合 |
+| `st2_` | 第二类栈溢出 |
+| `xp_` | 攻防 / 提权 |
+| **Vulnhub / Vulhub** | |
+| `vg_` | Vulnhub 靶机 |
+| `vm_` | Vulhub 漏洞环境 |
+| `vn_` | Vulnhub 新系列 |
+| `vp_` | Vulhub Pwn |
+| `vq_` | Vulhub 快速复现 |
+| `vr_` | Vulnhub 逆向 |
+| `vs_` | Vulhub Web |
+| `vt_` | Vulnhub 权限提升 |
+| **其他** | |
+| `py_` | Python 相关 |
 | `w6_` / `w10_` / `w11_` | Windows 相关 |
+| `search_` | 站内搜索截图 |
+| `persuade_` | 对抗机器学习 CTF |
+| `heist_` / `fourtune_` | ML CTF 挑战 |
 | 通用 | `xxx_image001.png` |
 
 新文章建议使用文章缩写前缀 + 序号，如 `dvwa-csrf_image001.png`。
@@ -397,6 +475,17 @@ mywiki/
 
 ---
 
+## 自动部署
+
+项目通过 `.github/workflows/static.yml` 配置 GitHub Actions，推送到 `main` 分支时自动构建并部署到 GitHub Pages：
+
+- 触发条件：`push` 到 `main` 或手动 `workflow_dispatch`
+- 构建步骤：checkout → configure Pages → cache（基于 `index.html`/`readme.md`/`assets/**` 哈希）→ upload artifact
+- 部署步骤：使用 `actions/deploy-pages@v5` 部署到 `github-pages` 环境
+- 缓存策略：使用 `actions/cache@v5` 缓存构建产物，避免重复构建
+
+---
+
 ## 维护清单（添加文章时逐项检查）
 
 - [ ] 在 `posts/` 下创建了 `.html` 文件
@@ -408,7 +497,8 @@ mywiki/
 - [ ] `assets/posts-data.js` 的 `POSTS_DATA` 数组已添加新条目（含 `id`、`references` 字段）
 - [ ] 新标签已在 `assets/posts-data.js` 的 `TAG_COLORS` 中添加颜色映射，并在 `style.css` 中添加 `tag-xxx` class
 - [ ] 图片已放入 `assets/` 且同时提供了 `.png` 和 `.webp` 两份文件
-- [ ] `<script src="../assets/common.js"></script>` 和 `<script src="../assets/backlinks.js"></script>` 已在页面最后引用
+- [ ] `<script src="../assets/post-tags.js"></script>`、`<script src="../assets/common.js"></script>` 和 `<script src="../assets/backlinks.js"></script>` 已在页面最后引用（顺序：post-tags → common → backlinks）
+- [ ] `<div class="mk-post-tags"></div>` 已包含在 `.post-tags` 容器中
 - [ ] `<div id="postReferences"></div>` 和 `<div id="postBacklinks"></div>` 已包含在页面中
 - [ ] 图谱侧边栏和懒加载脚本已包含
 - [ ] 超过 10 行的代码块能正常折叠，折叠/展开按钮工作正常（`.mk-code-wrap.collapsed` 逻辑已包含）
