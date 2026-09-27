@@ -133,37 +133,17 @@ print(string)
   <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
-
-
 <div id="postReferences"></div>
 <div id="postBacklinks"></div>
 
 <div class="mk-graph-sidebar" id="mkGraphSidebar">
   <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
-</div><script>
-(function(){
-var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
-if(!gs||!gc)return;
-var s=document.createElement("script");
-s.src="../assets/vis-network.min.js";
-s.onload=function(){
-  var d=document.createElement("script");
-  d.src="../assets/posts-data.js";
-  d.onload=function(){
-    var p=document.createElement("script");
-    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
-    document.body.appendChild(p);
-    var g=document.createElement("script");
-    g.src="../assets/graph.js";
-    document.body.appendChild(g);
-  };
-  document.body.appendChild(d);
-};
-document.body.appendChild(s);
-})();
-</script>
+</div>
+
+<script src="../assets/posts-data.js"></script>
 <script src="../assets/post-tags.js"></script>
-<script src="../assets/common.js"></script><script src="../assets/backlinks.js"></script>
+<script src="../assets/common.js"></script>
+<script src="../assets/backlinks.js"></script>
 </body>
 </html>

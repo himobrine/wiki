@@ -171,109 +171,17 @@ int main() {
   <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
-<script>
-const tocLinks = document.querySelectorAll('.mk-toc a');
-const tocTargets = [];
-tocLinks.forEach(a => {
-  const id = a.getAttribute('href').slice(1);
-  const el = document.getElementById(id);
-  if (el) tocTargets.push({ el, link: a });
-});
-const tocObs = new IntersectionObserver(
-  (entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        tocLinks.forEach(a => a.classList.remove('active'));
-        const match = tocTargets.find(t => t.el === e.target);
-        if (match) match.link.classList.add('active');
-      }
-    });
-  },
-  { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' }
-);
-tocTargets.forEach(t => tocObs.observe(t.el));
-
-document.querySelectorAll('.mk-post-content pre').forEach(pre => {
-  const wrap = document.createElement('div');
-  wrap.className = 'mk-code-wrap';
-  pre.parentNode.insertBefore(wrap, pre);
-  wrap.appendChild(pre);
-
-  const lines = pre.textContent.split('\n').length;
-
-  const header = document.createElement('div');
-  header.className = 'mk-code-header';
-
-  const info = document.createElement('span');
-  info.className = 'mk-code-info';
-  info.textContent = `CODE // ${lines} line${lines === 1 ? '' : 's'}`;
-
-  const actions = document.createElement('div');
-  actions.className = 'mk-code-actions';
-
-  const copy = document.createElement('button');
-  copy.className = 'mk-code-btn mk-code-btn-copy'; copy.textContent = 'copy';
-  copy.onclick = (e) => {
-    e.stopPropagation();
-    navigator.clipboard.writeText(pre.textContent).then(() => {
-      copy.textContent = 'copied!'; copy.classList.add('copied');
-      setTimeout(() => { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
-    });
-  };
-
-  const fold = document.createElement('button');
-  fold.className = 'mk-code-btn mk-code-btn-fold'; fold.textContent = '\u2191';
-  fold.onclick = (e) => {
-    e.stopPropagation();
-    wrap.classList.toggle('collapsed');
-    fold.textContent = wrap.classList.contains('collapsed') ? '\u2193' : '\u2191';
-  };
-  wrap.onclick = () => {
-    if (wrap.classList.contains('collapsed')) {
-      wrap.classList.remove('collapsed');
-      fold.textContent = '\u2191';
-    }
-  };
-
-  if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
-
-  actions.append(copy, fold);
-  header.append(info, actions);
-  wrap.prepend(header);
-});
-</script>
-
 <div id="postReferences"></div>
 <div id="postBacklinks"></div>
 
 <div class="mk-graph-sidebar" id="mkGraphSidebar">
   <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
-</div><script>
-(function(){
-var gs=document.getElementById("mkGraphSidebar"),gc=document.getElementById("graphContainer");
-if(!gs||!gc)return;
-var s=document.createElement("script");
-s.src="../assets/vis-network.min.js";
-s.onload=function(){
-  var d=document.createElement("script");
-  d.src="../assets/posts-data.js";
-  d.onload=function(){
-    var p=document.createElement("script");
-    p.textContent="const POSTS=POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:p.url.replace(\"posts/\",\"\"),excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});";
-    document.body.appendChild(p);
-    var g=document.createElement("script");
-    g.src="../assets/graph.js";
-    document.body.appendChild(g);
-  };
-  document.body.appendChild(d);
-};
-document.body.appendChild(s);
-})();
-</script>
+</div>
+
+<script src="../assets/posts-data.js"></script>
 <script src="../assets/post-tags.js"></script>
 <script src="../assets/common.js"></script>
-
 <script src="../assets/backlinks.js"></script>
 </body>
 </html>

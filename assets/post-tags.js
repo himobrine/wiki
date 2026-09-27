@@ -29,18 +29,8 @@
     return a;
   }
 
-  function findPost() {
-    var path = location.pathname.split('/').pop();
-    if (!Array.isArray(window.POSTS_DATA)) return null;
-    for (var i = 0; i < POSTS_DATA.length; i++) {
-      var base = (POSTS_DATA[i].url || '').split('/').pop();
-      if (base === path) return POSTS_DATA[i];
-    }
-    return null;
-  }
-
   function render() {
-    var p = findPost();
+    var p = currentPost();
     if (!p) return;
     var t = (p.tags && typeof p.tags === 'object') ? p.tags : {};
     var order = ['category', 'knowledge', 'tools'];
@@ -61,15 +51,6 @@
     });
   }
 
-  if (window.POSTS_DATA) {
-    render();
-  } else {
-    var base = document.currentScript && document.currentScript.src
-      ? document.currentScript.src.replace(/[^/]*$/, '')
-      : '';
-    var s = document.createElement('script');
-    s.src = base + 'posts-data.js';
-    s.onload = render;
-    (document.head || document.body).appendChild(s);
-  }
+  if (!Array.isArray(window.POSTS_DATA)) return;
+  render();
 })();

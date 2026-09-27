@@ -385,7 +385,8 @@ Breakpoints:
 - Fixed right, `top: 50%, translateY(-50%)`
 - Width: 240px, aspect-ratio 1
 - Border: `var(--mk-rule-strong)` — gold hairline
-- Hidden on <1400px
+- Responsive: 240px above 1400px; 160px between 1300–1400px; hidden below 1300px
+  (hidden elements never intersect, so the lazy load simply never runs)
 
 ### 5.12 Floating Buttons
 

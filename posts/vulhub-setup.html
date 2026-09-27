@@ -109,24 +109,19 @@ docker-compose up -d</code></pre>
 <div id="postReferences"></div>
 <div id="postBacklinks"></div>
 
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
 <div class="mk-float-buttons">
   <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
   <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
 </div>
 
-<script>
-const tocLinks = document.querySelectorAll('.mk-toc a');
-const headings = document.querySelectorAll('.post-content h4[id], .post-content h5[id]');
-function updateToc() {
-  let currentId = '';
-  headings.forEach(h => { if (h.getBoundingClientRect().top <= 100) currentId = h.id; });
-  tocLinks.forEach(a => { a.classList.toggle('active', a.getAttribute('href') === '#' + currentId); });
-}
-window.addEventListener('scroll', updateToc);
-updateToc();
-</script>
-
+<script src="../assets/posts-data.js"></script>
 <script src="../assets/post-tags.js"></script>
 <script src="../assets/common.js"></script>
-<script src="../assets/backlinks.js"></script></body>
+<script src="../assets/backlinks.js"></script>
+</body>
 </html>

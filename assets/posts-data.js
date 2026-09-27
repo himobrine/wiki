@@ -1859,6 +1859,16 @@ function getFlatTags(p) {
   return out;
 }
 
+// 当前页对应的文章：按文件名匹配 POSTS_DATA[].url；非文章页返回 null
+function currentPost() {
+  if (!Array.isArray(POSTS_DATA)) return null;
+  var file = location.pathname.split('/').pop();
+  for (var i = 0; i < POSTS_DATA.length; i++) {
+    if ((POSTS_DATA[i].url || '').split('/').pop() === file) return POSTS_DATA[i];
+  }
+  return null;
+}
+
 var TAG_COLORS = {
   "逆向": '7b2d8e',
   "调试": '2ea44f',

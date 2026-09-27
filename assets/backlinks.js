@@ -2,13 +2,9 @@
   'use strict';
 
   function render() {
-    var path = location.pathname.split('/').pop();
-    var myId = null;
-    for (var i = 0; i < POSTS_DATA.length; i++) {
-      var base = (POSTS_DATA[i].url || '').split('/').pop();
-      if (base === path) { myId = POSTS_DATA[i].id; break; }
-    }
-    if (!myId) return;
+    var me = currentPost();
+    if (!me || !me.id) return;
+    var myId = me.id;
 
     var refs = (POSTS_BY_ID[myId] && POSTS_BY_ID[myId].references) || [];
     renderSection('postReferences', '// REFERENCES', refs);
@@ -52,15 +48,5 @@
     return d.innerHTML;
   }
 
-  if (window.POSTS_DATA && window.POSTS_BY_ID && window.BACKLINKS) {
-    render();
-  } else {
-    var base = document.currentScript && document.currentScript.src
-      ? document.currentScript.src.replace(/[^/]*$/, '')
-      : '';
-    var s = document.createElement('script');
-    s.src = base + 'posts-data.js';
-    s.onload = render;
-    (document.head || document.body).appendChild(s);
-  }
+  if (window.POSTS_DATA && window.POSTS_BY_ID && window.BACKLINKS) render();
 })();

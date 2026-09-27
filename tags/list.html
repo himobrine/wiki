@@ -64,17 +64,8 @@
 
 <script src="../assets/posts-data.js"></script>
 <script src="../assets/common.js"></script>
-<script>const POSTS = POSTS_DATA.map(function(p){return{title:p.title,date:p.date,url:'../'+p.url,excerpt:p.excerpt,tags:p.tags,primary:p.primary,secondary:p.secondary};});</script>
+<script>const POSTS = POSTS_DATA.map(function(p){return Object.assign({},p,{url:'../'+p.url});});</script>
 <script>
-if (typeof window.getFlatTags !== 'function') {
-  window.getFlatTags = function(p) {
-    var t = (p && p.tags) || {};
-    return [].concat(t.category || [], t.knowledge || [], t.tools || []);
-  };
-}
-if (typeof window.TAG_COLORS !== 'object' || !window.TAG_COLORS) {
-  window.TAG_COLORS = {};
-}
 function esc(str) { return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function getAllTags() {
@@ -251,25 +242,6 @@ if (tag) {
   <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
 </aside>
-<script>
-(function(){
-var gs=document.getElementById('mkGraphSidebar'),gc=document.getElementById('graphContainer');
-if(!gs||!gc)return;
-var obs=new IntersectionObserver(function(entries){
-  if(!entries[0].isIntersecting)return;
-  obs.disconnect();
-  var s=document.createElement('script');
-  s.src='../assets/vis-network.min.js';
-  s.onload=function(){
-    var g=document.createElement('script');
-    g.src='../assets/graph.js';
-    document.body.appendChild(g);
-  };
-  document.body.appendChild(s);
-},{rootMargin:'200px'});
-obs.observe(gs);
-})();
-</script>
 
 </body>
 </html>

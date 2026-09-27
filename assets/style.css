@@ -751,7 +751,13 @@ body {
   min-height: 0;
 }
 .mk-graph-sidebar #graphContainer canvas { border-radius: var(--mk-radius-xs); }
-@media (max-width: 1400px) { .mk-graph-sidebar { display: none; } }
+/* 中间宽度缩小显示；正文列 960px 居中，160px 侧栏不遮挡正文的最小视口为 1296px */
+@media (max-width: 1400px) {
+  .mk-graph-sidebar { width: 160px; right: var(--mk-space-sm); }
+  .mk-graph-sidebar .mk-graph-title { font-size: 10px; letter-spacing: 0.12em; margin-bottom: 2px; }
+  .mk-graph-sidebar .mk-graph-toggle { font-size: 10px; letter-spacing: 0.04em; padding: 1px 4px; margin-left: 4px; }
+}
+@media (max-width: 1299px) { .mk-graph-sidebar { display: none; } }
 
 /* === Code Block Header === */
 .mk-code-wrap { position: relative; }
@@ -923,14 +929,6 @@ body {
   flex-wrap: wrap;
   gap: 5px;
   margin-top: 8px;
-}
-
-[data-theme="dark"] .mk-backlink-card {
-  border-color: oklch(100% 0 0 / 0.08);
-  background: oklch(15% 0 0 / 0.3);
-}
-[data-theme="dark"] .mk-backlink-card:hover {
-  box-shadow: 0 4px 16px oklch(0% 0 0 / 0.2);
 }
 
 /* === Lightbox === */

@@ -63,10 +63,7 @@
       document.querySelectorAll('.mk-themedock-item').forEach(function (el) {
         el.classList.toggle('active', el.dataset.theme === t);
       });
-      if (t === 'black') qToggle = 'white';
-      else if (t === 'white') qToggle = 'black';
-      else if (t === 'elysia') qToggle = 'black';
-      else if (t === 'rei') qToggle = 'black';
+      qToggle = (t === 'black') ? 'white' : 'black';
     }
 
     var saved = localStorage.getItem('mk-theme') || 'black';
@@ -119,11 +116,9 @@
     var img = new Image();
     img.onload = function () {
       document.querySelectorAll('img[src$=".png"]').forEach(function (el) {
-        var ws = el.getAttribute('src');
-        if (ws.indexOf('.png') > -1) {
-          el.setAttribute('src', ws.replace(/\.png$/, '.webp'));
-          el.addEventListener('error', function () { this.setAttribute('src', ws); });
-        }
+        var png = el.getAttribute('src');
+        el.setAttribute('src', png.replace(/\.png$/, '.webp'));
+        el.addEventListener('error', function () { this.setAttribute('src', png); });
       });
     };
     img.src = 'data:image/webp;base64,UklGRi4AAABXRUJQVlA4TCEAAAAvAUAAEB8wAiMwAgSSNtse/cXjxyCCmrYNWPwmHRsB8wAZ';
@@ -163,12 +158,7 @@
       sec.style.display = 'none';
       main.appendChild(sec);
     }
-    // 3) 加载 search.js（仅加载一次）
-    if (document.getElementById('mkSearchLoaded')) return;
-    var marker = document.createElement('span');
-    marker.id = 'mkSearchLoaded';
-    marker.style.display = 'none';
-    (document.head || document.body).appendChild(marker);
+    // 3) 加载 search.js
     var s = document.createElement('script');
     s.src = (function () {
       var base = document.currentScript && document.currentScript.src
@@ -179,17 +169,10 @@
     (document.head || document.body).appendChild(s);
   })();
 
-  /* === Code Block: Copy + Fold === */
+  /* === Code Block: Wrap + Header + Copy + Fold === */
   (function () {
-    document.querySelectorAll('.mk-code-wrap').forEach(function (wrap) {
-      if (wrap.querySelector('.mk-code-actions')) return;
-      var pre = wrap.querySelector('pre');
-      if (!pre) return;
-      var code = pre.querySelector('code');
-      var text = code ? code.textContent : pre.textContent;
-      var lines = text.split('\n').length;
-      var header = wrap.querySelector('.mk-code-header');
-      if (!header) return;
+    function buildActions(wrap, header, getText) {
+      if (header.querySelector('.mk-code-actions')) return;
       var actions = document.createElement('div');
       actions.className = 'mk-code-actions';
       var copy = document.createElement('button');
@@ -197,7 +180,7 @@
       copy.textContent = 'copy';
       copy.onclick = function (e) {
         e.stopPropagation();
-        navigator.clipboard.writeText(text).then(function () {
+        navigator.clipboard.writeText(getText()).then(function () {
           copy.textContent = 'copied!';
           copy.classList.add('copied');
           setTimeout(function () { copy.textContent = 'copy'; copy.classList.remove('copied'); }, 1500);
@@ -217,10 +200,83 @@
           fold.textContent = '\u2191';
         }
       };
-      if (lines > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
       actions.append(copy, fold);
-      header.append(actions);
+      header.appendChild(actions);
+      return fold;
+    }
+
+    // 支持两种输入：裸 <pre>（无 wrap）与旧文章手写的 .mk-code-wrap + .mk-code-header
+    document.querySelectorAll('.mk-post-content pre').forEach(function (pre) {
+      var wrap = pre.parentNode;
+      var header = null;
+
+      if (wrap && wrap.classList && wrap.classList.contains('mk-code-wrap')) {
+        header = wrap.querySelector('.mk-code-header');
+      } else {
+        wrap = document.createElement('div');
+        wrap.className = 'mk-code-wrap';
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(pre);
+        header = document.createElement('div');
+        header.className = 'mk-code-header';
+        var lines = pre.textContent.split('\n').length;
+        var info = document.createElement('span');
+        info.className = 'mk-code-info';
+        info.textContent = 'CODE // ' + lines + ' line' + (lines === 1 ? '' : 's');
+        header.appendChild(info);
+        wrap.prepend(header);
+      }
+      if (!header) return;
+
+      var fold = buildActions(wrap, header, function () { return pre.textContent; });
+      if (!fold) return;
+      var lineCount = pre.textContent.split('\n').length;
+      if (lineCount > 10) { wrap.classList.add('collapsed'); fold.textContent = '\u2193'; }
     });
+  })();
+
+  /* === TOC Active Highlight (post pages) === */
+  (function () {
+    var toc = document.querySelector('.mk-toc');
+    if (!toc) return;
+    var links = toc.querySelectorAll('a');
+    var targets = [];
+    links.forEach(function (a) {
+      var el = document.getElementById(a.getAttribute('href').slice(1));
+      if (el) targets.push({ el: el, link: a });
+    });
+    if (!targets.length) return;
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) { a.classList.remove('active'); });
+        var match = targets.find(function (t) { return t.el === e.target; });
+        if (match) match.link.classList.add('active');
+      });
+    }, { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' });
+    targets.forEach(function (t) { obs.observe(t.el); });
+  })();
+
+  /* === Knowledge Graph: load vis-network + graph.js === */
+  (function () {
+    // base 必须在同步执行时取：DOMContentLoaded 回调里 document.currentScript 已是 null
+    var base = (document.currentScript && document.currentScript.src
+      ? document.currentScript.src.replace(/[^/]*$/, '')
+      : '');
+    function loadScript(src, onload) {
+      var s = document.createElement('script');
+      s.src = src;
+      if (onload) s.onload = onload;
+      document.body.appendChild(s);
+    }
+    function boot() {
+      // 侧栏可能排在脚本标签之后（index.html / tags/list.html），必须 DOM 就绪后再取元素
+      if (!document.getElementById('mkGraphSidebar') || !document.getElementById('graphContainer')) return;
+      // graph.js 直接读取全局 POSTS_DATA（含 id/references 以渲染引用边）
+      loadScript(base + 'vis-network.min.js', function () { loadScript(base + 'graph.js'); });
+    }
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+    else boot();
   })();
 
   /* === Image Lightbox (zoom + pan) === */
@@ -396,11 +452,6 @@
       '</div>';
     document.body.appendChild(root);
 
-    if (document.getElementById('mkAiLoaded')) return;
-    var marker = document.createElement('span');
-    marker.id = 'mkAiLoaded';
-    marker.style.display = 'none';
-    (document.head || document.body).appendChild(marker);
     var s = document.createElement('script');
     s.src = (function () {
       var base = document.currentScript && document.currentScript.src

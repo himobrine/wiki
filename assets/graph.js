@@ -2,10 +2,11 @@
   'use strict';
 
   var c = document.getElementById('graphContainer');
-  if (!c || typeof vis === 'undefined' || typeof POSTS === 'undefined') return;
+  // POSTS_DATA 是唯一数据源（posts-data.js），含 id / references 以渲染引用边
+  var POSTS = window.POSTS_DATA;
+  if (!c || typeof vis === 'undefined' || !POSTS) return;
 
-  var PC = (typeof PRIMARY_COLORS !== 'undefined' && PRIMARY_COLORS)
-    || (typeof window !== 'undefined' && window.PRIMARY_COLORS) || {};
+  var PC = window.PRIMARY_COLORS || {};
 
   // ===== 权重与连接规则 =====
   var TAG_W = { category: 1, knowledge: 3, tools: 2 };   // 分类=1 知识点=3 工具=2
@@ -76,37 +77,45 @@
   var POST_W = POSTS.map(function (p) { return tagWeights(p); });
 
   // 文章页：pathname 匹配某 POST 文件名 → 单篇放射图；index/tags/graph 页 → 全站图
-  var isFullPage = window.location.pathname.split('/').pop() === 'graph.html';
-  var f = window.location.pathname.split('/').pop();
-  var currentIdx = -1;
-  for (var i = 0; i < POSTS.length; i++) {
-    if ((POSTS[i].url || '').indexOf(f) !== -1) { currentIdx = i; break; }
-  }
+  var pathParts = window.location.pathname.split('/');
+  var file = pathParts[pathParts.length - 1];
+  var isFullPage = file === 'graph.html';
+  var inSubDir = file !== 'index.html' && !isFullPage && file !== 'links.html' && pathParts.length >= 3;
+  var pagePost = currentPost();
+  var currentIdx = pagePost ? idToIndex[pagePost.id] : -1;
 
   var nodes, edges, network;
 
-  function basePath() {
-    var parts = window.location.pathname.split('/');
-    var last = parts[parts.length - 1];
-    if (last !== 'index.html' && last !== 'graph.html' && last !== 'links.html' && parts.length >= 3) return '../';
-    return '';
-  }
+  function basePath() { return inSubDir ? '../' : ''; }
 
   function clickNav(params) {
     if (params.nodes.length > 0) {
       var node = nodes.get(params.nodes[0]);
-      if (node && node.url) window.location.href = node.url;
+      // 文章 url 恒为站点根相对路径（posts/xxx.html），按当前页深度补前缀
+      if (node && node.url) window.location.href = basePath() + node.url;
     }
   }
 
   // ===== 单篇放射图（文章页侧边栏）—— 新版本 =====
   if (currentIdx !== -1 && !isFullPage) {
-    var connected = [currentIdx], wt = {};
+    var connected = [currentIdx], wt = {}, refEdges = [];
     for (var i1 = 0; i1 < POSTS.length; i1++) {
       if (i1 === currentIdx) continue;
       var s = shared(POSTS[currentIdx], POSTS[i1]);
       if (allowsEdge(s) && s.total >= 2) { connected.push(i1); wt[i1] = s.total; }
     }
+    // 引用边与被引用边：目标文章即使无标签关联也必须进节点集，否则边指向不存在的节点
+    function linkRef(id, label) {
+      var j = idToIndex[id];
+      if (j === undefined || j === currentIdx) return;
+      refEdges.push({ from: currentIdx, to: j, type: 'reference', value: 5, width: 2.5,
+        dashes: false, title: label + POSTS[j].title,
+        color: { color: '#d4a020', highlight: '#ff8c00', opacity: 1 } });
+      if (connected.indexOf(j) === -1) { connected.push(j); wt[j] = 5; }
+    }
+    (pagePost.references || []).forEach(function (refId) { linkRef(refId, '引用: '); });
+    (BACKLINKS[pagePost.id] || []).forEach(function (blId) { linkRef(blId, '被引用: '); });
+
     var nodeArr = [];
     for (var k = 0; k < connected.length; k++) {
       var idx = connected[k];
@@ -133,27 +142,7 @@
           color: { inherit: 'both', opacity: Math.min(0.15 + sa.total * 0.08, 0.5) } });
       }
     }
-    // Reference edges for current post
-    var curPost = POSTS[currentIdx];
-    (curPost.references || []).forEach(function (refId) {
-      var j = idToIndex[refId];
-      if (j !== undefined && j !== currentIdx) {
-        edgeArr.push({ from: currentIdx, to: j, type: 'reference', value: 5, width: 2.5,
-          dashes: false, title: '引用: ' + POSTS[j].title,
-          color: { color: '#d4a020', highlight: '#ff8c00', opacity: 1 } });
-        if (connected.indexOf(j) === -1) { connected.push(j); wt[j] = 5; }
-      }
-    });
-    // Backlink edges (posts that reference current post)
-    (typeof BACKLINKS !== 'undefined' ? BACKLINKS[curPost.id] || [] : []).forEach(function (blId) {
-      var j = idToIndex[blId];
-      if (j !== undefined && j !== currentIdx) {
-        edgeArr.push({ from: j, to: currentIdx, type: 'reference', value: 5, width: 2.5,
-          dashes: false, title: '被引用: ' + POSTS[j].title,
-          color: { color: '#d4a020', highlight: '#ff8c00', opacity: 1 } });
-        if (connected.indexOf(j) === -1) { connected.push(j); wt[j] = 5; }
-      }
-    });
+    edgeArr = edgeArr.concat(refEdges);
     edges = new vis.DataSet(edgeArr);
     network = new vis.Network(c, { nodes: nodes, edges: edges }, {
       nodes: { shape: 'dot', borderWidth: 0, borderWidthSelected: 2, font: { size: 0 } },
@@ -190,6 +179,41 @@
     c.addEventListener('mouseleave', function () { network.setOptions({ physics: { enabled: true } }); });
   }
 
+  // ===== 物理模拟的初始布局：枢纽标签排内圈，文章按主分类切扇区分环 =====
+  // 坐标只作为力导向的起点，模拟启动后由 vis 接管；确定性排布可避免从随机位置炸开
+  function placeNodes(nArr) {
+    var hubs = [], byGroup = {}, order = [];
+    nArr.forEach(function (n) {
+      if (String(n.id).indexOf('hub:') === 0) { hubs.push(n); return; }
+      var g = n.group || '';
+      if (!byGroup[g]) { byGroup[g] = []; order.push(g); }
+      byGroup[g].push(n);
+    });
+    if (hubs.length > 1) {
+      for (var h = 0; h < hubs.length; h++) {
+        var ha = -Math.PI / 2 + 2 * Math.PI * h / hubs.length;
+        hubs[h].x = 44 * Math.cos(ha);
+        hubs[h].y = 44 * Math.sin(ha);
+      }
+    } else if (hubs.length === 1) { hubs[0].x = 0; hubs[0].y = 0; }
+    // 扇区宽度按分类文章数的平方根分配：避免小分类挤成一条缝，也避免超大分类独占整圈
+    var total = 0, weights = order.map(function (g) { var w = Math.sqrt(byGroup[g].length); total += w; return w; });
+    var radii = [70, 104, 138], start = -Math.PI / 2;
+    order.forEach(function (g, gi) {
+      var list = byGroup[g], slice = 2 * Math.PI * weights[gi] / total;
+      var a0 = start + slice * 0.05, span = slice * 0.9;   // 左右各留 5% 间隙，相邻分类不在边界重合
+      var perRing = Math.max(1, Math.ceil(list.length / radii.length));
+      for (var i = 0; i < list.length; i++) {
+        var ri = Math.min(radii.length - 1, Math.floor(i / perRing));
+        var cnt = Math.min(perRing, list.length - ri * perRing);
+        var a = a0 + span * (cnt > 1 ? (i - ri * perRing) / (cnt - 1) : 0.5);
+        list[i].x = radii[ri] * Math.cos(a);
+        list[i].y = radii[ri] * Math.sin(a);
+      }
+      start += slice;
+    });
+  }
+
   // ===== 默认模式：加权直连图 —— 线上版本 =====
   function buildDefault() {
     var strong = {};
@@ -210,6 +234,7 @@
         title: '权重 ' + s2.total + ' 共享: ' + s2.list.map(function (z) { return z.tag; }).join(', '),
         color: { inherit: 'both', opacity: Math.min(0.2 + s2.total * 0.1, 0.85) } });
     }
+    placeNodes(nArr);
     return { nodes: new vis.DataSet(nArr), edges: new vis.DataSet(eArr) };
   }
 
@@ -250,6 +275,7 @@
         }
       });
     });
+    placeNodes(nArr);
     return { nodes: new vis.DataSet(nArr), edges: new vis.DataSet(eArr) };
   }
 

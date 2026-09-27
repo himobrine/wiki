@@ -1,17 +1,18 @@
 # 信息安全实验室 — 静态博客
 
-纯前端静态安全技术博客，零构建工具依赖，浏览器直开。文章以独立 HTML 文件存放在 `posts/`，首页与标签页通过内置 JavaScript 数据数组驱动渲染。
+纯前端静态安全技术博客，零构建工具依赖，浏览器直接打开即可。文章为独立 HTML 文件存放在 `posts/`，首页与标签页由 `assets/posts-data.js` 中的数据驱动渲染。
+
+---
 
 ## 功能特性
 
-- **5 套主题** — 暗色（默认）、亮色、水晶、Ego、Rei，一键切换
-- **知识图谱** — 基于 vis-network 的关系图谱，标签共享边（虚线）+ 引用边（实线金色），hub 节点支持点击跳转标签页
-- **全站搜索** — 基于文章标题/摘要/标签的即时搜索，支持中英文
-- **AI 助手** — 文章页内置 AI 问答入口，可对当前文章内容提问
-- **引用与反向链接** — 文章底部自动渲染「本文引用」和「反向链接」，形成双向链接网络
-- **标签系统** — 结构化标签对象（`category` / `knowledge` / `tools`），按标签筛选 + 彩色标注
-- **代码块折叠** — 超过 10 行的代码块自动折叠，点击展开，带 copy / fold 按钮
-- **自动部署** — GitHub Actions 推送到 `main` 自动构建并部署到 GitHub Pages
+- **4 套主题** — `black`（默认）/ `white` / `elysia` / `rei`，一键切换并记忆到 `localStorage`
+- **知识图谱** — 基于 `vis-network`，标签共享边（虚线）+ 引用边（实线金色）；文章页侧边栏懒加载，首页/标签页为枢纽视图，`graph.html` 为全站视图
+- **全站搜索** — 标题 / 摘要 / 标签即时搜索，支持中英文，由 `common.js` 按需懒加载
+- **AI 助手** — 文章页右下角入口，按需懒加载 `ai-assistant.js`
+- **标签系统** — 结构化标签对象（`category` / `knowledge` / `tools`），文章标签栏自动渲染为彩色 chip
+- **代码块增强** — 超过 10 行自动折叠，带 `copy` / `fold` 按钮
+- **自动部署** — GitHub Actions 推送到 `main` 自动部署到 GitHub Pages
 
 ---
 
@@ -19,146 +20,80 @@
 
 ```
 mywiki/
-├── index.html              # 首页 — 最新文章列表 + 标签索引
-├── links.html              # 友情链接页
-├── graph.html              # 知识图谱可视化
+├── index.html              # 首页：最新 12 篇 + 标签索引
+├── links.html              # 友情链接
+├── graph.html              # 全站知识图谱
 ├── assets/
-│   ├── style.css           # 全局样式（5 套主题）
-│   ├── common.js           # 公共逻辑：主题切换、回到顶部、滚动动画、WebP 自适应、搜索/AI 入口注入
-│   ├── posts-data.js       # 文章数据（POSTS_DATA）+ 标签颜色（TAG_COLORS）
-│   ├── post-tags.js        # 文章标签栏自动渲染（基于 POSTS_DATA 生成彩色标签链接）
-│   ├── search.js           # 全站搜索逻辑
-│   ├── ai-assistant.js     # AI 助手交互
-│   ├── backlinks.js        # 引用 / 反向链接自动渲染
-│   ├── graph.js            # 知识图谱逻辑
-│   ├── vis-network.min.js  # 图谱可视化库
-│   └── *.gif / *.png / *.webp  # 文章配图
-├── posts/                  # 所有文章 HTML（每篇一个文件）
-├── tags/
-│   └── list.html           # 标签归档页（按标签筛选 + 分页）
-├── source/
-│   └── images/             # 源图片（设计稿/素材）
-├── .github/
-│   └── workflows/
-│       └── static.yml      # GitHub Pages 自动部署（push 到 main 触发）
-└── .gitignore
+│   ├── style.css           # 设计系统（Lacquer Lab，OKLCH 变量，4 主题）
+│   ├── posts-data.js       # 唯一数据源：POSTS_DATA / POSTS_BY_ID / BACKLINKS /
+│   │                       #   TAG_COLORS / getFlatTags() / currentPost()
+│   ├── common.js           # 公共运行时：主题切换、回到顶部、TOC 高亮、代码块增强、
+│   │                       #   搜索 / AI / 图谱懒加载、图片灯箱、WebP 自适应
+│   ├── post-tags.js        # 文章标签栏渲染
+│   ├── backlinks.js        # 引用 / 反向链接区块渲染
+│   ├── search.js           # 全站搜索（由 common.js 懒加载）
+│   ├── ai-assistant.js     # AI 助手（由 common.js 懒加载）
+│   ├── graph.js            # 知识图谱渲染（由 common.js 懒加载）
+│   └── vis-network.min.js  # 图谱库（第三方，勿改）
+├── posts/                  # 121 篇文章，每篇一个 HTML
+├── tags/list.html          # 标签归档页（按标签筛选）
+├── design.md               # 设计系统规范（Lacquer Lab，主题令牌与组件规范）
+├── .github/workflows/static.yml
+└── readme.md
 ```
 
 ---
 
-## 添加新文章流程
+## 架构约定（重要）
 
-### 步骤 1：创建文章 HTML
+**页面里不写业务脚本。** 所有行为都在 `assets/` 的共享脚本里，HTML 只保留结构和 4 个 `<script src>` 引用。
 
-在 `posts/` 下新建 `.html` 文件，遵循下方的**文章模板规范**。
+- ✅ 行为变更 → 只改 `assets/` 下的脚本，121 篇文章同时生效
+- ❌ 不要把 JS 内联到文章 HTML 中（历史上曾这样做，导致 121 份重复代码、行为漂移）
+- ❌ 不要在任何脚本里动态加载 `posts-data.js`（数据必须静态引入，见下）
+- 不要手写 `POSTS` 映射数组去裁剪 `POSTS_DATA` —— 裁剪会丢掉 `id` / `references`，
+  曾导致文章图谱的引用边整条链路静默失效。图谱直接读 `POSTS_DATA`。
 
-关键要点：
-- `<head>` 中使用 `preconnect` / `preload` / `media="print" onload="this.media='all'"` 优化字体和 CSS 加载（参考模板）
-- **不要**在 `<head>` 中引用 `vis-network.min.js`（图谱是懒加载的）
-- 文章底部必须按顺序引用以下脚本（直接从已有文章复制）：
-  1. `<script src="../assets/post-tags.js"></script>` — 文章标签栏自动渲染
-  2. `<script src="../assets/common.js"></script>` — 主题切换、回到顶部、滚动动画、WebP 自适应、搜索/AI 入口
-  3. `<script src="../assets/backlinks.js"></script>` — 引用 / 反向链接自动渲染
-- 每篇文章底部必须包含图谱侧边栏和懒加载脚本（直接从已有文章复制）
+### 脚本加载顺序
 
-### 步骤 2：准备文章图片
-
-1. 截图放入 `assets/`，使用文章缩写前缀 + 序号命名（见下方**图片命名规范**）
-2. **必须同时提供 `.png` 和 `.webp` 两种格式** — `common.js` 会自动检测浏览器支持并切换
-   - WebP 转换工具：浏览器另存、ffmpeg、cwebp 等
-   - 如 `rd_image001.png` + `rd_image001.webp`
-
-### 步骤 3：更新数据文件
-
-打开 `assets/posts-data.js`，在 `POSTS_DATA` 数组末尾添加新条目：
-
-```js
-{
-  title: '文章标题',
-  id: 'your-article',          // 唯一标识（用于 references 引用）
-  references: [],               // 引用的其他文章 id 数组（可选）
-  primary: '主分类',       // Web安全 / CTF / 逆向 / C/C++
-  secondary: '子分类',     // 如 DVWA / Pwn / Crack 等
-  date: '2026 // 06 / 05',
-  url: 'posts/your-article.html',
-  excerpt: '文章摘要，1-2 句话概述内容',
-  tags: {
-    category: ['标签1'],
-    knowledge: ['知识点'],
-    tools: ['工具']
-  }
-}
-```
-
-| 字段 | 说明 |
-|------|------|
-| `title` | 文章标题 |
-| `id` | 唯一标识符（用于引用关系），建议用文件名（不含 `.html`） |
-| `references` | 本文引用的其他文章 `id` 数组，留空 `[]` 则无引用关系 |
-| `primary` | 主分类（用于知识图谱群组聚类，影响节点颜色） |
-| `secondary` | 子分类（用于知识图谱节点形状） |
-| `date` | 日期格式 `YYYY // MM / DD`，用于排序 |
-| `url` | 相对于站点根目录的路径 |
-| `excerpt` | 首页展示的摘要文字 |
-| `tags` | 标签对象（`category` / `knowledge` / `tools`），用于筛选和颜色标注 |
-
-> `index.html` 和 `tags/list.html` 会自动从 `POSTS_DATA` 加载数据，无需手动编辑。
-> **知识图谱**会自动渲染**标签共享边**（虚线）和**引用边**（实线金色），关系由 `tags` 和 `references` 共同决定。
-> 文章页底部会自动显示**引用**（本文引用了哪些文章）和**反向链接**（哪些文章引用了本文）。
-
-### 步骤 4：添加新标签颜色和 CSS 类
-
-如果使用了全新标签，需要做两件事：
-
-**4a. 在 `assets/posts-data.js` 的 `TAG_COLORS` 对象中增加颜色映射：**
-
-```js
-'新标签': '颜色十六进制（不含 #）'
-```
-
-颜色值参考：`00d4ff` / `3366ff` / `ff6b35` / `7b2d8e` / `2ea44f` / `e4405f` / `8b5cf6` / `f59e0b` / `10b981`
-
-**4b. 在 `assets/style.css` 中为标签添加对应的 `tag-xxx` CSS class（用于文章 hero 区的标签导航栏）：**
-
-```css
-.tag-xxx { color: #xxxxxx; border-color: #xxxxxx44; }
-```
-
-然后在文章的 `.tags-bar` 中使用 `<a class="tag tag-xxx">#标签名</a>`。
-
-### 步骤 5：检查导航栏同步
-
-文章内的 `.nav-inner` 导航栏包含指向特定标签的快捷链接，必须与首页 `index.html` 的导航栏保持一致：
+文章页底部固定为这 4 行，顺序不可调换：
 
 ```html
-<div class="nav-inner">
-  <a href="../index.html">首页</a>
-  <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
-  <a href="../tags/list.html?tag=安全工具">安全工具</a>
-  <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
-  <a href="../tags/list.html?tag=逆向">逆向</a>
-  <a href="../tags/list.html?tag=调试">调试</a>
-  <a href="../tags/list.html">标签归档</a>
-</div>
+<script src="../assets/posts-data.js"></script>
+<script src="../assets/post-tags.js"></script>
+<script src="../assets/common.js"></script>
+<script src="../assets/backlinks.js"></script>
 ```
 
-如需增删导航项，必须同步更新 **所有文章** + `index.html` + `tags/list.html`。
+`posts-data.js` 必须最先引入（其余脚本都依赖它定义的全局变量）。`common.js` 内部使用
+`document.currentScript.src` 推导资源基路径，因此放在 `posts/` 或子目录均可，无需区分。
 
-### 步骤 6：本地验证
+懒加载链（由 `common.js` 负责，勿在 HTML 中重复实现）：
 
-用浏览器打开页面，检查：
-- 文章内容正常显示，图片无 404
-- 主题切换正常（`common.js` 已生效）
-- 代码块 copy / fold 按钮正常
-- 回到顶部按钮正常
-- 图谱侧边栏懒加载正常
-- 首页新文章条目出现在最新列表
+| 触发条件 | 加载 |
+|----------|------|
+| 搜索框获得焦点 | `search.js` |
+| 出现 AI 助手挂载点 | `ai-assistant.js` |
+| `#mkGraphSidebar` 所在页在 DOM 就绪后 | `vis-network.min.js` → `graph.js` |
 
 ---
 
-## 文章模板规范
+## 添加新文章
 
-### HTML 骨架
+### 步骤 1：创建 HTML
+
+复制任意现有文章（如 `posts/cpp-constants.html`）后替换内容，或使用下方模板。
+**必须保留**的骨架节点：
+
+| 节点 | 作用 |
+|------|------|
+| `<div class="mk-post-content">` | 正文容器 — 代码块增强与 TOC 都以它为根 |
+| `<div class="mk-post-tags"></div>` | `post-tags.js` 的挂载点 |
+| `<nav class="mk-toc">` | 目录；`a[href]` 必须与正文标题 `id` 一一对应 |
+| `<div id="postReferences">` / `<div id="postBacklinks">` | 引用 / 反链区块挂载点 |
+| `<div class="mk-graph-sidebar" id="mkGraphSidebar">` | 图谱侧栏（内含 `#graphContainer`） |
+
+### 步骤 2：文章模板
 
 ```html
 <!DOCTYPE html>
@@ -169,340 +104,206 @@ mywiki/
 <title>文章标题 - 信息安全实验室</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&family=Titillium+Web:wght@400;600;700&display=swap"></noscript>
 <link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
 <noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
 </head>
 <body>
-<div class="scanline"></div>
-<div class="container">
+<div class="mk-scanline"></div>
+<div class="mk-container">
 
-<div class="hero">
-  <h1>// BLOG : 信息安全实验室</h1>
-  <div class="subtitle">RHODES ISLAND <span>://</span> SECURITY <span>//</span> RESEARCH <span>//</span> EXPLOIT <span>//</span> DEFENSE</div>
-  <div class="tags-bar">
-    <a href="../index.html" class="tag tag-cyan">#首页</a>
-    <!-- 标签颜色 class 映射见下方「标签色值映射」表 -->
-    <a href="../tags/list.html?tag=标签名" class="tag tag-xxx">#标签名</a>
-  </div>
-  <div class="tagline">&gt; LOADING - 100% <span class="cursor">▌</span></div>
+<div id="mkNavSentinel"></div>
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
 </div>
 
-<div id="navSentinel"></div>
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
 
-<div class="nav-sticky-wrapper" id="navWrap">
-  <div class="nav-inner">
-    <a href="../index.html">首页</a>
-    <!-- 导航栏必须与 index.html 同步 -->
-    <a href="../tags/list.html?tag=漏洞分析">漏洞分析</a>
-    <a href="../tags/list.html?tag=安全工具">安全工具</a>
-    <a href="../tags/list.html?tag=学习笔记">学习笔记</a>
-    <a href="../tags/list.html?tag=逆向">逆向</a>
-    <a href="../tags/list.html?tag=调试">调试</a>
-    <a href="../tags/list.html">标签归档</a>
-  </div>
-</div>
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 06 / 05</div>
+  <div class="mk-post-title">文章标题</div>
+  <div class="mk-post-tags"></div>
 
-<a href="../index.html" class="back-link">[ &larr; ] BACK TO HOME</a>
+  <div class="mk-post-content">
 
-<div class="post">
-  <div class="post-date">YYYY // MM / DD</div>
-  <div class="post-title">文章标题</div>
-  <div class="post-tags">
-    <div class="mk-post-tags"></div>
-    <a href="../tags/list.html?tag=标签名" class="post-tag" style="background:#xxxxxx22;color:#xxxxxx;border:1px solid #xxxxxx44">标签名</a>
-  </div>
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a>
+      <ul><li class="toc-h5"><a href="#usage">用法</a></li></ul>
+    </li>
+  </ul>
+</nav>
 
-  <div class="post-content" style="display:block;border:none;padding:0;margin:0;">
-    <nav class="post-toc">
-      <span class="post-toc-title">// 目录</span>
-      <ul>
-        <li class="toc-h4"><a href="#section-id">一级标题</a></li>
-        <li class="toc-h5"><a href="#sub-id">二级标题</a></li>
-      </ul>
-    </nav>
+<h4 id="overview">概述</h4>
+<p>正文段落。</p>
 
-    <!-- 正文内容 -->
-    <h4 id="section-id">一级标题</h4>
-    <p>段落文字</p>
-    <h5 id="sub-id">二级标题</h5>
-    <p>段落文字</p>
-    <pre><code>代码块</code></pre>
+<h5 id="usage">用法</h5>
+<pre><code>代码块：超过 10 行会自动折叠</code></pre>
 
   </div>
-</div>
+</article>
 
-<div class="footer">
-  <div class="brand"><span class="rei-symbol">◈</span> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG <span class="rei-symbol">◈</span></div>
-  <div class="motto">&gt; 道可道，非常道，名可名，非常名</div>
-  <div class="links">
+<footer class="mk-footer">
+  <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB</div>
+  <div class="mk-footer-links">
     <a href="https://github.com/himobrine/wiki">GitHub</a>
     <a href="../links.html">友情链接</a>
     <a href="../index.html">Home</a>
   </div>
-  <div class="copy">(c) 2026 // SECURITY BLOG</div>
-</div>
+</footer>
 
 <div id="postReferences"></div>
 <div id="postBacklinks"></div>
 
-</div>
-
-<div class="theme-dock" id="themeDock">
-  <div class="theme-dock-item active" data-theme="dark">☽</div>
-  <div class="theme-dock-item" data-theme="light">☀</div>
-  <div class="theme-dock-item" data-theme="crystal">◇</div>
-  <div class="theme-dock-item" data-theme="ego">♢</div>
-  <div class="theme-dock-item" data-theme="rei">レ</div>
-</div>
-
-<div class="floating-buttons">
-  <button class="float-btn" id="themeToggle" title="切换主题" aria-label="切换主题">☽</button>
-  <button class="float-btn" id="backToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
-</div>
-
-<!--
-  TOC 高亮 + 代码块头栏（copy/fold）+ 图谱侧边栏懒加载
-  直接从已有文章（如 posts/cpp-constants.html）复制完整 script 块
--->
-<script>
-// 从已有文章复制：TOC IntersectionObserver + 代码块头栏自动生成 + 图谱懒加载
-</script>
-
-<!-- 图谱侧边栏 + 懒加载 -->
-<div class="graph-sidebar" id="graphSidebar">
-  <div class="graph-title"><a href="../graph.html">// 关系图谱</a></div>
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
   <div id="graphContainer"></div>
 </div>
-<script>
-// 从已有文章复制图谱懒加载脚本
-</script>
 
-<!-- post-tags.js：文章标签栏自动渲染 -->
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<script src="../assets/posts-data.js"></script>
 <script src="../assets/post-tags.js"></script>
-<!-- common.js：主题切换、回到顶部、滚动动画、WebP 自适应（必须放在最后） -->
 <script src="../assets/common.js"></script>
-<!-- backlinks.js：自动渲染引用和反向链接 -->
 <script src="../assets/backlinks.js"></script>
 </body>
 </html>
 ```
 
-### 标题层级约定
+新增文章时把 `index.html` 的 `.mk-nav` 导航项一并同步（导航栏目前是各页独立维护的静态标记）。
 
-| 层级 | 标签 | 用途 | 示例 |
-|------|------|------|------|
-| 一级 | `<h4>` | 主要章节标题 | `<h4 id="overview">概述</h4>` |
-| 二级 | `<h5>` | 子节标题 | `<h5 id="xdbg-control">调试控制</h5>` |
+### 步骤 3：登记数据
 
-- 每个标题必须带唯一 `id` 锚点（英文连字符），用于 TOC 跳转
-- TOC 侧边栏在 `<nav class="post-toc">` 中手动维护，两级 `<ul>` 嵌套
+在 `assets/posts-data.js` 的 `POSTS_DATA` 数组中追加：
 
-### 代码块格式
+```js
+{
+  title: '文章标题',
+  id: 'your-article',            // 唯一标识，建议与文件名一致（不含 .html）
+  references: [],                // 引用的其他文章 id；留空则无引用边
+  primary: 'Web安全',            // Web安全 / CTF / 逆向 / C/C++ / AI安全
+  secondary: 'DVWA',             // 决定图谱节点形状
+  date: '2026 // 06 / 05',       // 排序依据
+  url: 'posts/your-article.html', // 相对站点根
+  excerpt: '1-2 句摘要',
+  tags: {
+    category: ['文件上传'],
+    knowledge: ['文件上传漏洞'],
+    tools: ['Burp Suite']
+  }
+}
+```
+
+`POSTS_BY_ID`、`BACKLINKS` 由 `posts-data.js` 依据 `id` 与 `references` 自动派生，**不要手工维护**。
+`id` 缺失或悬空会在浏览器控制台输出 `[backlinks] dangling reference` 警告。
+
+### 步骤 4：新标签配色
+
+在 `assets/posts-data.js` 的 `TAG_COLORS` 中加一行即可（不含 `#`）：
+
+```js
+'新标签': '00d4ff'
+```
+
+文章标签 chip 的颜色由 `post-tags.js` 从 `TAG_COLORS` 读取，缺失时回落到分组默认色
+（`category` 灰 / `knowledge` 紫 / `tools` 青），无需再改 CSS。
+
+---
+
+## 代码块
+
+`<div class="mk-post-content">` 内的**所有裸 `<pre>`** 都会被 `common.js` 自动处理：
+
+- 包裹进 `.mk-code-wrap`，注入 `.mk-code-header`（`CODE // N lines` + 操作按钮）
+- 提供 `copy`（剪贴板）与 `fold`（展开/折叠）按钮
+- 行数 > 10 时自动添加 `.collapsed`，CSS 以 `max-height` + `mask-image` 渐变遮罩呈现
+
+因此正文里**只需写裸 `<pre><code>`**，不要手写 `.mk-code-wrap` 结构。
+历史文章中已有的手写 wrap 也能正常工作：`common.js` 检测到已有 wrap 时会保留其
+`.mk-code-info` 标签（如 `bash`），仅补齐操作按钮，不会重复包裹。
 
 ```html
-<div class="code-wrapper">
-  <div class="code-header">
-    <span class="code-header-info">文件名 / 语言</span>
-    <div class="code-header-actions">
-      <button class="code-btn" onclick="...copy...">📋</button>
-      <button class="code-btn" onclick="...fold...">🔽</button>
-    </div>
-  </div>
-  <pre><code>代码内容</code></pre>
-</div>
-```
-
-#### 代码块自动折叠
-
-当代码块行数超过 **10 行**时，页面加载后会自动将其折叠，仅显示约 2 行高度并带有底部渐变遮罩效果：
-
-```
-┌──────────────────────────────────────┐
-│ CODE // 42 lines          [copy] [↓] │
-├──────────────────────────────────────┤
-│ #include <stdio.h>                   │
-│ int main() {                         │
-│ ...                                  │
-│ ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░│  <- 渐变遮罩
-└──────────────────────────────────────┘
-```
-
-**交互方式：**
-- 点击代码块右上角的 `↓` 按钮可展开/恢复折叠（按钮变为 `↑`）
-- 直接点击折叠态的代码块区域也会展开
-
-**实现原理：**
-- 脚本遍历每篇文章的 `<pre>` 元素，统计行数（`split('\n').length`）
-- 行数 > 10 时，为外层 `.mk-code-wrap` 添加 `collapsed` class
-- CSS 中 `.mk-code-wrap.collapsed pre` 设置 `max-height: 2.8em; overflow: hidden` 并叠加 `mask-image` 渐变
-- 该逻辑以内联 `<script>` 形式存在于每篇文章 HTML 底部（而非 `common.js`），新增文章需包含此脚本
-
-### 图片
-
-```html
-<img src="../assets/xxx_image001.png" alt="描述文字">
+<!-- 推荐 -->
+<pre><code>apt update</code></pre>
 ```
 
 ---
 
-## 标签色值映射
+## 知识图谱
 
-| 标签 | 颜色 | CSS class |
-|------|------|-----------|
-| `#逆向` | `#7b2d8e` | `tag-purple` |
-| `#调试` | `#2ea44f` | `tag-green` |
-| `#X64dbg` | `#00d4ff` | `tag-cyan` |
-| `#Windbg` | `#3366ff` | `tag-blue` |
-| `#学习笔记` | `#ff6b35` | `tag-orange` |
-| `#C/C++` | `#3366ff` | `tag-blue` |
-| `#底层原理` | `#ff6b35` | `tag-orange` |
-| `#Web安全` | `#3366ff` | `tag-blue` |
-| `#DVWA` | `#00d4ff` | `tag-cyan` |
-| `#CTF` | `#e4405f` | — |
-| `#Crypto` | `#00d4ff` | `tag-cyan` |
-| `#RSA` | `#8b5cf6` | — |
-| `#Pwn` | `#10b981` | — |
-| `#蓝桥杯` | `#ec4899` | — |
-| `#SQL注入` | `#8b5cf6` | — |
-| `#XSS` | `#e4405f` | — |
-| `#CSRF` | `#e4405f` | — |
-| `#文件上传` | `#ff6b35` | `tag-orange` |
-| `#文件包含` | `#ff6b35` | `tag-orange` |
-| `#暴力破解` | `#ff6b35` | `tag-orange` |
-| `#命令注入` | `#2ea44f` | `tag-green` |
-| `#靶场搭建` | `#ff6b35` | `tag-orange` |
-| `自定义标签` | `#8888a0` | `tag-add`（虚线边框） |
+`graph.js` 依据 `POSTS_DATA` 构建，三种视图由页面上下文决定：
 
----
-
-## 图片命名规范
-
-所有图片统一命名为 `<前缀>_image<序号>.png`（同时提供 `.webp`），前缀按文章主题归类：
-
-| 前缀 | 用途 |
+| 页面 | 视图 |
 |------|------|
-| **逆向 / 二进制** | |
-| `rd_` | 逆向调试（x64dbg / OllyDbg） |
-| `re_` | 逆向基础（IDA / Ghidra） |
-| `smali_` | Android Smali 逆向 |
-| `mw_` | mov 指令分析 |
-| `bf_` | 二进制相关 |
-| `ce_` | CrackMe 文章 |
-| **C/C++ / 底层** | |
-| `tt_` | 常量 / 编译优化（C/C++ 底层分析） |
-| `vc_` | 虚函数表 / vtable |
-| `ve_` | 变量 / 内存布局 |
-| **Web 安全** | |
-| `ws_` | Web 安全（通用） |
-| `wst_` | Web 安全工具 |
-| `xss_` | XSS 攻击 |
-| `si_` | 信息收集 |
-| `no_` | Open Redirect / HTTP 重定向 |
-| `oa_` | 其他 Web 漏洞（CSRF / CSP / 弱会话等） |
-| `od_` | DVWA 各模块 |
-| **DVWA** | |
-| `ph_` | DVWA 搭建 / PHP |
-| `nw_` | DVWA 网络层 |
-| `np_` | DVWA 页面 |
-| `pd_` | DVWA Payload |
-| **Upload-labs** | |
-| `ws_ul-pass1-2_` | Pass 1-2 |
-| `ws_ul-pass3-4_` | Pass 3-4 |
-| `ws_ul-pass5-6_` | Pass 5-6 |
-| `ws_ul-pass7-8_` | Pass 7-8 |
-| `ws_ul-pass9-10_` | Pass 9-10 |
-| `ws_ul-pass11-12_` | Pass 11-12 |
-| `ws_ul-pass13-14_` | Pass 13-14 |
-| `ws_ul-pass15-16_` | Pass 15-16 |
-| `ws_ul-pass17-18_` | Pass 17-18 |
-| `ws_ul-pass19-20_` | Pass 19-20 |
-| **CTF / Pwn / Crypto** | |
-| `p2_` | Pwn 二进制利用 |
-| `rc4_m1_` / `rc4_m2_` | RC4 算法分析 |
-| `rsa_` | RSA 密码学 |
-| `ss_` | 安全工具 / 综合 |
-| `st2_` | 第二类栈溢出 |
-| `xp_` | 攻防 / 提权 |
-| **Vulnhub / Vulhub** | |
-| `vg_` | Vulnhub 靶机 |
-| `vm_` | Vulhub 漏洞环境 |
-| `vn_` | Vulnhub 新系列 |
-| `vp_` | Vulhub Pwn |
-| `vq_` | Vulhub 快速复现 |
-| `vr_` | Vulnhub 逆向 |
-| `vs_` | Vulhub Web |
-| `vt_` | Vulnhub 权限提升 |
-| **其他** | |
-| `py_` | Python 相关 |
-| `w6_` / `w10_` / `w11_` | Windows 相关 |
-| `search_` | 站内搜索截图 |
-| `persuade_` | 对抗机器学习 CTF |
-| `heist_` / `fourtune_` | ML CTF 挑战 |
-| 通用 | `xxx_image001.png` |
+| 文章页 | 以当前文章为中心的放射图（含引用边 / 被引用边） |
+| `index.html`、`tags/list.html` | 枢纽视图（侧栏带 `data-default-spoke` 属性，带切换按钮） |
+| `graph.html` | 全站图 + 枢纽切换按钮 |
 
-新文章建议使用文章缩写前缀 + 序号，如 `dvwa-csrf_image001.png`。
+连边规则：共享标签权重 `category:1 / knowledge:3 / tools:2`；含非枢纽知识点（权重 ≥ 3）
+或共享 ≥ 2 个不同标签时连边；`references` 额外生成金色实线引用边，目标文章即使没有标签
+关联也会被纳入节点集，因此不会出现悬空边。
+
+**布局策略**：侧栏与全站页同样使用 `forceAtlas2Based` 力导向模拟 —— 侧栏用
+`gravitationalConstant: -50`、预稳定 80 次，`graph.html` 用 `-85`、200 次。取景交给
+vis 的 `stabilization.fit`，代码不手动调 `fit()`，否则视口会锁死在模拟前的位置上。
+`placeNodes()` 只提供**初始布局**（枢纽标签排内圈，文章按主分类切扇区分环），让模拟从
+确定性的相局位置展开，而不是从随机位置炸开。交互两处一致：悬停或拖拽节点冻结模拟，
+鼠标移出恢复。侧栏宽度随视口分三档：>1400px 为 240px，1300–1400px 为 160px，≤1299px 隐藏。
+
+> **当前数据状态**：121 篇文章的 `references` 均为空数组，所以图谱上暂时看不到引用边，
+> 文章底部也不会出现「引用 / 反向链接」区块。代码链路已就绪 —— 填写 `references` 后即自动生效。
 
 ---
 
-## CSS 变量主题系统
+## 主题系统
 
-样式文件 `assets/style.css` 定义 5 套主题：
+`assets/style.css` 使用 OKLCH 令牌定义 4 套主题，通过 `<html data-theme="...">` 切换：
 
-| 主题 | `data-theme` 值 | 风格 |
-|------|----------------|------|
-| 暗色 | `dark`（默认） | 黑色背景，青色强调 |
-| 亮色 | `light` | 白色背景，深蓝强调 |
-| 水晶 | `crystal` | 米白背景，淡紫/粉强调 |
-| Ego | `ego` | 粉色背景，湖蓝强调 |
-| Rei | `rei` | 蓝灰背景，红色强调（绫波丽主题） |
+| 主题 | `data-theme` | 风格 |
+|------|--------------|------|
+| 玄黑（默认） | `black` | 漆器近黑底，金 / 青双色强调 |
+| 素白 | `white` | 暖白底，低饱和强调 |
+| 艾露西亚 | `elysia` | 粉晶，柔和强调 |
+| rei | `rei` | 蓝钢蓝灰底，朱红强调 |
 
-核心 CSS 变量（位于 `:root` 和 `[data-theme="xxx"]`）：
-
-| 变量 | 作用 |
-|------|------|
-| `--bg-primary` | 主背景色 |
-| `--bg-elevated` | 卡片/区块背景 |
-| `--text-primary` | 主文字色 |
-| `--text-secondary` | 次要文字 |
-| `--text-muted` | 弱化文字 |
-| `--accent-cyan` | 青色强调 |
-| `--accent-blue` | 蓝色强调 |
-| `--accent-orange` | 橙色强调 |
-| `--border-color` | 边框色 |
-| `--nav-bg` | 导航栏背景 |
+主要变量：`--mk-lacquer`（页面底色）、`--mk-raised` / `--mk-graphite`（卡片层级）、
+`--mk-text` / `--mk-muted` / `--mk-faint`（文字层级）、`--mk-gold` / `--mk-patina`
+（主强调色）、`--mk-rule`（描边）。组件统一使用 `mk-` 前缀（`.mk-tile`、`.mk-tag`、
+`.mk-code-wrap`、`.mk-graph-sidebar` 等）。
 
 ---
 
 ## 自动部署
 
-项目通过 `.github/workflows/static.yml` 配置 GitHub Actions，推送到 `main` 分支时自动构建并部署到 GitHub Pages：
-
-- 触发条件：`push` 到 `main` 或手动 `workflow_dispatch`
-- 构建步骤：checkout → configure Pages → cache（基于 `index.html`/`readme.md`/`assets/**` 哈希）→ upload artifact
-- 部署步骤：使用 `actions/deploy-pages@v5` 部署到 `github-pages` 环境
-- 缓存策略：使用 `actions/cache@v5` 缓存构建产物，避免重复构建
+`.github/workflows/static.yml`：推送到 `main` 或手动 `workflow_dispatch` 触发，
+checkout → 配置 Pages → 缓存 → 上传产物 → `actions/deploy-pages` 部署。
+纯静态，无需构建步骤。
 
 ---
 
-## 维护清单（添加文章时逐项检查）
+## 维护清单
 
-- [ ] 在 `posts/` 下创建了 `.html` 文件
-- [ ] 文章内 `<title>` 标签正确
-- [ ] 文章内标签导航栏的 tag 链接颜色 class 匹配
-- [ ] 文章内 `post-tag` 的 inline style 颜色值正确
-- [ ] TOC 侧边栏的链接与正文 `id` 锚点一一对应
-- [ ] 文章内 `.nav-inner` 导航栏与首页 `index.html` 同步
-- [ ] `assets/posts-data.js` 的 `POSTS_DATA` 数组已添加新条目（含 `id`、`references` 字段）
-- [ ] 新标签已在 `assets/posts-data.js` 的 `TAG_COLORS` 中添加颜色映射，并在 `style.css` 中添加 `tag-xxx` class
-- [ ] 图片已放入 `assets/` 且同时提供了 `.png` 和 `.webp` 两份文件
-- [ ] `<script src="../assets/post-tags.js"></script>`、`<script src="../assets/common.js"></script>` 和 `<script src="../assets/backlinks.js"></script>` 已在页面最后引用（顺序：post-tags → common → backlinks）
-- [ ] `<div class="mk-post-tags"></div>` 已包含在 `.post-tags` 容器中
-- [ ] `<div id="postReferences"></div>` 和 `<div id="postBacklinks"></div>` 已包含在页面中
-- [ ] 图谱侧边栏和懒加载脚本已包含
-- [ ] 超过 10 行的代码块能正常折叠，折叠/展开按钮工作正常（`.mk-code-wrap.collapsed` 逻辑已包含）
-- [ ] 页面在浏览器打开测试正常（主题切换、代码块按钮、回到顶部、图谱均正常，无 404 资源）
+- [ ] 文章骨架节点齐全（`mk-post-content` / `mk-post-tags` / `mk-toc` / `postReferences` / `postBacklinks` / `mkGraphSidebar`）
+- [ ] 页面底部 4 个 `<script src>` 顺序正确，且**没有**任何内联业务脚本
+- [ ] `POSTS_DATA` 已登记新条目，`id` 与文件名一致
+- [ ] 新标签已加入 `TAG_COLORS`
+- [ ] TOC 的 `a[href]` 与正文标题 `id` 一一对应
+- [ ] 导航栏与 `index.html` 同步
+- [ ] 图片放入 `assets/`，并同时提供 `.png` 与 `.webp`（`common.js` 自动按浏览器能力切换）
+- [ ] 浏览器实测：主题切换、代码块 copy/fold、回到顶部、搜索、图谱侧栏
 
 ---
 

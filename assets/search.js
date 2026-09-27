@@ -24,10 +24,6 @@
     return PREFIX + 'posts/' + u.replace(/^\/+/, '');
   }
 
-  function dataReady() {
-    return !!window.POSTS_DATA;
-  }
-
   function showSections() {
     document.querySelectorAll('section.mk-section > header.mk-section-head h2').forEach(function (h2) {
       var txt = h2.textContent || '';
@@ -140,15 +136,6 @@
     else showSections();
   }
 
-  if (dataReady()) {
-    onData();
-  } else {
-    var base = document.currentScript && document.currentScript.src
-      ? document.currentScript.src.replace(/[^/]*$/, '')
-      : '';
-    var s = document.createElement('script');
-    s.src = base + 'posts-data.js';
-    s.onload = onData;
-    (document.head || document.body).appendChild(s);
-  }
+  // posts-data.js 由页面静态引入（common.js 之前），数据必然就绪
+  onData();
 })();
