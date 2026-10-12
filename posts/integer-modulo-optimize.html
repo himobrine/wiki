@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>整数取模优化：汇编识别与还原技巧 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 10 / 12</div>
+  <div class="mk-post-title">整数取模优化：汇编识别与还原技巧</div>
+  <div class="mk-post-tags"></div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a></li>
+    <li class="toc-h4"><a href="#asm">汇编实例</a>
+      <ul>
+        <li class="toc-h5"><a href="#asm-mingw">MinGW 汇编</a></li>
+        <li class="toc-h5"><a href="#asm-msvc64">MSVC 汇编（64→64）</a></li>
+        <li class="toc-h5"><a href="#asm-msvc32">MSVC 汇编（64→32）</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#pow2">2的幂取模四种方案</a>
+      <ul>
+        <li class="toc-h5"><a href="#scheme1">方案1：位掩码 + 符号判定</a></li>
+        <li class="toc-h5"><a href="#scheme2">方案2：正负数分别处理</a></li>
+        <li class="toc-h5"><a href="#scheme3">方案3：高位清除修正</a></li>
+        <li class="toc-h5"><a href="#scheme4">方案4：非2的幂</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#summary">总结</a></li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述</h4>
+
+<p>除法已经讲完了，来说一下取模。编译器在生成取模运算的汇编代码时，会根据除数是否为 2 的幂采取完全不同的优化策略：2 的幂被转换为位掩码（<code>and</code>）配合符号修正，而非 2 的幂则先用魔数乘法求出商，再用被除数减去「商 × 除数」得到余数。本文通过同一份代码在 MinGW 与 MSVC（64→64 / 64→32）下的三组汇编输出，分析取模运算的指令特征。</p>
+
+<h4 id="asm">汇编实例</h4>
+
+<p>示例代码分别对 8（2的幂）和 9（非2的幂）取模：</p>
+
+<pre><code>printf("argc %% 8 = %d", argc % 8);
+printf("argc %% 9 = %d", argc % 9);
+</code></pre>
+
+<h5 id="asm-mingw">MinGW 汇编</h5>
+
+<pre><code>main(int, char**):
+    push   %rbp
+    mov    %rsp,%rbp
+    sub    $0x20,%rsp
+    mov    %ecx,0x10(%rbp)
+    mov    %rdx,0x18(%rbp)
+    call   0x7ff7410d1837              ; &lt;__main&gt;
+    mov    0x10(%rbp),%eax             ; eax = argc
+    cltd
+    shr    $0x1d,%edx                  ; edx &gt;&gt; 29（这里相当于判断符号）
+    add    %edx,%eax                   ; eax = argc + (argc &lt; 0 ? 7 : 0)
+    and    $0x7,%eax                   ; eax = eax &amp; 7
+    sub    %edx,%eax                   ; 减回修正量
+    mov    %eax,%edx
+    lea    0x88f5(%rip),%rax           ; 0x7ff7410da000
+    mov    %rax,%rcx
+    call   0x7ff7410d8e40              ; &lt;printf(char const*, ...)&gt;
+    mov    0x10(%rbp),%edx             ; edx = argc
+    movslq %edx,%rax
+    imul   $0x38e38e39,%rax,%rax       ; rax = argc * 0x38e38e39
+    shr    $0x20,%rax                  ; rax = rax &gt;&gt; 32（逻辑右移）
+    sar    %eax                        ; eax = eax &gt;&gt; 1（算术右移）
+    mov    %edx,%ecx                   ; ecx = argc
+    sar    $0x1f,%ecx                  ; ecx = argc &gt;&gt; 31（取符号位）
+    sub    %ecx,%eax                   ; eax = argc / 9
+    mov    %eax,%ecx                   ; ecx = eax
+    shl    $0x3,%ecx                   ; ecx = eax &lt;&lt; 3
+    add    %eax,%ecx                   ; ecx = (eax &lt;&lt; 3) + eax = 9*q
+    mov    %edx,%eax
+    sub    %ecx,%eax                   ; eax = argc - 9 * (argc / 9)
+    mov    %eax,%edx
+    lea    0x88bf(%rip),%rax           ; 0x7ff7410da000
+    mov    %rax,%rcx
+    call   0x7ff7410d8e40              ; &lt;printf(char const*, ...)&gt;
+    mov    $0x0,%eax
+    add    $0x20,%rsp
+    pop    %rbp
+    ret
+</code></pre>
+
+<p><strong>分析</strong>：第一段（% 8）中，<code>shr $0x1d</code> 把符号位右移到最低位，负数时得到 7、正数时得到 0，作为偏移量加入后再 <code>and $0x7</code> 取低 3 位，最后减回偏移量 —— 这就是 2 的幂取模的符号修正过程。第二段（% 9）先用魔数 <code>0x38e38e39</code> 配合移位求出 <code>argc / 9</code>，再通过 <code>argc - 9*q</code> 得到余数，属于典型的「先求商再回乘相减」。</p>
+
+<h5 id="asm-msvc64">MSVC 汇编（64→64）</h5>
+
+<pre><code>64-&gt;64
+main(int,char **):
+    movq   %rdx, 0x10(%rsp)
+    movl   %ecx, 0x8(%rsp)
+    pushq  %rdi
+    subq   $0x20, %rsp
+    movl   0x30(%rsp), %eax            ; eax = argc
+    cltd                                ; 扩展 eax
+    andl   $0x7, %edx                  ; edx = edx &amp; 7（负数得 7，正数得 0）
+    addl   %edx, %eax                  ; eax = eax + edx
+    andl   $0x7, %eax                  ; eax = eax &amp; 7
+    subl   %edx, %eax                  ; (argc + (argc&lt;0?7:0)) &amp; 7 - (argc&lt;0?7:0)
+    movl   %eax, %edx
+    leaq   0x86ca(%rip), %rcx
+    callq  0x140001195                 ; printf
+    movl   0x30(%rsp), %eax            ; eax = argc
+    cltd                                ; 扩展
+    movl   $0x9, %ecx
+    idivl  %ecx                        ; eax = argc / 9, edx = argc % 9
+    movl   %edx, %eax
+    movl   %eax, %edx
+    leaq   0x86b6(%rip), %rcx
+    callq  0x140001195                 ; printf
+    xorl   %eax, %eax
+    addq   $0x20, %rsp
+    popq   %rdi
+    retq
+</code></pre>
+
+<p><strong>分析</strong>：2 的幂取模与 MinGW 思路一致，<code>cltd</code> 符号扩展后 <code>and $0x7</code> 得到修正量（负数 7、正数 0），加偏移 → <code>and</code> 取低位 → 减回偏移。非 2 的幂（% 9）则直接使用 <code>idiv</code> 硬件除法指令，余数保存在 <code>edx</code> 中。</p>
+
+<h5 id="asm-msvc32">MSVC 汇编（64→32）</h5>
+
+<pre><code>64-&gt;32
+main(int,char **):
+    pushl  %ebp
+    movl   %esp, %ebp
+    movl   0x8(%ebp), %eax
+    andl   $0x80000007, %eax           ; imm = 0x80000007
+    jns    0x4014d2                     ; eax 符号位为 0（argc &gt;= 0）时跳转
+    decl   %eax
+    orl    $-0x8, %eax
+    incl   %eax                         ; 负数取模修正
+    pushl  %eax
+    pushl  $0x606b30                    ; imm = 0x606B30
+    calll  0x40119a                     ; _printf
+    addl   $0x8, %esp
+    movl   0x8(%ebp), %eax              ; eax = argc
+    cltd                                ; 扩展（后面是正常的除法操作）
+    movl   $0x9, %ecx
+    idivl  %ecx
+    pushl  %edx
+    pushl  $0x606b38                    ; imm = 0x606B38
+    calll  0x40119a                     ; _printf
+    addl   $0x8, %esp
+    xorl   %eax, %eax
+    cmpl   %esp, %ebp
+    calll  0x4010ff                     ; __RTC_CheckEsp
+    popl   %ebp
+    retl
+</code></pre>
+
+<p><strong>分析</strong>：<code>andl $0x80000007</code> 一条指令同时完成符号位保留与低 3 位提取（0x80000007 = 符号位 | 7 的掩码），随后用 <code>jns</code> 判定：正数直接使用结果，负数走 <code>decl → orl → incl</code> 修正。非 2 的幂同样使用 <code>idiv</code>。</p>
+
+<h4 id="pow2">2的幂取模四种方案</h4>
+
+<h5 id="scheme1">方案1：位掩码 + 符号判定</h5>
+
+<p>对 2<sup>k</sup> 取余，余数只需要被除数低 k 位的值；如果是负数，需要在第 k 位之前补 1（保留符号位）。代码模板：</p>
+
+<pre><code>mov  reg, 被除数
+and  reg, 80000007h        ; 掩码 = 符号位 | (2^k - 1)
+jns  lab1                  ; 符号位为 0（非负）直接跳过
+or   reg, 0FFFFFFF8h       ; 负数：高位补 1
+lab1:
+</code></pre>
+
+<p>余数的值非 0 时没有问题；如果结果恰好为 0 则可能是错误的（负数被修正成了错误值）。调整方法是在 <code>or</code> 运算之前先 <code>-1</code>，<code>or</code> 算完之后再 <code>+1</code>。如果余数不为 0，不影响计算结果。模板：</p>
+
+<pre><code>mov  reg, 被除数
+and  reg, 80000007h        ; 掩码由 2^k 决定
+jns  lab1
+dec  reg
+or   reg, 0FFFFFFF8h
+inc  reg
+lab1:
+</code></pre>
+
+<p>碰到这个就能判定是取模代码，原型是变量对 2<sup>k</sup> 执行取模运算。还原方法：直接去掉高位、保留低位，统计低位有多少个 1 就能得到 k 值。</p>
+
+<h5 id="scheme2">方案2：正负数分别处理</h5>
+
+<p>对 2<sup>k</sup> 取余，正数使用方案1，负数可以使用下面的调整公式：</p>
+
+<p><code>x % 2^k = (x + 2^(k-1)) &amp; (2^k - 1) - 2^(k-1)</code></p>
+
+<p>遇到这个公式也可以判定是取模代码，原型是变量对 2<sup>k</sup> 执行取模运算。还原方法：直接看 <code>and reg, 0FFFFFFF8h</code>，统计低位一共保留了多少个 0 即可得到 k 的值。</p>
+
+<h5 id="scheme3">方案3：高位清除修正</h5>
+
+<p>对 2<sup>k</sup> 取余，正数使用以下调整公式：</p>
+
+<p><code>x % 2^k = x - (x &amp; ~(2^k - 1))</code></p>
+
+<p>对负数使用以下调整公式：</p>
+
+<p><code>x % 2^k = x - ((x + 2^(k-1)) &amp; ~(2^k - 1))</code></p>
+
+<p>遇到这个公式也可以判定是取模代码，原型是变量对 2<sup>k</sup> 执行取模运算。还原方法：直接看 <code>and reg, 0FFFFFFF8h</code>，统计低位一共保留了多少个 0 即可得到 k 的值。</p>
+
+<h5 id="scheme4">方案4：非2的幂</h5>
+
+<p>对非 2<sup>k</sup> 取余，根据取模定义：</p>
+
+<p><code>r = a % b</code></p>
+
+<p>根据性质可以得到：</p>
+
+<p><code>r = a - q * b = a - (a / b) * b</code></p>
+
+<p>碰到这个很简单，直接看除数 b 就可以了。通常的表现形式是：魔数乘法（或 <code>idiv</code>）求商，随后 <code>被除数 - 商 * 除数</code> 得到余数。</p>
+
+<h4 id="summary">总结</h4>
+
+<ul>
+  <li><strong>除数为 2 的幂</strong>：识别特征是 <code>and</code> 位掩码（如 <code>0x80000007</code>、<code>0FFFFFFF8h</code>）配合 <code>jns</code>/<code>cltd</code> 符号判定与加减修正。还原时统计掩码低位的 1（或保留的 0）的个数得到 k，即原始运算为 <code>x % 2^k</code>。</li>
+  <li><strong>除数非 2 的幂</strong>：识别特征是先通过魔数乘法 + 移位或 <code>idiv</code> 求商，再执行 <code>被除数 - 商 * 除数</code>。还原时直接读取回乘的常数即为除数。</li>
+  <li><strong>MinGW vs MSVC</strong>：MinGW 偏好魔数乘法 + 移位求商的纯指令序列；MSVC 在非 2 的幂场景常直接使用 <code>idiv</code>，在 64→32 场景下则常用单条 <code>and 0x80000007</code> + <code>jns</code> 分支完成 2 的幂取模。</li>
+</ul>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<div id="postReferences"></div>
+<div id="postBacklinks"></div>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<script src="../assets/posts-data.js"></script>
+<script src="../assets/post-tags.js"></script>
+<script src="../assets/common.js"></script>
+<script src="../assets/backlinks.js"></script>
+</body>
+</html>

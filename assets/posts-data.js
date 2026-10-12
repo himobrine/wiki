@@ -1814,6 +1814,21 @@ var POSTS_DATA = [
       tools: ["MinGW", "MSVC"]
     }
   },
+  {
+    title: "整数取模优化：汇编识别与还原技巧",
+    id: "integer-modulo-optimize",
+    references: ["integer-division-optimize"],
+    primary: "C/C++",
+    secondary: "基础",
+    date: "2026 // 10 / 12",
+    url: "posts/integer-modulo-optimize.html",
+    excerpt: "系统讲解编译器如何生成取模运算的汇编代码：2的幂除数被转换为 and 位掩码配合 jns/cltd 符号判定与加减修正，非2的幂则先用魔数乘法或 idiv 求商再回乘相减；含 MinGW 与 MSVC（64→64 / 64→32）三组汇编对比，总结四种取模优化方案及其逆向识别、还原方法。",
+    tags: {
+      category: ["C/C++", "逆向"],
+      knowledge: ["取模优化", "汇编", "编译优化"],
+      tools: ["MinGW", "MSVC"]
+    }
+  },
 ];
 
 // === Reference & Backlink Helpers ===
@@ -2159,6 +2174,7 @@ var TAG_COLORS = {
   "迷宫": '8b5cf6',
   "通配符提权": '8b5cf6',
   "除法优化": '8b5cf6',
+  "取模优化": '8b5cf6',
   "隐写": '8b5cf6',
   "题型分析": '8b5cf6',
   "魔数乘法": '8b5cf6',
