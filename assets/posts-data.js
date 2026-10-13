@@ -1829,6 +1829,21 @@ var POSTS_DATA = [
       tools: ["MinGW", "MSVC"]
     }
   },
+  {
+    title: "溢出与进位：32位整数的隐藏陷阱",
+    id: "integer-overflow-carry",
+    references: ["asm-sub-complement"],
+    primary: "C/C++",
+    secondary: "基础",
+    date: "2026 // 10 / 13",
+    url: "posts/integer-overflow-carry.html",
+    excerpt: "讲解 32 位整数运算的两类越界行为：无符号数越界为进位（进位位保存在 CF 标志），有符号数溢出破坏符号位（由 OF 标志记录）；随后以 n2 = 5 + (n1++) 等自增自减表达式为例，对比 MinGW（lea 指令）与 MSVC（中间变量、incl/decl）的三组汇编输出，分析前后缀 ++/-- 的指令级语义差异与逆向识别特征。",
+    tags: {
+      category: ["C/C++", "逆向"],
+      knowledge: ["溢出", "进位", "自增自减", "汇编"],
+      tools: ["MinGW", "MSVC"]
+    }
+  },
 ];
 
 // === Reference & Backlink Helpers ===
@@ -2175,6 +2190,9 @@ var TAG_COLORS = {
   "通配符提权": '8b5cf6',
   "除法优化": '8b5cf6',
   "取模优化": '8b5cf6',
+  "溢出": '8b5cf6',
+  "进位": '8b5cf6',
+  "自增自减": '8b5cf6',
   "隐写": '8b5cf6',
   "题型分析": '8b5cf6',
   "魔数乘法": '8b5cf6',

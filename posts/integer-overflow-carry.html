@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>溢出与进位：32位整数的隐藏陷阱 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 10 / 13</div>
+  <div class="mk-post-title">溢出与进位：32位整数的隐藏陷阱</div>
+  <div class="mk-post-tags"></div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a></li>
+    <li class="toc-h4"><a href="#overflow">算术结果溢出</a>
+      <ul>
+        <li class="toc-h5"><a href="#carry">无符号：进位（CF）</a></li>
+        <li class="toc-h5"><a href="#signed-overflow">有符号：溢出（OF）</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#incdec">自增自减</a>
+      <ul>
+        <li class="toc-h5"><a href="#incdec-code">示例代码</a></li>
+        <li class="toc-h5"><a href="#incdec-mingw">MinGW 汇编</a></li>
+        <li class="toc-h5"><a href="#incdec-msvc64">MSVC 汇编（64→64）</a></li>
+        <li class="toc-h5"><a href="#incdec-msvc32">MSVC 汇编（64→32）</a></li>
+        <li class="toc-h5"><a href="#incdec-semantics">前后缀语义分析</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#summary">总结</a></li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述</h4>
+
+<p>32 位整数在参与算术运算时存在两类越界行为：结果超出存储空间后，无符号数表现为进位、有符号数表现为溢出，二者由不同的标志位记录。本文先解释这两类现象，再通过自增自减表达式在 MinGW 与 MSVC（64→64 / 64→32）下的三组汇编输出，分析 <code>++</code>/<code>--</code> 前后缀在指令层面的真实语义。</p>
+
+<h4 id="overflow">算术结果溢出</h4>
+
+<p>解释起来很简单：4 字节 32 位的内存空间经过运算之后得到的结果超过了存储空间的大小。对于有符号数而言，会由正数变成负数。</p>
+
+<h5 id="overflow-loop">示例代码</h5>
+
+<pre><code>for (int i = 1; i &gt; 0; i++) {
+    printf("%d", i);
+}
+</code></pre>
+
+<p><code>i</code> 从 1 开始不断自增并打印，当结果超过 <code>INT_MAX</code> 后，最高位（符号位）被破坏，正数变为负数，条件 <code>i &gt; 0</code> 不再成立，循环随之结束。这类依赖有符号溢出的写法属于未定义行为，实际结果依赖编译器与运行环境。</p>
+
+<h5 id="carry">无符号：进位（CF）</h5>
+
+<p>无符号数发生存储范围超过叫<strong>进位</strong>。因为没有符号位，进位不会破坏数据本身；出现问题时，溢出到最高位之外的那一位 1 会被存储在 <code>CF</code>（Carry Flag）寄存器中，查看该标志位就能看到。</p>
+
+<h5 id="signed-overflow">有符号：溢出（OF）</h5>
+
+<p>有符号数超出存储范围叫<strong>溢出</strong>。很简单——破坏掉了有符号数的正负标记位（最高位）。检查 <code>OF</code>（Overflow Flag）寄存器即可，具体细则参考 Intel 手册。</p>
+
+<h4 id="incdec">自增自减</h4>
+
+<h5 id="incdec-code">示例代码</h5>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int main(int argc, char* argv[]){
+    int n1 = argc;
+    int n2 = argc;
+    n2 = 5 + (n1++);
+    n2 = 5 + (++n1);
+    n1 = 5 + (n2--);
+    n1 = 5 + (--n2);
+    return 0;
+}
+</code></pre>
+
+<h5 id="incdec-mingw">MinGW 汇编</h5>
+
+<pre><code>main(int, char**):
+    push   %rbp
+    mov    %rsp,%rbp
+    sub    $0x30,%rsp
+    mov    %ecx,0x10(%rbp)
+    mov    %rdx,0x18(%rbp)
+    call   0x7ff6d3351827              ; &lt;__main&gt;
+    mov    0x10(%rbp),%eax
+    mov    %eax,-0x4(%rbp)
+    mov    0x10(%rbp),%eax
+    mov    %eax,-0x8(%rbp)
+    mov    -0x4(%rbp),%eax
+    lea    0x1(%rax),%edx
+    mov    %edx,-0x4(%rbp)
+    add    $0x5,%eax
+    mov    %eax,-0x8(%rbp)
+    addl   $0x1,-0x4(%rbp)
+    mov    -0x4(%rbp),%eax
+    add    $0x5,%eax
+    mov    %eax,-0x8(%rbp)
+    mov    -0x8(%rbp),%eax
+    lea    -0x1(%rax),%edx
+    mov    %edx,-0x8(%rbp)
+    add    $0x5,%eax
+    mov    %eax,-0x4(%rbp)
+    subl   $0x1,-0x8(%rbp)
+    mov    -0x8(%rbp),%eax
+    add    $0x5,%eax
+    mov    %eax,-0x4(%rbp)
+    mov    $0x0,%eax
+    add    $0x30,%rsp
+    pop    %rbp
+    ret
+</code></pre>
+
+<h5 id="incdec-msvc64">MSVC 汇编（64→64）</h5>
+
+<pre><code>64-&gt;64
+main(int,char **):
+    movq   %rdx, 0x10(%rsp)
+    movl   %ecx, 0x8(%rsp)
+    pushq  %rdi
+    subq   $0x10, %rsp
+    movl   0x20(%rsp), %eax
+    movl   %eax, (%rsp)
+    movl   0x20(%rsp), %eax
+    movl   %eax, 0x4(%rsp)
+    movl   (%rsp), %eax
+    addl   $0x5, %eax
+    movl   %eax, 0x8(%rsp)
+    movl   (%rsp), %eax
+    incl   %eax
+    movl   %eax, (%rsp)
+    movl   0x8(%rsp), %eax
+    movl   %eax, 0x4(%rsp)
+    movl   (%rsp), %eax
+    incl   %eax
+    movl   %eax, (%rsp)
+    movl   (%rsp), %eax
+    addl   $0x5, %eax
+    movl   %eax, 0x4(%rsp)
+    movl   0x4(%rsp), %eax
+    addl   $0x5, %eax
+    movl   %eax, 0xc(%rsp)
+    movl   0x4(%rsp), %eax
+    decl   %eax
+    movl   %eax, 0x4(%rsp)
+    movl   0xc(%rsp), %eax
+    movl   %eax, (%rsp)
+    movl   0x4(%rsp), %eax
+    decl   %eax
+    movl   %eax, 0x4(%rsp)
+    movl   0x4(%rsp), %eax
+    addl   $0x5, %eax
+    movl   %eax, (%rsp)
+    xorl   %eax, %eax
+    addq   $0x10, %rsp
+    popq   %rdi
+    retq
+</code></pre>
+
+<h5 id="incdec-msvc32">MSVC 汇编（64→32）</h5>
+
+<pre><code>64-&gt;32
+main(int,char **):
+    pushl  %ebp
+    movl   %esp, %ebp
+    subl   $0x10, %esp
+    movl   0x8(%ebp), %eax
+    movl   %eax, -0x4(%ebp)
+    movl   0x8(%ebp), %ecx
+    movl   %ecx, -0x8(%ebp)
+    movl   -0x4(%ebp), %edx
+    addl   $0x5, %edx
+    movl   %edx, -0xc(%ebp)
+    movl   -0x4(%ebp), %eax
+    addl   $0x1, %eax
+    movl   %eax, -0x4(%ebp)
+    movl   -0xc(%ebp), %ecx
+    movl   %ecx, -0x8(%ebp)
+    movl   -0x4(%ebp), %edx
+    addl   $0x1, %edx
+    movl   %edx, -0x4(%ebp)
+    movl   -0x4(%ebp), %eax
+    addl   $0x5, %eax
+    movl   %eax, -0x8(%ebp)
+    movl   -0x8(%ebp), %ecx
+    addl   $0x5, %ecx
+    movl   %ecx, -0x10(%ebp)
+    movl   -0x8(%ebp), %edx
+    subl   $0x1, %edx
+    movl   %edx, -0x8(%ebp)
+    movl   -0x10(%ebp), %eax
+    movl   %eax, -0x4(%ebp)
+    movl   -0x8(%ebp), %ecx
+    subl   $0x1, %ecx
+    movl   %ecx, -0x8(%ebp)
+    movl   -0x8(%ebp), %edx
+    addl   $0x5, %edx
+    movl   %edx, -0x4(%ebp)
+    xorl   %eax, %eax
+    movl   %ebp, %esp
+    popl   %ebp
+    retl
+</code></pre>
+
+<h5 id="incdec-semantics">前后缀语义分析</h5>
+
+<p>这三组汇编说明的就是一件事：<code>++</code> 在前在后的区别。MinGW 偏好 <code>lea</code> 的做法——在一条指令里算出新值并存回变量，旧值保留在寄存器里继续参与后续运算；MSVC 更倾向于使用中间变量来处理。</p>
+
+<p>后缀自增（以 <code>n2 = 5 + (n1++)</code> 为例）：</p>
+
+<pre><code>t  = a + 5; a = a + 1; b = t;
+→ 等价于  b = 旧a + 5; a = 旧a + 1;
+</code></pre>
+
+<p>后缀自减（以 <code>n1 = 5 + (n2--)</code> 为例）：</p>
+
+<pre><code>t2 = b + 5; b = b - 1; a = t2;
+→ 等价于  a = 旧b + 5; b = 旧b - 1;
+</code></pre>
+
+<p>前缀 <code>++n</code>/<code>--n</code> 则先完成自增/自减，参与运算的已经是新值：汇编中表现为 <code>addl/subl $0x1</code>（或 <code>incl/decl</code>）先行写回变量，随后再读取该变量与 5 相加。</p>
+
+<h4 id="summary">总结</h4>
+
+<ul>
+  <li><strong>进位 vs 溢出</strong>：无符号数越界叫进位，进位位保存在 <code>CF</code>；有符号数越界叫溢出，符号位被破坏，由 <code>OF</code> 记录。</li>
+  <li><strong>后缀 ++/--</strong>：先取旧值参与运算，再更新变量；MinGW 用 <code>lea</code> 一条指令同时保留旧值与写回新值，MSVC 用中间变量暂存旧值的运算结果。</li>
+  <li><strong>前缀 ++/--</strong>：先更新变量（<code>addl/subl $0x1</code> 或 <code>incl/decl</code> 写回），再读取新值参与运算。</li>
+  <li>逆向识别时，看到紧邻算术运算的 <code>lea 0x1(%rax),%edx</code> + 写回 + 旧值继续相加的模式，即可判定为前后缀自增自减的表达式。</li>
+</ul>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<div id="postReferences"></div>
+<div id="postBacklinks"></div>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<script src="../assets/posts-data.js"></script>
+<script src="../assets/post-tags.js"></script>
+<script src="../assets/common.js"></script>
+<script src="../assets/backlinks.js"></script>
+</body>
+</html>
