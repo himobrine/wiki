@@ -1844,6 +1844,35 @@ var POSTS_DATA = [
       tools: ["MinGW", "MSVC"]
     }
   },
+  {
+    title: "揭秘x86条件转移指令精髓",
+    id: "x86-conditional-jump",
+    references: ["integer-overflow-carry"],
+    primary: "C/C++",
+    secondary: "基础",
+    date: "2026 // 10 / 13",
+    url: "posts/x86-conditional-jump.html",
+    excerpt: "x86 条件转移指令速查：JCXZ/JECXZ 寄存器判零，有符号比较（JG/JGE/JL/JLE）依据 SF 与 OF 组合、无符号比较（JA/JAE/JB/JBE）依据 CF 与 ZF，以及 JC/JZ/JS/JO 等单标志位指令；均需配合 CMP 使用，是逆向分析分支与循环逻辑的基础。",
+    tags: {
+      category: ["C/C++", "逆向"],
+      knowledge: ["条件转移", "标志寄存器", "汇编"]
+    }
+  },
+  {
+    title: "一行代码实现斐波那契的短路奇技",
+    id: "fibonacci-short-circuit",
+    references: ["x86-conditional-jump"],
+    primary: "C/C++",
+    secondary: "基础",
+    date: "2026 // 10 / 19",
+    url: "posts/fibonacci-short-circuit.html",
+    excerpt: "用 (num < 2) || (num = flib(num-1) + flib(num-2)); 一行实现斐波那契：逻辑或的短路求值在汇编层面就是 cmp + jcc，因此可以顶替 if；再对比三目运算符在 MinGW / MSVC 未优化时的跳转形态，以及 /O1、/O2 下 setcc、cmov 的无分支改写与分支预测的性能取舍。",
+    tags: {
+      category: ["C/C++", "逆向"],
+      knowledge: ["表达式短路", "三目运算符", "分支预测", "汇编"],
+      tools: ["MinGW", "MSVC"]
+    }
+  },
 ];
 
 // === Reference & Backlink Helpers ===
@@ -2193,6 +2222,11 @@ var TAG_COLORS = {
   "溢出": '8b5cf6',
   "进位": '8b5cf6',
   "自增自减": '8b5cf6',
+  "条件转移": '8b5cf6',
+  "标志寄存器": '8b5cf6',
+  "表达式短路": '8b5cf6',
+  "三目运算符": '8b5cf6',
+  "分支预测": '8b5cf6',
   "隐写": '8b5cf6',
   "题型分析": '8b5cf6',
   "魔数乘法": '8b5cf6',

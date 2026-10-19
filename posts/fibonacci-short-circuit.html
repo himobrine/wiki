@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>一行代码实现斐波那契的短路奇技 - 信息安全实验室</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&amp;family=Noto+Sans+SC:wght@400;500;700&amp;family=Albert+Sans:wght@400;500;600&amp;display=swap"></noscript>
+<link rel="stylesheet" href="../assets/style.css" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="../assets/style.css"></noscript>
+</head>
+<body>
+<div class="mk-scanline"></div>
+<div class="mk-container">
+
+<div class="mk-brand fade-up">
+  <span class="mk-mark"></span>
+  <span class="mk-wordmark">// HIMOBRINE</span>
+</div>
+
+<div id="mkNavSentinel"></div>
+
+<div class="mk-nav-wrap" id="mkNavWrap">
+  <nav class="mk-nav">
+    <a href="../index.html" class="mk-nav-link">首页</a>
+    <a href="../tags/list.html?tag=漏洞分析" class="mk-nav-link">漏洞分析</a>
+    <a href="../tags/list.html?tag=安全工具" class="mk-nav-link">安全工具</a>
+    <a href="../tags/list.html?tag=学习笔记" class="mk-nav-link">学习笔记</a>
+    <a href="../tags/list.html?tag=逆向" class="mk-nav-link">逆向</a>
+    <a href="../tags/list.html?tag=调试" class="mk-nav-link">调试</a>
+    <a href="../tags/list.html" class="mk-nav-link">标签归档</a>
+  </nav>
+</div>
+
+<a href="../index.html" class="mk-back-link">[ &larr; ] BACK TO HOME</a>
+
+<article class="mk-bento-tile">
+  <div class="mk-post-date">2026 // 10 / 19</div>
+  <div class="mk-post-title">一行代码实现斐波那契的短路奇技</div>
+  <div class="mk-post-tags"></div>
+
+  <div class="mk-post-content" >
+
+<nav class="mk-toc">
+  <span class="mk-toc-title">// 目录</span>
+  <ul>
+    <li class="toc-h4"><a href="#overview">概述</a></li>
+    <li class="toc-h4"><a href="#short-circuit">表达式短路</a>
+      <ul>
+        <li class="toc-h5"><a href="#sc-code">示例代码</a></li>
+        <li class="toc-h5"><a href="#sc-mingw">MinGW 汇编</a></li>
+        <li class="toc-h5"><a href="#sc-analyze">汇编解读</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#conditional-expr">条件表达式</a>
+      <ul>
+        <li class="toc-h5"><a href="#ce-plans">四种转换方案</a></li>
+        <li class="toc-h5"><a href="#ce-mingw">MinGW 汇编</a></li>
+        <li class="toc-h5"><a href="#ce-msvc">MSVC 汇编</a></li>
+        <li class="toc-h5"><a href="#ce-opt">优化级别差异</a></li>
+      </ul>
+    </li>
+    <li class="toc-h4"><a href="#branch-predict">分支预测</a></li>
+    <li class="toc-h4"><a href="#summary">总结</a></li>
+  </ul>
+</nav>
+
+<h4 id="overview">概述</h4>
+
+<p>逻辑运算符 <code>||</code> / <code>&amp;&amp;</code> 具有短路求值特性：左操作数已经能决定整个表达式的结果时，右操作数不再求值。把「赋值」塞进右操作数，就能让短路承担 <code>if</code> 的职责——这也是「一行实现斐波那契」的由来。本文用这段代码的 MinGW 汇编说明短路表达式为什么等价于分支结构，再对比三目运算符在 MinGW 与 MSVC 下的汇编形态，以及优化级别带来的分支 / 无分支差异。</p>
+
+<h4 id="short-circuit">表达式短路</h4>
+
+<p>这段技术很有意思，先给出方案：一行实现斐波那契。</p>
+
+<h5 id="sc-code">示例代码</h5>
+
+<pre><code>#include &lt;stdio.h&gt;
+
+int flib(int num){
+    (num &lt; 2) || (num = flib(num - 1) + flib(num - 2));
+    return num;
+}
+
+int main(int argc, char* argv[]){
+    for (int i = 1; i &lt; 10; i++) {
+        printf("%d\t", flib(i));
+    }
+    return 0;
+}</code></pre>
+
+<p>关键在于第二行：<code>num &lt; 2</code> 成立时（递归出口），<code>||</code> 直接短路，右侧的赋值不会执行；不成立时才求值右侧，先把 <code>num</code> 赋成前两项之和，再返回。也就是说这条语句其实可以代替 <code>if</code>。</p>
+
+<h5 id="sc-mingw">MinGW 汇编</h5>
+
+<pre><code>flib(int):
+    push   %rbp
+    push   %rbx
+    sub    $0x28,%rsp
+    lea    0x20(%rsp),%rbp
+    mov    %ecx,0x20(%rbp)
+    cmpl   $0x1,0x20(%rbp)
+    jle    0x7ff6ddfb1719          ; &lt;flib(int)+57&gt;
+    mov    0x20(%rbp),%eax
+    sub    $0x1,%eax
+    mov    %eax,%ecx
+    call   0x7ff6ddfb16e0          ; &lt;flib(int)&gt;
+    mov    %eax,%ebx
+    mov    0x20(%rbp),%eax
+    sub    $0x2,%eax
+    mov    %eax,%ecx
+    call   0x7ff6ddfb16e0          ; &lt;flib(int)&gt;
+    add    %ebx,%eax
+    mov    %eax,0x20(%rbp)
+    cmpl   $0x0,0x20(%rbp)
+    mov    0x20(%rbp),%eax
+    add    $0x28,%rsp
+    pop    %rbx
+    pop    %rbp
+    ret</code></pre>
+
+<h5 id="sc-analyze">汇编解读</h5>
+
+<ul>
+  <li><strong>参数入栈</strong>：<code>mov %ecx,0x20(%rbp)</code> 把第一个整型参数 <code>num</code> 存到栈上，后面对 <code>num</code> 的所有读写都走这个栈槽（-O0 的典型特征）。</li>
+  <li><strong>短路判定就是分支</strong>：<code>cmpl $0x1,0x20(%rbp)</code> 比较 <code>num</code> 与 1，<code>jle</code> 在有符号「小于等于」时跳转到函数尾部（对应递归出口）。短路求值在指令层面被编译成了 <code>cmp + jcc</code>，与手写 <code>if (num &lt; 2) return num;</code> 的分支完全同构。</li>
+  <li><strong>递归调用两次</strong>：右侧表达式先算 <code>flib(num - 1)</code>，用 <code>ebx</code> 暂存结果；再算 <code>flib(num - 2)</code>，最后 <code>add %ebx,%eax</code> 求和并写回栈槽，实现赋值 <code>num = ...</code>。</li>
+  <li><strong>表达式真值被丢弃</strong>：末尾的 <code>cmpl $0x0,0x20(%rbp)</code> 是编译器对整个 <code>||</code> 表达式做真值判定留下的痕迹——该语句的结果并没有被使用，随后 <code>mov 0x20(%rbp),%eax</code> 才是 <code>return num;</code> 的取值。</li>
+  <li><strong>结论</strong>：这种写法和 <code>if</code> 很像，都是根据比较结果决定是否跳转，属于典型的分支结构。其他逻辑运算符（<code>&amp;&amp;</code>、<code>!</code> 组合）同理。</li>
+</ul>
+
+<h4 id="conditional-expr">条件表达式</h4>
+
+<p>条件表达式就是三目运算符 <code>cond ? a : b</code>，本质上是带返回值的分支结构，其汇编形态与上面的短路写法非常相似。</p>
+
+<h5 id="ce-plans">四种转换方案</h5>
+
+<p>表达式转换方案一共有四种：</p>
+
+<ul>
+  <li><strong>方案 1</strong>：表达式 1 简单，表达式 2 和表达式 3 两者为常量且差值为 1。</li>
+  <li><strong>方案 2</strong>：表达式 2 和表达式 3 两者为常量且差值大于 1。</li>
+  <li><strong>方案 3</strong>：表达式 2 或表达式 3 含有变量。</li>
+  <li><strong>方案 4</strong>：表达式 2 或表达式 3 含有变量表达式。</li>
+</ul>
+
+<p>以 <code>printf("%d", argc == 5 ? 5 : 6);</code> 为例（属于方案 2：两个分支为常量、差值为 1），在未开启优化时并不会使用 <code>setcc</code> / <code>cmov</code> 进行优化，因此编译结果保留跳转。</p>
+
+<h5 id="ce-mingw">MinGW 汇编</h5>
+
+<pre><code>main(int, char**):
+    push   %rbp
+    mov    %rsp,%rbp
+    sub    $0x20,%rsp
+    mov    %ecx,0x10(%rbp)
+    mov    %rdx,0x18(%rbp)
+    call   0x7ff6817d1807          ; &lt;__main&gt;
+    cmpl   $0x5,0x10(%rbp)
+    jne    0x7ff6817d1701          ; &lt;main(int, char**)+33&gt;
+    mov    $0x5,%eax
+    jmp    0x7ff6817d1706          ; &lt;main(int, char**)+38&gt;
+    mov    $0x6,%eax
+    mov    %eax,%edx
+    lea    0x88f1(%rip),%rax       ; 0x7ff6817da000
+    mov    %rax,%rcx
+    call   0x7ff6817d8e10          ; &lt;printf(char const*, ...)&gt;
+    mov    $0x0,%eax
+    add    $0x20,%rsp
+    pop    %rbp
+    ret</code></pre>
+
+<h5 id="ce-msvc">MSVC 汇编</h5>
+
+<pre><code>main(int,char **):
+    movq   %rdx, 0x10(%rsp)
+    movl   %ecx, 0x8(%rsp)
+    pushq  %rdi
+    subq   $0x30, %rsp
+    cmpl   $0x5, 0x40(%rsp)
+    jne    0x1400014df             ; &lt;+31&gt; at main.cpp:4
+    movl   $0x5, 0x20(%rsp)
+    jmp    0x1400014e7             ; &lt;+39&gt; at main.cpp:4
+    movl   $0x6, 0x20(%rsp)
+    movl   0x20(%rsp), %edx
+    leaq   0x86be(%rip), %rcx
+    callq  0x140001195             ; printf
+    xorl   %eax, %eax
+    addq   $0x30, %rsp
+    popq   %rdi
+    retq</code></pre>
+
+<p>两者的结构完全一致：<code>cmp</code> 判断条件 → <code>jne</code> 跳到「假」分支 → 两条路径各自把结果写回寄存器或栈槽 → <code>jmp</code> 汇合。区别只在落地位置：MinGW 直接写 <code>eax</code>，MSVC 把常量写进栈槽再取到 <code>edx</code> 传参。</p>
+
+<h5 id="ce-opt">优化级别差异</h5>
+
+<p>没有使用 <code>setcc</code> / <code>cmov</code> 进行优化只是因为没开优化，开启后就会有：<code>argc == 5 ? 5 : 6</code> 会被编译成无分支（branchless）的 <code>setcc</code> 形态。</p>
+
+<table>
+  <thead>
+    <tr><th>优化级别</th><th>形态</th><th>特征指令</th></tr>
+  </thead>
+  <tbody>
+    <tr><td><code>/Od</code>（未优化）</td><td>两条 <code>mov</code> 到栈槽 + 跳转</td><td><code>jne</code> / <code>movl $5,mem</code> / <code>movl $6,mem</code></td></tr>
+    <tr><td><code>/O1</code></td><td>常为 <code>setcc</code> + <code>add</code>，或 <code>CMOV</code></td><td><code>setne</code> / <code>add</code>，或 <code>cmovel</code></td></tr>
+    <tr><td><code>/O2</code></td><td>无分支，<code>CMOV</code> 或 <code>setcc</code> + <code>add</code></td><td><code>cmovel</code> 或 <code>setne %dl; add</code></td></tr>
+  </tbody>
+</table>
+
+<h4 id="branch-predict">分支预测</h4>
+
+<p>条件表达式最终转换出的汇编与分支结构表现极其相似，判断比较的方式也与表达式短路一致。从 Pentium（P5）时代开始，CPU 就引入了针对分支指令（if-then-else）导致流水线失败的数据处理方法——分支预测：由 CPU 猜测程序的跳转方向并提前取指执行，猜对则流水线不中断。因此在复杂的条件表达式中，使用分支通常比条件传送的效率更高。</p>
+
+<h4 id="summary">总结</h4>
+
+<ul>
+  <li><strong>短路即分支</strong>：<code>(num &lt; 2) || (num = ...)</code> 之所以能替代 <code>if</code>，是因为 <code>||</code> 的短路语义在指令层面就是 <code>cmp + jcc</code>；把赋值写在右侧，跳转与否就等价于「是否执行赋值」。</li>
+  <li><strong>递归出口靠短路</strong>：<code>num &lt; 2</code> 成立时右侧不求值，直接返回 <code>num</code>，这正是斐波那契递归的终止条件。</li>
+  <li><strong>三目即带值分支</strong>：<code>cond ? a : b</code> 在未优化时是 <code>jcc</code> + 两条赋值路径 + <code>jmp</code> 汇合；开启优化后才会被 <code>setcc</code> / <code>cmov</code> 改写成无分支形态。</li>
+  <li><strong>逆向识别</strong>：看到 <code>cmp/test</code> + <code>jcc</code> 后两条互斥的赋值路径再汇合，即可判定为条件表达式或短路表达式；无分支版本则以 <code>setcc</code>（写 0/1 字节）配合 <code>add/sub</code>，或 <code>cmovcc</code> 移动数据的形式出现。</li>
+  <li><strong>性能取舍</strong>：分支预测让可预测的分支开销极低，而 <code>cmov</code> 在数据依赖长、分支高度随机时更稳；编译器是否改写取决于优化级别与具体形态，逆向时不看优化级别很容易误判源码写法。</li>
+</ul>
+
+  </div>
+</article>
+
+<footer class="mk-footer">
+  <div class="mk-footer-brand"> RHODES ISLAND <span>://</span> SECURITY LAB <span>//</span> BLOG </div>
+  <div class="mk-footer-motto">&gt; 保持好奇 · 保持怀疑 · 保持学习</div>
+  <div class="mk-footer-links">
+    <a href="https://github.com/himobrine/wiki">GitHub</a>
+    <a href="../links.html">友情链接</a>
+    <a href="../index.html">Home</a>
+  </div>
+  <div class="mk-footer-copy">(c) 2026 // SECURITY BLOG</div></footer>
+
+<div class="mk-themedock" id="mkThemeDock">
+  <span class="mk-themedock-item active" data-theme="black">■</span>
+  <span class="mk-themedock-item" data-theme="white">□</span>
+  <span class="mk-themedock-item" data-theme="elysia">◇</span>
+  <span class="mk-themedock-item" data-theme="rei">▽</span>
+</div>
+
+<div class="mk-float-buttons">
+  <button class="mk-float-btn" id="mkThemeToggle" title="切换主题" aria-label="切换主题">■</button>
+  <button class="mk-float-btn" id="mkBackToTop" title="回到顶部" aria-label="回到顶部">⌃</button>
+</div>
+
+<div id="postReferences"></div>
+<div id="postBacklinks"></div>
+
+<div class="mk-graph-sidebar" id="mkGraphSidebar">
+  <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
+  <div id="graphContainer"></div>
+</div>
+
+<script src="../assets/posts-data.js"></script>
+<script src="../assets/post-tags.js"></script>
+<script src="../assets/common.js"></script>
+<script src="../assets/backlinks.js"></script>
+</body>
+</html>
