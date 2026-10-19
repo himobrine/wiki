@@ -1,6 +1,17 @@
 (function () {
   'use strict';
 
+  // 引用 / 反链区块属于正文的收尾内容，必须排在页脚之前（页脚是阅读页最后一个区块）。
+  // 页面里两个挂载点写在哪里都行，这里统一搬到页脚上方；没有页脚的老文章保持原位。
+  function relocate() {
+    var refs = document.getElementById('postReferences');
+    var back = document.getElementById('postBacklinks');
+    var footer = document.querySelector('.mk-footer, .footer');
+    if (!refs || !back || !footer || !footer.parentNode) return;
+    footer.parentNode.insertBefore(refs, footer);
+    footer.parentNode.insertBefore(back, footer);
+  }
+
   function render() {
     var me = currentPost();
     if (!me || !me.id) return;
@@ -48,5 +59,6 @@
     return d.innerHTML;
   }
 
+  relocate();
   if (window.POSTS_DATA && window.POSTS_BY_ID && window.BACKLINKS) render();
 })();
