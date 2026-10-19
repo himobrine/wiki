@@ -8,6 +8,7 @@
 
 - **4 套主题** — `black`（默认）/ `white` / `elysia` / `rei`，一键切换并记忆到 `localStorage`
 - **知识图谱** — 基于 `vis-network`，标签共享边（虚线）+ 引用边（实线金色）；文章页侧边栏懒加载，首页/标签页为枢纽视图，`graph.html` 为全站视图
+- **左侧栏** — 文章页左侧固定列：目录（TOC）+ `// RELATED` 相关文章（按标签权重 / 引用关系排序，标签聚合展示，单行标题右侧渐隐）
 - **全站搜索** — 标题 / 摘要 / 标签即时搜索，支持中英文，由 `common.js` 按需懒加载
 - **AI 助手** — 文章页右下角入口，按需懒加载 `ai-assistant.js`
 - **标签系统** — 结构化标签对象（`category` / `knowledge` / `tools`），文章标签栏自动渲染为彩色 chip
@@ -27,8 +28,8 @@ mywiki/
 │   ├── style.css           # 设计系统（Lacquer Lab，OKLCH 变量，4 主题）
 │   ├── posts-data.js       # 唯一数据源：POSTS_DATA / POSTS_BY_ID / BACKLINKS /
 │   │                       #   TAG_COLORS / getFlatTags() / currentPost()
-│   ├── common.js           # 公共运行时：主题切换、回到顶部、TOC 高亮、代码块增强、
-│   │                       #   搜索 / AI / 图谱懒加载、图片灯箱、WebP 自适应
+│   ├── common.js           # 公共运行时：主题切换、回到顶部、左列（目录 + // RELATED）、
+│   │                       #   TOC 高亮、代码块增强、搜索 / AI / 图谱懒加载、图片灯箱、WebP 自适应
 │   ├── post-tags.js        # 文章标签栏渲染
 │   ├── backlinks.js        # 引用 / 反向链接区块渲染
 │   ├── search.js           # 全站搜索（由 common.js 懒加载）
@@ -53,6 +54,18 @@ mywiki/
 - ❌ 不要在任何脚本里动态加载 `posts-data.js`（数据必须静态引入，见下）
 - 不要手写 `POSTS` 映射数组去裁剪 `POSTS_DATA` —— 裁剪会丢掉 `id` / `references`，
   曾导致文章图谱的引用边整条链路静默失效。图谱直接读 `POSTS_DATA`。
+
+**阅读页的收尾顺序同样由脚本决定，不依赖 HTML 书写顺序**：
+
+| 顺序 | 内容 | 由谁保证 |
+|------|------|----------|
+| 1 | 正文 `</article>` | — |
+| 2 | `// REFERENCES` / `// BACKLINKS` | `backlinks.js` 的 `relocate()` 把 `#postReferences` / `#postBacklinks` 搬到页脚之前 |
+| 3 | 页脚（最后一个区块） | 同上；5 篇没有页脚的老文章（`// EOF` 内联块）的挂载点已静态放在 EOF 块之前 |
+
+左列同理：`common.js` 找到 `.mk-toc` 后新建 `.mk-sideleft` 固定列，把目录搬进去，再追加
+`// RELATED`（Top 3 相关文章 + 聚合标签行）。所以这些节点在文章 HTML 里写在哪儿都不影响最终显示，
+改版只需动 `assets/` 下的脚本与样式。JS 未执行时退化为现状：目录照旧固定在左侧，不出现 `// RELATED`。
 
 ### 脚本加载顺序
 
@@ -146,6 +159,9 @@ mywiki/
   </div>
 </article>
 
+<div id="postReferences"></div>
+<div id="postBacklinks"></div>
+
 <footer class="mk-footer">
   <div class="mk-footer-brand">RHODES ISLAND <span>://</span> SECURITY LAB</div>
   <div class="mk-footer-links">
@@ -154,9 +170,6 @@ mywiki/
     <a href="../index.html">Home</a>
   </div>
 </footer>
-
-<div id="postReferences"></div>
-<div id="postBacklinks"></div>
 
 <div class="mk-graph-sidebar" id="mkGraphSidebar">
   <div class="mk-graph-title"><a href="../graph.html">// 关系图谱</a></div>
@@ -301,6 +314,8 @@ checkout → 配置 Pages → 缓存 → 上传产物 → `actions/deploy-pages`
 - [ ] `POSTS_DATA` 已登记新条目，`id` 与文件名一致
 - [ ] 新标签已加入 `TAG_COLORS`
 - [ ] TOC 的 `a[href]` 与正文标题 `id` 一一对应
+- [ ] 左侧栏正常：目录完整（长目录自身可滚）、`// RELATED` 为 Top 3 相关文章 + 聚合标签行；窗口 ≤1200px 时整列隐藏
+- [ ] 页脚是阅读页最后一个区块，`// REFERENCES` / `// BACKLINKS` 位于其上方（顺序由 `backlinks.js` 保证，无页脚的老文章挂载点静态放在 `// EOF` 块之前）
 - [ ] 导航栏与 `index.html` 同步
 - [ ] 图片放入 `assets/`，并同时提供 `.png` 与 `.webp`（`common.js` 自动按浏览器能力切换）
 - [ ] 浏览器实测：主题切换、代码块 copy/fold、回到顶部、搜索、图谱侧栏

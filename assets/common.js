@@ -235,6 +235,142 @@
     });
   })();
 
+  /* === Left Column: TOC + Related Posts (post pages) === */
+  (function () {
+    var toc = document.querySelector('.mk-toc');
+    if (!toc) return;
+
+    var TAG_W = { category: 1, knowledge: 3, tools: 2 };   // 与 graph.js 的连边权重一致
+    var REF_BONUS = 5;
+    var MAX_ITEMS = 3;
+
+    var me = (typeof currentPost === 'function') ? currentPost() : null;
+    var items = me ? relatedPosts(me) : [];
+
+    var aside = document.createElement('aside');
+    aside.className = 'mk-sideleft';
+    aside.id = 'mkSideLeft';
+    toc.parentNode.insertBefore(aside, toc);
+    aside.appendChild(toc);
+    if (items.length) aside.appendChild(buildRelated(items));
+    document.body.appendChild(aside);
+
+    function relatedPosts(post) {
+      if (typeof POSTS_DATA === 'undefined' || !Array.isArray(POSTS_DATA)) return [];
+      var mine = tagGroupMap(post);
+      var myRefs = post.references || [];
+      var myBack = (typeof BACKLINKS !== 'undefined' && BACKLINKS[post.id]) || [];
+
+      var scored = [];
+      POSTS_DATA.forEach(function (p) {
+        if (p.id === post.id) return;
+        var theirs = tagGroupMap(p);
+        var score = 0;
+        var shared = [];
+        Object.keys(mine).forEach(function (t) {
+          if (theirs[t]) { score += TAG_W[theirs[t]] || 1; shared.push(t); }
+        });
+        var linked = myRefs.indexOf(p.id) !== -1 || myBack.indexOf(p.id) !== -1;
+        if (linked) score += REF_BONUS;
+        if (score <= 0) return;
+        scored.push({ post: p, score: score, shared: shared, linked: linked });
+      });
+
+      scored.sort(function (a, b) {
+        if (b.score !== a.score) return b.score - a.score;
+        return dateKey(b.post.date).localeCompare(dateKey(a.post.date));
+      });
+      return scored.slice(0, MAX_ITEMS);
+    }
+
+    // 标签名 → 所属分组，同时兼容 group 为字符串的老数据
+    function tagGroupMap(p) {
+      var map = {};
+      var tags = (p && p.tags) || {};
+      ['category', 'knowledge', 'tools'].forEach(function (g) {
+        [].concat(tags[g] || []).forEach(function (t) { if (!map[t]) map[t] = g; });
+      });
+      return map;
+    }
+
+    function dateKey(d) {
+      return (d || '').replace(/ \/\/ /g, '-').split(' / ').join('-');
+    }
+
+    function buildRelated(items) {
+      var sec = document.createElement('section');
+      sec.className = 'mk-relposts';
+
+      var title = document.createElement('span');
+      title.className = 'mk-relposts-title';
+      title.textContent = '// RELATED';
+      sec.appendChild(title);
+
+      var tagRow = buildTagRow(items);
+      if (tagRow) sec.appendChild(tagRow);
+
+      var ul = document.createElement('ul');
+      ul.className = 'mk-relposts-list';
+      items.forEach(function (it) {
+        var p = it.post;
+        var li = document.createElement('li');
+
+        var link = document.createElement('a');
+        link.className = 'mk-relposts-link';
+        link.href = '../' + p.url;
+        link.title = p.title + (it.linked ? '（与本文有引用关系）' : '');
+        link.textContent = (it.linked ? '\u2194 ' : '') + p.title;
+
+        li.appendChild(link);
+        ul.appendChild(li);
+      });
+      sec.appendChild(ul);
+      return sec;
+    }
+
+    // 标签聚合：把各条目共享的标签合并到区块头部统一展示。
+    // 同一篇文章命中同一个标签只计一次；计数 = 关联到该标签的文章数。
+    function buildTagRow(items) {
+      var order = [];
+      var count = {};
+      items.forEach(function (it) {
+        var seen = {};
+        (it.shared || []).forEach(function (t) {
+          if (seen[t]) return;
+          seen[t] = 1;
+          if (count[t] === undefined) { count[t] = 0; order.push(t); }
+          count[t]++;
+        });
+      });
+      if (!order.length) return null;
+
+      order.sort(function (a, b) {
+        if (count[b] !== count[a]) return count[b] - count[a];
+        return a.localeCompare(b);
+      });
+
+      var row = document.createElement('div');
+      row.className = 'mk-relposts-tags';
+      order.forEach(function (t) {
+        var chip = document.createElement('a');
+        chip.className = 'mk-relposts-tag';
+        chip.href = '../tags/list.html?tag=' + encodeURIComponent(t);
+        chip.textContent = '#' + t;
+        if (count[t] > 1) {
+          var n = document.createElement('span');
+          n.className = 'mk-relposts-tag-n';
+          n.textContent = '\u00d7' + count[t];
+          chip.appendChild(n);
+        }
+        if (typeof TAG_COLORS !== 'undefined' && TAG_COLORS[t]) {
+          chip.style.setProperty('--tag-color', '#' + TAG_COLORS[t]);
+        }
+        row.appendChild(chip);
+      });
+      return row;
+    }
+  })();
+
   /* === TOC Active Highlight (post pages) === */
   (function () {
     var toc = document.querySelector('.mk-toc');

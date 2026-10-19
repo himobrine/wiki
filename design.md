@@ -339,6 +339,33 @@ Breakpoints:
 - Width: 200px, hidden on <1200px
 - Active link: gold text + gold left border
 
+#### 5.8.1 Left Column: TOC + `// RELATED`
+
+`common.js` 把 `.mk-toc` 搬进固定列 `.mk-sideleft`，并在目录下方追加相关文章区块：
+
+```html
+<aside class="mk-sideleft">
+  <nav class="mk-toc">…</nav>          <!-- 原目录，搬进来后 position: static -->
+  <section class="mk-relposts">
+    <span class="mk-relposts-title">// RELATED</span>
+    <div class="mk-relposts-tags">     <!-- 标签聚合行 -->
+      <a class="mk-relposts-tag">#C/C++<span class="mk-relposts-tag-n">×3</span></a>
+    </div>
+    <ul class="mk-relposts-list">
+      <li><a class="mk-relposts-link">↔ 揭秘x86条件转移指令精髓</a></li>
+    </ul>
+  </section>
+</aside>
+```
+
+- 列容器：`position: fixed`，宽 200px，`max-height: 78vh`，`display: flex` 纵向排列，`gap: var(--mk-space-sm)`
+- 目录：`flex: 1 1 auto; min-height: 0; overflow-y: auto` —— 优先保证目录完整，过长才自身滚动
+- `// RELATED`：`flex: 0 1 auto; max-height: 26vh`，内部列表可滚动（3px 细滚动条，同目录）
+- 相关文章规则：按标签权重打分（`category:1 / knowledge:3 / tools:2`，与图谱连边一致）+ 引用 / 反链关系 `+5`，取 **Top 3**，同分按日期倒序；有引用关系的条目以 `↔` 前缀标识
+- 条目：单行标题，`white-space: nowrap` + 右侧 `mask-image` 渐隐（不使用省略号）
+- 标签聚合：把各条目共享的标签合并到区块头部的标签行统一展示，去重后全部列出，`×N` 为该标签关联到的文章数；颜色取 `TAG_COLORS`
+- 断点：`≤1200px` 整列 `display: none`（与目录一致）；JS 未执行时不生成该列，目录保持原有的独立固定定位
+
 ### 5.9 Footer
 
 ```html
@@ -356,6 +383,7 @@ Breakpoints:
 - Top border: `var(--mk-rule)` hairline
 - Bottom: optional patina accent edge (2px `var(--mk-patina)`)
 - Centered text, relaxed spacing
+- 页脚是阅读页的最后一个区块：`// REFERENCES` / `// BACKLINKS` 位于页脚上方（由 `backlinks.js` 的 `relocate()` 保证；没有页脚的 5 篇 `// EOF` 内联块文章，挂载点静态放在该块之前）
 
 ### 5.10 Theme Dock
 
